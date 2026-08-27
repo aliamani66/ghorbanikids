@@ -226,6 +226,8 @@ class GK_Sidebar {
         // ۲. صفحات اصلی و امکانات
         } elseif (strpos($t_lower, 'خانه') !== false || strpos($t_lower, 'اصلی') !== false || $url === home_url('/') || $url === home_url()) {
             $icon = '🏠';
+        } elseif (strpos($t_lower, 'درسی') !== false || strpos($t_lower, 'آموزش درسی') !== false || strpos($t_lower, 'کتاب') !== false) {
+            $icon = '📚';
         } elseif (strpos($t_lower, 'بازی') !== false) {
             $icon = '🎮';
         } elseif (strpos($t_lower, 'اشتراک') !== false || strpos($t_lower, 'قیمت') !== false || strpos($t_lower, 'تعرفه') !== false || strpos($t_lower, 'vip') !== false) {
