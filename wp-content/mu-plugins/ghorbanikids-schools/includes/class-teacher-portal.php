@@ -1972,14 +1972,49 @@ class GK_Teacher_Portal {
         </div>
 
         <script>
+        function gkSwitchTeacherTab(targetTab) {
+            if (!targetTab) return;
+            var $btn = jQuery('.gk-tab-btn[data-target="' + targetTab + '"]');
+            var $pane = jQuery('#' + targetTab);
+            if ($btn.length && $pane.length) {
+                jQuery('.gk-tab-btn').removeClass('active');
+                $btn.addClass('active');
+                jQuery('.gk-tab-pane').removeClass('active');
+                $pane.addClass('active');
+                try {
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState(null, null, '#' + targetTab);
+                    }
+                    localStorage.setItem('gk_teacher_active_tab_<?php echo $class->id; ?>', targetTab);
+                } catch(e) {}
+            }
+        }
+
         jQuery(document).ready(function($) {
             $('.gk-tab-btn').on('click', function() {
                 var target = $(this).data('target');
-                $('.gk-tab-btn').removeClass('active');
-                $(this).addClass('active');
-                $('.gk-tab-pane').removeClass('active');
-                $('#' + target).addClass('active');
+                gkSwitchTeacherTab(target);
             });
+
+            // بازیابی تب فعال از روی هش آدرس یا حافظه محلی
+            var initialTab = '';
+            if (window.location.hash) {
+                var h = window.location.hash.replace('#', '');
+                if ($('#' + h).length) {
+                    initialTab = h;
+                }
+            }
+            if (!initialTab) {
+                try {
+                    var saved = localStorage.getItem('gk_teacher_active_tab_<?php echo $class->id; ?>');
+                    if (saved && $('#' + saved).length) {
+                        initialTab = saved;
+                    }
+                } catch(e) {}
+            }
+            if (initialTab && initialTab !== 'tab-students') {
+                gkSwitchTeacherTab(initialTab);
+            }
 
             $('#gk-teacher-search-st').on('input', function() {
                 var q = $(this).val().trim().toLowerCase();
@@ -2014,8 +2049,12 @@ class GK_Teacher_Portal {
                     btn.text('🚀 ایجاد مسابقه و دریافت لینک').prop('disabled', false);
                     if (res.success && res.data) {
                         $('#gk-new-league-modal').fadeOut(200);
+                        try {
+                            localStorage.setItem('gk_teacher_active_tab_<?php echo $class->id; ?>', 'tab-leagues');
+                            window.location.hash = 'tab-leagues';
+                        } catch(e) {}
                         alert('🏆 مسابقه «' + res.data.title + '» ایجاد شد!\nلینک مسابقه: ' + res.data.league_url);
-                        location.reload(true);
+                        window.location.reload(true);
                     } else {
                         alert(res.data || 'خطا در ایجاد لیگ.');
                     }
@@ -2213,8 +2252,12 @@ class GK_Teacher_Portal {
                     gkExamSubmitting = false;
                     if (res.success && res.data) {
                         gkCloseExamModal();
+                        try {
+                            localStorage.setItem('gk_teacher_active_tab_<?php echo $class->id; ?>', 'tab-exams');
+                            window.location.hash = 'tab-exams';
+                        } catch(e) {}
                         alert('📝 آزمون کلاسی «' + res.data.title + '» با موفقیت ساخته شد!\nلینک سالن آزمون:\n' + res.data.exam_url);
-                        location.reload(true);
+                        window.location.reload(true);
                     } else {
                         var err = (res.data && res.data.message) ? res.data.message : (res.data || 'خطا در ایجاد آزمون کلاسی.');
                         alert(err);
