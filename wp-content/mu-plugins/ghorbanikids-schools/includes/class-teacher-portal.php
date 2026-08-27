@@ -1947,26 +1947,30 @@ class GK_Teacher_Portal {
                                         </span>
                                     </div>
 
-                                    <div style="overflow-x:auto;">
-                                        <table class="gk-table-st gk-table-exam-scores" style="font-size:12.5px; background:#fff; border-radius:12px;">
-                                            <thead>
-                                                <tr style="background:#f3e8ff; color:#581c87;">
-                                                    <th>رتبه</th>
-                                                    <th>نام نوآموز</th>
-                                                    <th style="text-align:center;">تعداد دروس آزمون‌داده</th>
-                                                    <th style="text-align:center;">میانگین درصد تسلط</th>
-                                                    <th style="text-align:center;">سطح توصیفی</th>
-                                                    <th style="text-align:center;">آخرین ثبت</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php if (empty($ex_scores)): ?>
-                                                    <tr>
-                                                        <td colspan="6" style="text-align:center; padding:20px; color:#94a3b8; font-weight:700;">
-                                                            هنوز هیچ دانش‌آموزی در این آزمون شرکت نکرده است.
-                                                        </td>
+                                    <?php if (empty($ex_scores)): ?>
+                                        <div style="background:#ffffff; border:1.5px dashed #c084fc; border-radius:14px; padding:24px 16px; text-align:center; margin:8px 0;">
+                                            <div style="font-size:32px; margin-bottom:8px;">⏳</div>
+                                            <div style="font-size:14px; font-weight:900; color:#581c87; margin-bottom:4px;">
+                                                هنوز هیچ دانش‌آموزی در این آزمون شرکت نکرده است.
+                                            </div>
+                                            <div style="font-size:12px; color:#6b21a8; opacity:0.8;">
+                                                به محض اینکه نوآموزان از طریق لینک اختصاصی یا عمومی در این آزمون شرکت کنند، نمرات و ارزیابی توصیفی آن‌ها در این بخش نمایش داده خواهد شد.
+                                            </div>
+                                        </div>
+                                    <?php else: ?>
+                                        <div style="overflow-x:auto;">
+                                            <table class="gk-table-st gk-table-exam-scores" style="font-size:12.5px; background:#fff; border-radius:12px; width:100%;">
+                                                <thead>
+                                                    <tr style="background:#f3e8ff; color:#581c87;">
+                                                        <th>رتبه</th>
+                                                        <th>نام نوآموز</th>
+                                                        <th style="text-align:center;">تعداد دروس آزمون‌داده</th>
+                                                        <th style="text-align:center;">میانگین درصد تسلط</th>
+                                                        <th style="text-align:center;">سطح توصیفی</th>
+                                                        <th style="text-align:center;">آخرین ثبت</th>
                                                     </tr>
-                                                <?php else: ?>
+                                                </thead>
+                                                <tbody>
                                                     <?php foreach ($ex_scores as $s_idx => $sc): 
                                                         $s_medal = ($s_idx === 0) ? '🥇 ' : (($s_idx === 1) ? '🥈 ' : (($s_idx === 2) ? '🥉 ' : '#' . ($s_idx + 1)));
                                                         $s_pct = round($sc->avg_score);
@@ -1991,10 +1995,10 @@ class GK_Teacher_Portal {
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
-                                                <?php endif; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
 
                                 <!-- Student Specific Exam Links Dropdown -->
