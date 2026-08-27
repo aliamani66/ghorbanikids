@@ -16,21 +16,31 @@
     box-sizing: border-box !important;
 }
 
-/* 1. Hero Header */
+/* 1. Hero Header Card (Matching /curriculum/) */
 .gk-archive-hero {
     text-align: center !important;
-    margin-bottom: 24px !important;
+    padding: 36px 20px 28px !important;
+    background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #faf5ff 100%) !important;
+    border-radius: 24px !important;
+    border: 2px solid #e2e8f0 !important;
+    margin-bottom: 30px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
 }
 
 .gk-hero-badge {
-    display: inline-block !important;
-    background: #e0f2fe !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #ffffff !important;
     color: #0284c7 !important;
-    font-size: 0.92rem !important;
+    font-size: 13px !important;
     font-weight: 800 !important;
-    padding: 6px 18px !important;
-    border-radius: 20px !important;
-    margin-bottom: 12px !important;
+    padding: 6px 16px !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12) !important;
+    margin-bottom: 14px !important;
     border: 1px solid #bae6fd !important;
 }
 
@@ -661,11 +671,106 @@
     color: #ffffff !important;
 }
 
+/* Unified Tags on Thumb (Desktop Defaults) */
+.gk-ai-tag {
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%) !important;
+    color: #ffffff !important;
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+    padding: 4px 10px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    z-index: 5 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    pointer-events: none !important;
+}
+
+.gk-free-tag,
+.gk-vip-tag {
+    position: absolute !important;
+    bottom: 10px !important;
+    right: 10px !important;
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+    z-index: 5 !important;
+    pointer-events: none !important;
+    direction: rtl !important;
+    box-sizing: border-box !important;
+    width: auto !important;
+    min-width: unset !important;
+    max-width: max-content !important;
+    height: auto !important;
+}
+
+.gk-free-tag {
+    background: #16a34a !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 3px 8px rgba(22, 163, 74, 0.35) !important;
+}
+
+.gk-vip-tag {
+    background: linear-gradient(135deg, #9333ea, #7e22ce) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 3px 8px rgba(147, 51, 234, 0.35) !important;
+}
+
+.gk-vip-tag .gk-crown-svg {
+    width: 12px !important;
+    height: 12px !important;
+    display: inline-block !important;
+    flex-shrink: 0 !important;
+    fill: #fef08a !important;
+}
+
+.gk-tag-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    display: inline-block !important;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.9) !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-card-desc {
+    font-size: 0.85rem !important;
+    color: #64748b !important;
+    line-height: 1.6 !important;
+    margin: 8px 0 14px 0 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+}
+
 /* 6. Mobile Layout (< 768px): ZERO OVERFLOW & BOTTOM SHEET DRAWER */
 @media (max-width: 768px) {
     .gk-archive-wrapper {
         margin: 12px auto 40px !important;
         padding: 0 10px !important;
+    }
+
+    .gk-archive-hero {
+        padding: 24px 14px 20px !important;
+        border-radius: 20px !important;
+        margin-bottom: 20px !important;
     }
 
     .gk-archive-title {
@@ -738,18 +843,50 @@
     }
 
     .gk-card-thumb {
-        height: 120px !important;
+        height: 110px !important;
     }
 
     .gk-thumb-svg-circle {
-        width: 54px !important;
-        height: 54px !important;
-        border-radius: 16px !important;
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 14px !important;
     }
 
     .gk-thumb-svg-circle svg {
-        width: 34px !important;
-        height: 34px !important;
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .gk-free-tag,
+    .gk-vip-tag {
+        bottom: 6px !important;
+        right: 6px !important;
+        font-size: 9.5px !important;
+        font-weight: 800 !important;
+        padding: 2px 7px !important;
+        border-radius: 6px !important;
+        gap: 3px !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .gk-vip-tag .gk-crown-svg {
+        width: 10px !important;
+        height: 10px !important;
+    }
+
+    .gk-tag-dot {
+        width: 5px !important;
+        height: 5px !important;
+    }
+
+    .gk-ai-tag {
+        top: 6px !important;
+        left: 6px !important;
+        font-size: 8.5px !important;
+        font-weight: 800 !important;
+        padding: 2px 6px !important;
+        border-radius: 6px !important;
+        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3) !important;
     }
 
     .gk-card-body {
@@ -767,7 +904,7 @@
     }
 
     .gk-card-title {
-        font-size: 1.05rem !important;
+        font-size: 1.02rem !important;
         margin-bottom: 8px !important;
     }
 

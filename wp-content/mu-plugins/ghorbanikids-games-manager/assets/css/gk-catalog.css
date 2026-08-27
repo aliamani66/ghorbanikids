@@ -16,21 +16,31 @@
     box-sizing: border-box !important;
 }
 
-/* 1. Hero Header */
+/* 1. Hero Header Card (Matching /curriculum/) */
 .gk-archive-hero {
     text-align: center !important;
-    margin-bottom: 24px !important;
+    padding: 36px 20px 28px !important;
+    background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #faf5ff 100%) !important;
+    border-radius: 24px !important;
+    border: 2px solid #e2e8f0 !important;
+    margin-bottom: 30px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
 }
 
 .gk-hero-badge {
-    display: inline-block !important;
-    background: #e0f2fe !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #ffffff !important;
     color: #0284c7 !important;
-    font-size: 0.92rem !important;
+    font-size: 13px !important;
     font-weight: 800 !important;
-    padding: 6px 18px !important;
-    border-radius: 20px !important;
-    margin-bottom: 12px !important;
+    padding: 6px 16px !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12) !important;
+    margin-bottom: 14px !important;
     border: 1px solid #bae6fd !important;
 }
 
@@ -755,6 +765,12 @@
     .gk-archive-wrapper {
         margin: 12px auto 40px !important;
         padding: 0 10px !important;
+    }
+
+    .gk-archive-hero {
+        padding: 24px 14px 20px !important;
+        border-radius: 20px !important;
+        margin-bottom: 20px !important;
     }
 
     .gk-archive-title {
