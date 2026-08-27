@@ -1185,80 +1185,75 @@ class GK_School_Dashboard {
                 </div>
             </div>
 
-            <!-- ۲. پنجره لوکس مدیریت و جزئیات کلاس (دسته‌بندی‌شده و استاندارد) -->
+            <!-- ۲. پنجره لوکس مدیریت و جزئیات کلاس -->
             <div id="gk-class-info-modal" class="gk-modal-backdrop" style="display:none;">
-                <div class="gk-modal-card" style="max-width:540px;">
+                <div class="gk-modal-card" style="max-width:440px; padding:22px; border-radius:24px;">
                     
                     <!-- 1. Header -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:2px solid #f1f5f9; padding-bottom:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1.5px solid #f1f5f9; padding-bottom:12px;">
                         <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="width:46px; height:46px; border-radius:14px; background:linear-gradient(135deg,#e0e7ff,#c7d2fe); display:flex; align-items:center; justify-content:center; font-size:24px;">
+                            <div style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg,#e0e7ff,#c7d2fe); display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 4px 12px rgba(99,102,241,0.15);">
                                 🏫
                             </div>
                             <div>
-                                <h3 id="gk-m-class-title" style="margin:0; font-size:18px; font-weight:900; color:#1e1b4b;">کلاس</h3>
-                                <span id="gk-m-class-count-tag" style="font-size:12px; color:#4338ca; font-weight:800; background:#e0e7ff; padding:2px 10px; border-radius:10px; display:inline-block; margin-top:3px;">۰ نوآموز</span>
+                                <h3 id="gk-m-class-title" style="margin:0; font-size:17px; font-weight:900; color:#1e1b4b;">کلاس</h3>
+                                <span id="gk-m-class-count-tag" style="font-size:11.5px; color:#4338ca; font-weight:800; background:#e0e7ff; padding:2px 9px; border-radius:8px; display:inline-block; margin-top:2px;">۰ نوآموز</span>
                             </div>
                         </div>
-                        <button type="button" onclick="gkCloseModal('#gk-class-info-modal');" style="background:#f1f5f9; border:none; width:34px; height:34px; border-radius:50%; font-size:16px; cursor:pointer; color:#64748b; font-weight:900; display:flex; align-items:center; justify-content:center;">✕</button>
+                        <button type="button" onclick="gkCloseModal('#gk-class-info-modal');" style="background:#f1f5f9; border:none; width:32px; height:32px; border-radius:50%; font-size:15px; cursor:pointer; color:#64748b; font-weight:900; display:flex; align-items:center; justify-content:center;">✕</button>
                     </div>
 
                     <!-- 2. دسته‌بندی ۱: بخش مربی و ورود به پنل کلاس -->
-                    <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:18px; padding:16px; margin-bottom:14px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:13px; color:#334155;">
+                    <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:18px; padding:14px; margin-bottom:14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:12.5px; color:#334155;">
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <span>👩‍🏫</span>
-                                <span>مربی کلاس: <strong id="gk-m-teacher-name" style="color:#0f172a; font-weight:900;">ثبت نشده</strong></span>
+                                <span>مربی: <strong id="gk-m-teacher-name" style="color:#0f172a; font-weight:900;">ثبت نشده</strong></span>
                             </div>
-                            <span id="gk-m-teacher-phone" style="font-size:12px; color:#64748b; font-weight:700; direction:ltr;"></span>
+                            <span id="gk-m-teacher-phone" style="font-size:11.5px; color:#64748b; font-weight:700; direction:ltr;"></span>
                         </div>
 
-                        <!-- Action Group: Teacher Portal & Connect -->
-                        <div class="gk-class-actions-row" style="display:flex; gap:8px;">
-                            <a id="gk-m-teacher-portal-btn" href="#" target="_blank" style="flex:2; background:linear-gradient(135deg,#0284c7,#0369a1); color:#ffffff !important; padding:10px 14px; border-radius:12px; text-decoration:none; font-size:12.5px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(2,132,199,0.3);">
+                        <!-- Action Group: Teacher Portal + Bale Icon + Copy Icon -->
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <a id="gk-m-teacher-portal-btn" href="#" target="_blank" style="flex:1; background:linear-gradient(135deg,#0284c7,#0369a1); color:#ffffff !important; padding:10px 14px; border-radius:12px; text-decoration:none; font-size:12.5px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(2,132,199,0.25);">
                                 <span>🚀</span>
                                 <span>ورود به پنل معلم</span>
                             </a>
-                            <a id="gk-m-bale-teacher-btn" href="#" target="_blank" style="flex:1.5; background:linear-gradient(135deg,#10b981,#059669); color:#ffffff !important; padding:10px 12px; border-radius:12px; text-decoration:none; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(16,185,129,0.3);" title="ارسال لینک مستقیم به بله مربی">
-                                <span>📲</span>
-                                <span>بله مربی</span>
+                            <a id="gk-m-bale-teacher-btn" href="#" target="_blank" class="gk-icon-btn gk-btn-bale" style="width:40px; height:40px; flex-shrink:0; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="ارسال لینک ورود به بله مربی">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                             </a>
-                            <button type="button" onclick="gkCopyClassInviteLink();" style="flex:1; background:#ffffff; color:#334155 !important; border:1.5px solid #cbd5e1; padding:10px 10px; border-radius:12px; font-size:12px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;" title="کپی لینک ورود معلم به کلاس">
-                                <span>📋</span>
-                                <span>کپی</span>
+                            <button type="button" onclick="gkCopyClassInviteLink();" class="gk-icon-btn gk-btn-copy" style="width:40px; height:40px; flex-shrink:0; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" title="کپی لینک ورود معلم به کلاس">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
                         </div>
                     </div>
 
-                    <!-- 3. دسته‌بندی ۲: ابزارهای کلاس و اشتراک‌گذاری با اولیا -->
-                    <div style="margin-bottom:16px;">
-                        <div style="font-size:12px; font-weight:900; color:#64748b; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-                            <span>📢</span> ابزارهای کلاسی و اولیا:
+                    <!-- 3. کادر عملیات و ابزارهای گروهی -->
+                    <div style="background:#ffffff; border:1.5px solid #e0e7ff; border-radius:18px; padding:14px; margin-bottom:16px;">
+                        <div style="font-size:12px; font-weight:900; color:#4338ca; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            <span>📦</span> ابزارهای گروهی کلاس:
                         </div>
-                        <div class="gk-class-tools-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                            <a id="gk-m-bale-bulk-btn" href="#" target="_blank" style="background:#ecfdf5; color:#065f46 !important; border:1.5px solid #a7f3d0; padding:10px 12px; border-radius:12px; text-decoration:none; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:6px;">
-                                <span>📢</span>
-                                <span>ارسال گروهی به بله مادران</span>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                            <a id="gk-m-bale-bulk-btn" href="#" target="_blank" style="background:#ecfdf5; color:#065f46 !important; border:1.5px solid #a7f3d0; padding:10px 10px; border-radius:12px; text-decoration:none; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 6px rgba(16,185,129,0.08);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                <span>ارسال گروهی به بله</span>
                             </a>
-                            <a id="gk-m-print-btn" href="#" target="_blank" style="background:#eff6ff; color:#1e40af !important; border:1.5px solid #bfdbfe; padding:10px 12px; border-radius:12px; text-decoration:none; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:6px;">
-                                <span>🖨️</span>
+                            <a id="gk-m-print-btn" href="#" target="_blank" style="background:#eff6ff; color:#1e40af !important; border:1.5px solid #bfdbfe; padding:10px 10px; border-radius:12px; text-decoration:none; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 6px rgba(59,130,246,0.08);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                                 <span>چاپ کارت‌های QR</span>
                             </a>
                         </div>
                     </div>
 
-                    <!-- 4. دسته‌بندی ۳: اقدامات مدیریت کلاس -->
-                    <div class="gk-class-bottom-actions-row" style="display:flex; gap:8px; border-top:1.5px solid #f1f5f9; padding-top:14px; align-items:center;">
-                        <button type="button" onclick="gkFilterByClassFromModal();" style="flex:2; background:linear-gradient(135deg,#6366f1,#4f46e5); color:#ffffff !important; border:none; padding:11px 0; border-radius:12px; font-size:12.5px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(79,70,229,0.3);">
-                            <span>👶</span>
-                            <span>مشاهده نوآموزان این کلاس</span>
-                        </button>
-                        <button type="button" onclick="gkTriggerEditFromModal();" style="flex:1.2; background:#f8fafc; color:#334155 !important; border:1.5px solid #cbd5e1; padding:11px 0; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+                    <!-- 4. دکمه‌های متقارن ویرایش و حذف کلاس -->
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button type="button" onclick="gkTriggerEditFromModal();" style="flex:1; background:#f8fafc; color:#334155 !important; border:1.5px solid #cbd5e1; padding:10px 16px; border-radius:12px; font-size:12.5px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
                             <span>✏️</span>
-                            <span>ویرایش</span>
+                            <span>ویرایش کلاس</span>
                         </button>
-                        <button type="button" onclick="gkTriggerDeleteFromModal();" style="background:#fef2f2; color:#dc2626 !important; border:1.5px solid #fecaca; padding:11px 14px; border-radius:12px; font-size:12px; font-weight:900; cursor:pointer;" title="حذف کلاس">
+                        <button type="button" onclick="gkTriggerDeleteFromModal();" style="background:#fef2f2; color:#dc2626 !important; border:1.5px solid #fecaca; padding:10px 16px; border-radius:12px; font-size:12.5px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;" title="حذف این کلاس">
                             <span>🗑️</span>
+                            <span>حذف</span>
                         </button>
                     </div>
                 </div>
