@@ -78,13 +78,16 @@ class GK_School_Reports {
             ORDER BY id DESC
         ", $student_id));
 
-        // ۳. آزمون‌های روان‌شناختی و استعدادیابی
+        // ۳. آزمون‌های روان‌شناختی، هوش‌های چندگانه گاردنر و استعدادیابی
         $table_assessments = $wpdb->prefix . 'gk_student_assessments';
+        $table_results = $wpdb->prefix . 'gk_assessment_results';
         $assessments = $wpdb->get_results($wpdb->prepare("
-            SELECT * FROM $table_assessments
-            WHERE student_id = %d
-            ORDER BY id DESC
-        ", $student_id));
+            SELECT r.*, sa.student_id as st_id
+            FROM $table_results r
+            LEFT JOIN $table_assessments sa ON r.id = sa.result_id
+            WHERE sa.student_id = %d OR r.child_name = %s
+            ORDER BY r.id DESC
+        ", $student_id, $student->name));
 
         // ۴. سوابق امتیازات در مسابقات و لیگ‌های کلاسی
         $table_league_scores = $wpdb->prefix . 'gk_league_scores';
@@ -335,7 +338,105 @@ class GK_School_Reports {
                 <?php endif; ?>
             </div>
 
-            <!-- ۵. بخش دوم: سوابق بازی‌ها و لیگ‌های کلاسی -->
+            <!-- ۵. بخش دوم: سوابق آزمون‌های روان‌شناختی، هوش‌های چندگانه و استعدادیابی -->
+            <div class="gk-rc-section">
+                <div class="gk-rc-sec-header">
+                    <div class="gk-rc-sec-title">
+                        <span class="gk-rc-sec-ico">🧠</span>
+                        <h3>سوابق آزمون‌های روان‌شناختی، هوش‌های چندگانه و استعدادیابی</h3>
+                    </div>
+                    <span class="gk-rc-sec-badge"><?php echo count($assessments); ?> تست انجام‌شده</span>
+                </div>
+
+                <?php if (empty($assessments)): ?>
+                    <div class="gk-rc-empty-box">
+                        <span>🧠</span>
+                        <p>هنوز تست روان‌شناختی یا استعدادیابی برای این نوآموز ثبت نشده است.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="gk-rc-table-responsive">
+                        <table class="gk-rc-table">
+                            <thead>
+                                <tr>
+                                    <th>عنوان آزمون روان‌شناختی</th>
+                                    <th>تحلیل ابعاد و استعدادهای برتر</th>
+                                    <th>تاریخ انجام تست</th>
+                                    <th style="text-align:center;">کارنامه تفصیلی</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                $test_names = [
+                                    'gardner-intelligence'   => '🧠 تست هوش‌های چندگانه گاردنر',
+                                    'adhd-screening'         => '🎯 غربالگری تمرکز و بیش‌فعالی (ADHD)',
+                                    'learning-styles'        => '🎨 تست سبک‌های یادگیری کودک (VARK)',
+                                    'child-learning-style'   => '🎨 تست سبک‌های یادگیری کودک (VARK)',
+                                    'child-creativity'       => '💡 سنجش خلاقیت و ابتکار کودک',
+                                    'child-anxiety'          => '🕊️ سنجش اضطراب و آرامش کودک',
+                                    'emotional-intelligence' => '💖 هوش هیجانی و ارتباطی (EQ)'
+                                ];
+                                $dim_translations = [
+                                    'visual'        => 'دیداری و بصری',
+                                    'auditory'      => 'شنیداری',
+                                    'kinesthetic'   => 'لمسی و حرکتی',
+                                    'linguistic'    => 'زبانی و کلامی',
+                                    'logical'       => 'منطقی و ریاضی',
+                                    'spatial'       => 'فضایی و تجسمی',
+                                    'musical'       => 'موسیقیایی',
+                                    'bodily'        => 'بدنی و حرکتی',
+                                    'interpersonal' => 'بین‌فردی و اجتماعی',
+                                    'intrapersonal' => 'درون‌فردی',
+                                    'naturalist'    => 'طبیعت‌گرا',
+                                    'inattention'   => 'نقص توجه',
+                                    'hyperactivity' => 'بیش‌فعالی'
+                                ];
+                                foreach ($assessments as $as): 
+                                    $scores = json_decode($as->scores_data, true) ?: [];
+                                    $t_title = $test_names[$as->assessment_slug] ?? ('تست ' . $as->assessment_slug);
+                                    $view_url = home_url('/tests/' . $as->assessment_slug . '/?result_id=' . $as->id);
+                                ?>
+                                    <tr>
+                                        <td>
+                                            <strong style="color:#1e293b; font-size:13.5px;"><?php echo esc_html($t_title); ?></strong>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($scores) && is_array($scores)): ?>
+                                                <div class="gk-rc-topic-chips">
+                                                    <?php 
+                                                    $cnt = 0;
+                                                    foreach ($scores as $dim_k => $dim_v): 
+                                                        if ($cnt >= 3) break;
+                                                        $raw_name = is_array($dim_v) ? ($dim_v['title'] ?? $dim_k) : $dim_k;
+                                                        $dim_name = $dim_translations[$raw_name] ?? ($dim_translations[$dim_k] ?? $raw_name);
+                                                        $dim_score = is_array($dim_v) ? ($dim_v['score'] ?? '') : $dim_v;
+                                                        $cnt++;
+                                                    ?>
+                                                        <span class="gk-rc-topic-chip is-correct">
+                                                            ⭐ <?php echo esc_html($dim_name); ?>: <strong><?php echo esc_html($dim_score); ?></strong>
+                                                        </span>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php else: ?>
+                                                <span style="color:#94a3b8; font-size:12px;">تکمیل شده</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <span style="font-size:12px; color:#64748b;"><?php echo date_i18n('j F Y', strtotime($as->created_at)); ?></span>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <a href="<?php echo esc_url($view_url); ?>" target="_blank" class="gk-btn-tool" style="background:#7c3aed; padding:5px 12px; font-size:11.5px; border-radius:8px;">
+                                                🔍 مشاهده جزئیات
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- ۶. بخش سوم: سوابق بازی‌ها و لیگ‌های کلاسی -->
             <div class="gk-rc-section">
                 <div class="gk-rc-sec-header">
                     <div class="gk-rc-sec-title">
