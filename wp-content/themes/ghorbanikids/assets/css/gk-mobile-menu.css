@@ -1,0 +1,540 @@
+/* =========================================================
+   GhorbaniKids Desktop Header & Top Navbar (100% Isolated)
+   ========================================================= */
+
+.gk-top-navbar {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 99990 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-bottom: 1.5px solid #e2e8f0 !important;
+    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06) !important;
+    direction: rtl !important;
+    box-sizing: border-box !important;
+}
+
+.gk-navbar-inner {
+    max-width: 1320px !important;
+    margin: 0 auto !important;
+    padding: 10px 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    box-sizing: border-box !important;
+}
+
+/* ۱. برند و لوگو */
+.gk-nav-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-decoration: none !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-nav-logo {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    object-fit: cover !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15) !important;
+    transition: transform 0.25s ease !important;
+}
+
+.gk-nav-brand:hover .gk-nav-logo {
+    transform: scale(1.08) rotate(-4deg) !important;
+}
+
+.gk-nav-brand-title {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+    font-size: 1.45rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    line-height: 1.15 !important;
+    display: block !important;
+}
+
+.gk-nav-brand-subtitle {
+    font-size: 0.76rem !important;
+    font-weight: 800 !important;
+    color: #0284c7 !important;
+    display: block !important;
+}
+
+/* ۲. منوی اصلی دسکتاپ */
+.gk-nav-main-menu {
+    flex: 1 !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.gk-nav-main-menu ul,
+.gk-nav-main-menu ol,
+.gk-nav-main-menu li,
+.gk-top-navbar ul,
+.gk-top-navbar ol,
+.gk-top-navbar li {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.gk-nav-main-menu li::before,
+.gk-nav-main-menu li::after,
+.gk-top-navbar li::before,
+.gk-top-navbar li::after {
+    display: none !important;
+    content: none !important;
+}
+
+.gk-nav-main-menu ul.gk-nav-links,
+.gk-nav-main-menu > ul {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.gk-nav-main-menu ul.gk-nav-links > li,
+.gk-nav-main-menu > ul > li {
+    display: inline-flex !important;
+    align-items: center !important;
+    position: relative !important;
+}
+
+.gk-nav-main-menu ul.gk-nav-links > li > a,
+.gk-nav-main-menu > ul > li > a {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 9px 14px !important;
+    border-radius: 14px !important;
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* فلش زیبا برای گزینه‌های دارای زیرمنو */
+.gk-nav-main-menu li.menu-item-has-children > a::after,
+.gk-nav-links li.menu-item-has-children > a::after {
+    content: "" !important;
+    display: inline-block !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-right: 2px solid #64748b !important;
+    border-bottom: 2px solid #64748b !important;
+    transform: rotate(45deg) translateY(-2px) !important;
+    margin-right: 4px !important;
+    transition: transform 0.25s ease, border-color 0.25s ease !important;
+}
+
+.gk-nav-main-menu li.menu-item-has-children:hover > a::after,
+.gk-nav-links li.menu-item-has-children:hover > a::after {
+    transform: rotate(-135deg) translateY(-2px) !important;
+    border-color: #0284c7 !important;
+}
+
+.gk-nav-main-menu ul.gk-nav-links > li > a:hover,
+.gk-nav-main-menu > ul > li > a:hover,
+.gk-nav-main-menu li.current-menu-item > a {
+    color: #0284c7 !important;
+    background: #f0f9ff !important;
+}
+
+/* منوی کشویی بازشو دسکتاپ (Dropdown Submenu) */
+.gk-nav-main-menu ul.sub-menu,
+.gk-nav-links ul.sub-menu,
+.gk-top-navbar .sub-menu {
+    display: block !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(12px) !important;
+    position: absolute !important;
+    top: calc(100% + 4px) !important;
+    right: 0 !important;
+    min-width: 220px !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(25px) !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.15) !important;
+    padding: 10px !important;
+    margin: 0 !important;
+    z-index: 999999 !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.gk-nav-main-menu li:hover > ul.sub-menu,
+.gk-nav-links li:hover > ul.sub-menu,
+.gk-top-navbar li:hover > .sub-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li,
+.gk-top-navbar .sub-menu li {
+    display: block !important;
+    margin: 0 0 4px 0 !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li a,
+.gk-top-navbar .sub-menu li a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px 14px !important;
+    border-radius: 12px !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+    text-decoration: none !important;
+    transition: all 0.18s ease !important;
+    white-space: nowrap !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li a:hover,
+.gk-top-navbar .sub-menu li a:hover {
+    background: #f0f9ff !important;
+    color: #0284c7 !important;
+    transform: translateX(-4px) !important;
+}
+
+/* ۳. ابزارهای کاربر */
+.gk-nav-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-action-icon-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #475569 !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    text-decoration: none !important;
+    position: relative !important;
+    transition: all 0.2s ease !important;
+}
+
+.gk-action-icon-btn:hover {
+    color: #0284c7 !important;
+    background: #e0f2fe !important;
+    border-color: #bae6fd !important;
+    transform: translateY(-2px) !important;
+}
+
+.gk-cart-badge {
+    position: absolute !important;
+    top: -5px !important;
+    left: -5px !important;
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+    width: 19px !important;
+    height: 19px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 2px solid #ffffff !important;
+}
+
+.gk-nav-btn-login {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    padding: 9px 18px !important;
+    border-radius: 14px !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+    transition: all 0.22s ease !important;
+}
+
+.gk-nav-btn-login:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    color: #ffffff !important;
+}
+
+.gk-mobile-toggle-btn {
+    display: none !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 14px !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    color: #334155 !important;
+    cursor: pointer !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* =========================================================
+   Mobile Drawer & Overlay (100% Isolated & Responsive)
+   ========================================================= */
+
+/* Desktop: Mobile drawer & overlay MUST BE COMPLETELY HIDDEN */
+@media (min-width: 1024px) {
+    .gk-mobile-drawer,
+    .gk-mobile-drawer-overlay,
+    #gkMobileDrawer,
+    #gkMobileDrawerOverlay,
+    .gk-mobile-toggle-btn {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+}
+
+/* Mobile & Tablet (< 1024px) */
+@media (max-width: 1023px) {
+    .gk-nav-main-menu { display: none !important; }
+    .gk-mobile-toggle-btn { display: inline-flex !important; }
+    .gk-navbar-inner { padding: 8px 14px !important; }
+    .gk-nav-brand-subtitle { display: none !important; }
+    .gk-nav-brand-title { font-size: 1.2rem !important; }
+    .gk-nav-logo { width: 36px !important; height: 36px !important; border-radius: 10px !important; }
+
+    .gk-mobile-drawer-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(15, 23, 42, 0.6) !important;
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        z-index: 999990 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .gk-mobile-drawer-overlay.is-open {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    .gk-mobile-drawer {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 320px !important;
+        max-width: 86vw !important;
+        height: 100vh !important;
+        background: #ffffff !important;
+        z-index: 999999 !important;
+        box-shadow: -15px 0 45px rgba(0, 0, 0, 0.25) !important;
+        transform: translateX(100%) !important;
+        transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        direction: rtl !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    .gk-mobile-drawer.is-open {
+        transform: translateX(0) !important;
+    }
+
+    /* Drawer Header */
+    .gk-drawer-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 16px 18px !important;
+        border-bottom: 1.5px solid #f1f5f9 !important;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+        flex-shrink: 0 !important;
+    }
+
+    .gk-drawer-brand {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        text-decoration: none !important;
+    }
+
+    .gk-drawer-logo {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 12px !important;
+        object-fit: cover !important;
+    }
+
+    .gk-drawer-title {
+        font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+        font-size: 1.3rem !important;
+        font-weight: 900 !important;
+        color: #0f172a !important;
+    }
+
+    .gk-drawer-close-btn {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 12px !important;
+        background: #ffffff !important;
+        border: 1.5px solid #e2e8f0 !important;
+        color: #64748b !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .gk-drawer-close-btn:hover {
+        background: #fee2e2 !important;
+        color: #ef4444 !important;
+        border-color: #fca5a5 !important;
+    }
+
+    /* Drawer Content & List */
+    .gk-drawer-content {
+        flex: 1 !important;
+        padding: 16px 14px !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .gk-mobile-menu-list,
+    .gk-mobile-menu-list ul {
+        list-style: none !important;
+        list-style-type: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .gk-mobile-menu-list li::before,
+    .gk-mobile-menu-list li::after {
+        display: none !important;
+        content: none !important;
+    }
+
+    .gk-mobile-menu-list > li {
+        margin-bottom: 8px !important;
+        border-radius: 14px !important;
+        background: #f8fafc !important;
+        border: 1px solid #f1f5f9 !important;
+        overflow: hidden !important;
+    }
+
+    .gk-mobile-menu-list > li > a {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 12px 14px !important;
+        font-size: 0.96rem !important;
+        font-weight: 800 !important;
+        color: #1e293b !important;
+        text-decoration: none !important;
+        transition: background 0.18s ease, color 0.18s ease !important;
+    }
+
+    .gk-mobile-menu-list > li > a:hover,
+    .gk-mobile-menu-list > li.current-menu-item > a {
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
+    }
+
+    .gk-mobile-menu-list .sub-menu {
+        display: none !important;
+        padding: 6px 12px 10px 12px !important;
+        background: #ffffff !important;
+        border-top: 1px solid #f1f5f9 !important;
+    }
+
+    .gk-mobile-menu-list li.menu-item-has-children.is-open > .sub-menu,
+    .gk-mobile-menu-list li:hover > .sub-menu {
+        display: block !important;
+    }
+
+    .gk-mobile-menu-list .sub-menu li a {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 9px 12px !important;
+        font-size: 0.88rem !important;
+        font-weight: 700 !important;
+        color: #475569 !important;
+        text-decoration: none !important;
+        border-radius: 10px !important;
+    }
+
+    .gk-mobile-menu-list .sub-menu li a:hover {
+        background: #f0f9ff !important;
+        color: #0284c7 !important;
+    }
+
+    /* Drawer Footer */
+    .gk-drawer-footer {
+        padding: 14px 16px !important;
+        border-top: 1.5px solid #f1f5f9 !important;
+        background: #f8fafc !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .gk-btn-drawer-vip {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        padding: 11px !important;
+        border-radius: 12px !important;
+        font-size: 0.92rem !important;
+        font-weight: 800 !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+    }
+
+    .gk-btn-drawer-account {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        background: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        color: #1e293b !important;
+        padding: 10px !important;
+        border-radius: 12px !important;
+        font-size: 0.9rem !important;
+        font-weight: 800 !important;
+        text-decoration: none !important;
+    }
+}

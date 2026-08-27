@@ -1,0 +1,197 @@
+/*
+Theme Name: GhorbaniKids Custom Theme
+Theme URI: https://ghorbanikids.ir
+Author: GhorbaniKids
+Author URI: https://ghorbanikids.ir
+Description: قالب اختصاصی، فوق‌العاده سبک، مدرن و پرسرعت سامانه بازی‌ها و آموزش کودکان قربانی کیدز
+Version: 1.0.0
+License: GNU General Public License v2 or later
+Text Domain: ghorbanikids
+*/
+
+/* ۱. تعریف فونت کودکانه و دست‌نویس آوینی (Aviny) */
+@font-face {
+    font-family: 'aviny';
+    src: url('/wp-content/uploads/2021/10/aviny-web.woff2') format('woff2'),
+         url('/wp-content/uploads/2021/10/aviny-web.woff') format('woff'),
+         url('/wp-content/uploads/2021/10/aviny.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ۲. تعریف فونت ایران‌سنس اعداد فارسی (IRANSansXFaNum) */
+@font-face {
+    font-family: 'IRANSansXFaNum';
+    src: url('/wp-content/uploads/2021/10/IRANSansXFaNum-Regular.woff2') format('woff2'),
+         url('/wp-content/uploads/2021/10/IRANSansXFaNum-Regular.woff') format('woff'),
+         url('/wp-content/uploads/2021/10/IRANSansXFaNum-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* استایل‌های پایه و ریست قالب اختصاصی */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    font-family: 'IRANSansXFaNum', 'Vazirmatn', -apple-system, BlinkMacSystemFont, Tahoma, sans-serif !important;
+    direction: rtl;
+    text-align: right;
+    background-color: #f8fafc;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* کلاس‌های کمکی برای استفاده فوری از فونت آوینی در هر بخش */
+.font-aviny,
+.gk-font-aviny,
+.gk-hero-title,
+.gk-section-title,
+.gk-nav-brand-title,
+.gk-card-title,
+h1.gk-title-aviny,
+h2.gk-title-aviny {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, Tahoma, sans-serif !important;
+    letter-spacing: 0 !important;
+}
+
+a {
+    color: #0284c7;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #0369a1;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.gk-site-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.gk-site-main {
+    flex: 1;
+    width: 100%;
+}
+
+.gk-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ==========================================================
+   استایل لوکس و مدرن پیام‌ها و هشدارهای ووکامرس (WooCommerce Notices)
+   ========================================================== */
+.woocommerce-notices-wrapper {
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 15px auto !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+}
+
+.woocommerce-message,
+.woocommerce-info,
+.woocommerce-error {
+    background: #ffffff !important;
+    border: 1.5px solid #bbf7d0 !important;
+    border-top: 1.5px solid #bbf7d0 !important;
+    border-radius: 18px !important;
+    padding: 14px 20px !important;
+    margin: 0 0 20px 0 !important;
+    color: #1e293b !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.08) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    position: relative !important;
+    line-height: 1.6 !important;
+    outline: none !important;
+}
+
+.woocommerce-message::before {
+    content: "✅" !important;
+    font-size: 18px !important;
+    margin-left: 10px !important;
+    margin-right: 0 !important;
+    position: static !important;
+    display: inline-block !important;
+}
+
+.woocommerce-info {
+    border-color: #bae6fd !important;
+    border-top: 1.5px solid #bae6fd !important;
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.08) !important;
+}
+.woocommerce-info::before {
+    content: "ℹ️" !important;
+    font-size: 18px !important;
+    margin-left: 10px !important;
+    margin-right: 0 !important;
+    position: static !important;
+    display: inline-block !important;
+}
+
+.woocommerce-error {
+    border-color: #fecdd3 !important;
+    border-top: 1.5px solid #fecdd3 !important;
+    background: #fff1f2 !important;
+    color: #9f1239 !important;
+    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.08) !important;
+    list-style: none !important;
+}
+.woocommerce-error::before {
+    content: "⚠️" !important;
+    font-size: 18px !important;
+    margin-left: 10px !important;
+    margin-right: 0 !important;
+    position: static !important;
+    display: inline-block !important;
+}
+
+.woocommerce-message .button,
+.woocommerce-message .button.wc-forward,
+.woocommerce-info .button {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    padding: 8px 18px !important;
+    border-radius: 12px !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    order: 2 !important;
+    margin: 0 !important;
+    float: none !important;
+}
+.woocommerce-message .button:hover,
+.woocommerce-info .button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35) !important;
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+}

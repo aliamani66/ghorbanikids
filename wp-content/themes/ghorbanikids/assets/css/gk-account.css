@@ -1,0 +1,825 @@
+/* =========================================================
+   GhorbaniKids Ultra-Luxury My Account & Auth Stylesheet (100% Isolated)
+   Two-Column Desktop Dashboard (Vertical Sidebar + Main Content)
+   Complete Luxury Addresses Cards, Order Tables & VIP Dashboard
+   ========================================================= */
+
+.woocommerce-account,
+.woocommerce-account *,
+.woocommerce-MyAccount-navigation,
+.woocommerce-MyAccount-navigation *,
+.woocommerce-MyAccount-content,
+.woocommerce-MyAccount-content * {
+    box-sizing: border-box !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+
+/* =========================================================
+   1. Two-Column Dashboard Layout (Sidebar + Content)
+   ========================================================= */
+.woocommerce-account .woocommerce {
+    direction: rtl !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', 'Vazirmatn', Tahoma, sans-serif !important;
+    max-width: 1320px !important;
+    margin: 10px auto 60px auto !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 28px !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+}
+
+/* If user is logged out, center the auth card */
+.woocommerce-account .woocommerce:has(#customer_login) {
+    display: block !important;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation {
+    width: 270px !important;
+    min-width: 270px !important;
+    max-width: 270px !important;
+    flex-shrink: 0 !important;
+    background: #ffffff !important;
+    border: 2px solid #e0f2fe !important;
+    border-radius: 24px !important;
+    padding: 16px 14px !important;
+    box-shadow: 0 6px 25px rgba(2, 132, 199, 0.08) !important;
+    position: sticky !important;
+    top: 90px !important;
+    float: none !important;
+    margin: 0 !important;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation li {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation li a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 12px 16px !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    color: #334155 !important;
+    font-weight: 800 !important;
+    font-size: 0.94rem !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    width: 100% !important;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation li a:hover {
+    background: #f0f9ff !important;
+    border-color: #38bdf8 !important;
+    color: #0284c7 !important;
+    transform: translateX(-4px) !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.1) !important;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation li.is-active a {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    border-color: #0284c7 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35) !important;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: calc(100% - 298px) !important;
+    float: none !important;
+    margin: 0 !important;
+}
+
+/* =========================================================
+   2. Centered Auth Card (Login & Register) for Guests
+   ========================================================= */
+.woocommerce-account #customer_login,
+#customer_login {
+    max-width: 520px !important;
+    width: 100% !important;
+    margin: 0 auto 50px auto !important;
+    background: #ffffff !important;
+    border: 2.5px solid rgba(186, 230, 253, 0.9) !important;
+    border-radius: 32px !important;
+    padding: 34px 28px !important;
+    box-shadow: 0 20px 60px rgba(2, 132, 199, 0.12) !important;
+    display: block !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    float: none !important;
+}
+
+.gk-auth-tabs-wrapper {
+    max-width: 520px !important;
+    width: 100% !important;
+    margin: 30px auto 20px auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    direction: rtl !important;
+}
+
+.gk-auth-tabs-header {
+    display: flex !important;
+    background: #f0f9ff !important;
+    border: 1.5px solid #bae6fd !important;
+    border-radius: 22px !important;
+    padding: 5px !important;
+    gap: 6px !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08) !important;
+}
+
+.gk-auth-tab-btn {
+    flex: 1 !important;
+    height: 48px !important;
+    border-radius: 18px !important;
+    border: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', 'Vazirmatn', Tahoma, sans-serif !important;
+    font-size: 0.98rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.22s ease !important;
+    color: #475569 !important;
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+}
+
+.gk-auth-tab-btn:hover {
+    color: #0284c7 !important;
+}
+
+.gk-auth-tab-btn.active {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35) !important;
+}
+
+#customer_login h2 {
+    display: none !important;
+}
+
+#customer_login .u-column1,
+#customer_login .col-1,
+#customer_login .u-column2,
+#customer_login .col-2 {
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-sizing: border-box !important;
+}
+
+#customer_login .u-column1,
+#customer_login .col-1,
+#customer_login.show-login .u-column1,
+#customer_login.show-login .col-1 {
+    display: block !important;
+    animation: gkAuthFade 0.22s ease-out !important;
+}
+
+#customer_login:not(.show-register) .u-column2,
+#customer_login:not(.show-register) .col-2,
+#customer_login.show-login .u-column2,
+#customer_login.show-login .col-2 {
+    display: none !important;
+}
+
+#customer_login.show-register .u-column1,
+#customer_login.show-register .col-1 {
+    display: none !important;
+}
+
+#customer_login.show-register .u-column2,
+#customer_login.show-register .col-2 {
+    display: block !important;
+    animation: gkAuthFade 0.22s ease-out !important;
+}
+
+@keyframes gkAuthFade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.woocommerce-form-login,
+.woocommerce-form-register {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.woocommerce-form-login .woocommerce-form-row,
+.woocommerce-form-register .woocommerce-form-row {
+    padding: 0 !important;
+    margin-bottom: 16px !important;
+    width: 100% !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+.woocommerce-form-login label,
+.woocommerce-form-register label {
+    display: block !important;
+    margin-bottom: 6px !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+    text-align: right !important;
+}
+
+.woocommerce-form-login .woocommerce-Input,
+.woocommerce-form-register .woocommerce-Input,
+.woocommerce-form-login input[type="text"],
+.woocommerce-form-login input[type="password"],
+.woocommerce-form-register input[type="text"],
+.woocommerce-form-register input[type="email"],
+.woocommerce-form-register input[type="password"] {
+    width: 100% !important;
+    height: 50px !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 18px !important;
+    background: #f8fafc !important;
+    padding: 0 16px !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+    font-size: 0.95rem !important;
+    color: #0f172a !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    transition: all 0.22s ease !important;
+}
+
+.woocommerce-form-login input:focus,
+.woocommerce-form-register input:focus {
+    border-color: #0284c7 !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15) !important;
+}
+
+.woocommerce-form-login .woocommerce-form-login__submit,
+.woocommerce-form-register .woocommerce-form-register__submit,
+.woocommerce-form-login button[type="submit"],
+.woocommerce-form-register button[type="submit"] {
+    width: 100% !important;
+    height: 50px !important;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 18px !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+    font-size: 1.05rem !important;
+    font-weight: 900 !important;
+    cursor: pointer !important;
+    box-shadow: 0 8px 22px rgba(2, 132, 199, 0.35) !important;
+    transition: all 0.22s ease !important;
+    margin-top: 10px !important;
+}
+
+.woocommerce-form-login button[type="submit"]:hover,
+.woocommerce-form-register button[type="submit"]:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 28px rgba(2, 132, 199, 0.45) !important;
+}
+
+.woocommerce-form-login .woocommerce-form-login__rememberme {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 12px 0 0 0 !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    font-size: 0.88rem !important;
+}
+
+.woocommerce-LostPassword {
+    text-align: center !important;
+    margin-top: 18px !important;
+}
+
+.woocommerce-LostPassword a {
+    color: #0284c7 !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+}
+
+/* =========================================================
+   3. VIP Active / Inactive Top Banners
+   ========================================================= */
+.gk-dashboard-vip-banner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 20px 24px !important;
+    border-radius: 24px !important;
+    margin-bottom: 24px !important;
+    gap: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.gk-dashboard-vip-banner.active {
+    background: linear-gradient(135deg, #fef08a 0%, #fde047 60%, #facc15 100%) !important;
+    border: 2px solid #eab308 !important;
+    box-shadow: 0 10px 30px rgba(234, 179, 8, 0.25) !important;
+    color: #713f12 !important;
+}
+
+.gk-dashboard-vip-banner.inactive {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 60%, #bae6fd 100%) !important;
+    border: 2px solid #38bdf8 !important;
+    box-shadow: 0 10px 30px rgba(2, 132, 199, 0.15) !important;
+    color: #0c4a6e !important;
+}
+
+.gk-vip-banner-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+.gk-vip-banner-icon {
+    font-size: 2.4rem !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-vip-banner-texts h3 {
+    margin: 0 0 4px 0 !important;
+    font-size: 1.25rem !important;
+    font-weight: 900 !important;
+}
+
+.gk-vip-banner-texts p {
+    margin: 0 !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    opacity: 0.9 !important;
+}
+
+.gk-vip-banner-btn {
+    padding: 12px 24px !important;
+    border-radius: 18px !important;
+    font-size: 0.95rem !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+.gk-vip-banner-btn.play {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25) !important;
+}
+
+.gk-vip-banner-btn.buy {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35) !important;
+}
+
+.gk-vip-banner-btn:hover {
+    transform: translateY(-2px) !important;
+}
+
+/* =========================================================
+   4. User Hero Greeting Card
+   ========================================================= */
+.gk-acc-hero-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: #ffffff !important;
+    border: 2px solid #e0f2fe !important;
+    border-radius: 24px !important;
+    padding: 22px 24px !important;
+    margin-bottom: 24px !important;
+    box-shadow: 0 6px 25px rgba(2, 132, 199, 0.07) !important;
+    gap: 16px !important;
+    flex-wrap: wrap !important;
+}
+
+.gk-acc-user-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+.gk-acc-avatar {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 20px !important;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    font-size: 1.6rem !important;
+    font-weight: 900 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 6px 18px rgba(2, 132, 199, 0.3) !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-acc-name {
+    margin: 0 0 4px 0 !important;
+    font-size: 1.35rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+}
+
+.gk-acc-phone {
+    font-size: 0.9rem !important;
+    color: #64748b !important;
+    font-weight: 700 !important;
+}
+
+.gk-vip-pill {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 4px !important;
+}
+
+.gk-vip-pill.active span {
+    background: #fef08a !important;
+    color: #854d0e !important;
+    border: 1.5px solid #facc15 !important;
+    padding: 6px 14px !important;
+    border-radius: 14px !important;
+    font-weight: 900 !important;
+    font-size: 0.9rem !important;
+}
+
+.gk-vip-pill.inactive span {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1.5px solid #cbd5e1 !important;
+    padding: 6px 14px !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    font-size: 0.9rem !important;
+}
+
+.gk-btn-buy-vip {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    padding: 6px 14px !important;
+    border-radius: 14px !important;
+    font-weight: 900 !important;
+    font-size: 0.85rem !important;
+    text-decoration: none !important;
+    margin-top: 4px !important;
+}
+
+/* =========================================================
+   5. 4 Shortcut Grid Cards
+   ========================================================= */
+.gk-acc-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    gap: 16px !important;
+    margin-bottom: 24px !important;
+}
+
+.gk-acc-card {
+    background: #ffffff !important;
+    border: 2px solid #e0f2fe !important;
+    border-radius: 22px !important;
+    padding: 22px 20px !important;
+    text-decoration: none !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 4px 16px rgba(2, 132, 199, 0.05) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+.gk-acc-card:hover {
+    transform: translateY(-4px) !important;
+    border-color: #0284c7 !important;
+    box-shadow: 0 12px 30px rgba(2, 132, 199, 0.15) !important;
+}
+
+.gk-acc-card-icon {
+    font-size: 2rem !important;
+    margin-bottom: 12px !important;
+}
+
+.gk-acc-card h3 {
+    margin: 0 0 6px 0 !important;
+    font-size: 1.15rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+}
+
+.gk-acc-card p {
+    margin: 0 0 16px 0 !important;
+    font-size: 0.88rem !important;
+    color: #64748b !important;
+    font-weight: 700 !important;
+    line-height: 1.5 !important;
+}
+
+.gk-acc-card-link {
+    font-size: 0.9rem !important;
+    font-weight: 900 !important;
+    color: #0284c7 !important;
+}
+
+/* =========================================================
+   6. Luxury Addresses Styling (.woocommerce-Addresses)
+   ========================================================= */
+.woocommerce-MyAccount-content > p:first-of-type {
+    background: #f0f9ff !important;
+    border: 1.5px solid #bae6fd !important;
+    border-radius: 16px !important;
+    padding: 12px 18px !important;
+    color: #0369a1 !important;
+    font-weight: 800 !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.woocommerce-account .woocommerce-Addresses,
+.woocommerce-Addresses {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 20px !important;
+    margin-top: 20px !important;
+    width: 100% !important;
+}
+
+.woocommerce-Address {
+    background: #ffffff !important;
+    border: 2px solid #e0f2fe !important;
+    border-radius: 24px !important;
+    padding: 24px !important;
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.06) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    width: 100% !important;
+    float: none !important;
+    box-sizing: border-box !important;
+}
+
+.woocommerce-Address:hover {
+    border-color: #38bdf8 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 30px rgba(2, 132, 199, 0.12) !important;
+}
+
+.woocommerce-Address-title.title {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 12px !important;
+    border-bottom: 1.5px solid #f0f9ff !important;
+    width: 100% !important;
+}
+
+.woocommerce-Address-title h3 {
+    margin: 0 !important;
+    font-size: 1.2rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+}
+
+.woocommerce-Address-title a.edit {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+    border: 1.5px solid #bae6fd !important;
+    color: #0284c7 !important;
+    padding: 6px 14px !important;
+    border-radius: 14px !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.woocommerce-Address-title a.edit:hover {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    border-color: #0284c7 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+}
+
+.woocommerce-Address address {
+    font-style: normal !important;
+    font-size: 0.95rem !important;
+    line-height: 1.8 !important;
+    color: #475569 !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+/* =========================================================
+   7. Orders, Downloads, Account Details Tables & Forms
+   ========================================================= */
+.woocommerce-orders-table,
+.woocommerce-table--order-downloads,
+table.shop_table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    background: #ffffff !important;
+    border: 2px solid #e0f2fe !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    margin-bottom: 24px !important;
+    box-shadow: 0 4px 16px rgba(2, 132, 199, 0.05) !important;
+}
+
+table.shop_table th {
+    background: #f0f9ff !important;
+    color: #0369a1 !important;
+    font-weight: 900 !important;
+    padding: 14px 16px !important;
+    font-size: 0.92rem !important;
+    border-bottom: 2px solid #bae6fd !important;
+    text-align: right !important;
+}
+
+table.shop_table td {
+    padding: 14px 16px !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    color: #334155 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    vertical-align: middle !important;
+}
+
+table.shop_table tr:last-child td {
+    border-bottom: none !important;
+}
+
+.woocommerce-button.button,
+.woocommerce-Button.button,
+.woocommerce-orders-table__cell-order-actions a.button {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 8px 16px !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    transition: all 0.2s ease !important;
+}
+
+.woocommerce-button.button:hover,
+.woocommerce-Button.button:hover,
+.woocommerce-orders-table__cell-order-actions a.button:hover {
+    background: #0369a1 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+}
+
+.woocommerce-EditAccountForm fieldset {
+    border: 2px solid #e0f2fe !important;
+    border-radius: 20px !important;
+    padding: 20px !important;
+    margin: 24px 0 !important;
+    background: #ffffff !important;
+}
+
+.woocommerce-EditAccountForm fieldset legend {
+    font-weight: 900 !important;
+    font-size: 1.1rem !important;
+    color: #0369a1 !important;
+    padding: 0 10px !important;
+}
+
+.woocommerce-EditAccountForm .woocommerce-form-row {
+    margin-bottom: 16px !important;
+}
+
+.woocommerce-EditAccountForm label {
+    display: block !important;
+    margin-bottom: 6px !important;
+    font-weight: 800 !important;
+    font-size: 0.92rem !important;
+    color: #334155 !important;
+}
+
+.woocommerce-EditAccountForm input.input-text {
+    width: 100% !important;
+    height: 48px !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    background: #f8fafc !important;
+    padding: 0 16px !important;
+    font-size: 0.95rem !important;
+    outline: none !important;
+}
+
+.woocommerce-EditAccountForm input.input-text:focus {
+    border-color: #0284c7 !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15) !important;
+}
+
+/* =========================================================
+   8. Mobile Adaptations (< 960px)
+   ========================================================= */
+@media (max-width: 960px) {
+    .woocommerce-account .woocommerce {
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+
+    .woocommerce-account .woocommerce-MyAccount-navigation {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        position: static !important;
+        padding: 14px 12px !important;
+    }
+
+    .woocommerce-account .woocommerce-MyAccount-content {
+        width: 100% !important;
+    }
+
+    .woocommerce-account #customer_login,
+    #customer_login {
+        max-width: 100% !important;
+        margin: 10px auto 40px auto !important;
+        padding: 22px 16px !important;
+        border-radius: 24px !important;
+        border-width: 1.5px !important;
+        box-shadow: 0 10px 30px rgba(2, 132, 199, 0.08) !important;
+    }
+
+    .gk-auth-tabs-wrapper {
+        max-width: 100% !important;
+        margin: 16px auto 14px auto !important;
+        padding: 0 4px !important;
+    }
+
+    .gk-auth-tab-btn {
+        height: 44px !important;
+        font-size: 0.9rem !important;
+        border-radius: 14px !important;
+        padding: 0 8px !important;
+    }
+
+    .gk-dashboard-vip-banner {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 18px 16px !important;
+    }
+
+    .gk-vip-banner-btn {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    .gk-acc-hero-card {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 18px 16px !important;
+    }
+
+    .gk-vip-pill {
+        align-items: flex-start !important;
+        width: 100% !important;
+    }
+
+    .gk-btn-buy-vip {
+        width: 100% !important;
+        text-align: center !important;
+    }
+}

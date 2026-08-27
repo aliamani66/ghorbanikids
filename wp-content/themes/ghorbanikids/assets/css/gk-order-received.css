@@ -1,0 +1,753 @@
+/* =========================================================
+   GhorbaniKids Ultra-Clean Order Received Styles (100% Isolated & Responsive)
+   ========================================================= */
+
+body.woocommerce-order-received {
+    background: 
+        radial-gradient(circle at 50% 10%, rgba(186, 230, 253, 0.4) 0%, transparent 45%),
+        radial-gradient(circle at 10% 80%, rgba(254, 240, 138, 0.3) 0%, transparent 40%),
+        #f8fafc !important;
+    min-height: 100vh !important;
+    direction: rtl !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', 'Vazirmatn', Tahoma, sans-serif !important;
+    overflow-x: hidden !important;
+}
+
+.woocommerce-order {
+    max-width: 860px !important;
+    margin: 25px auto 70px auto !important;
+    padding: 0 16px !important;
+    direction: rtl !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+/* Hide default unstyled thank you notice & duplicate raw text */
+p.woocommerce-notice.woocommerce-notice--success.woocommerce-thankyou-order-received,
+.woocommerce-order > p:not(.gk-success-subtitle) {
+    display: none !important;
+}
+
+/* 1. Success Header */
+.gk-order-success-header {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 28px !important;
+    padding: 24px 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+    margin-bottom: 24px !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.gk-success-icon-badge {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 22px !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 2rem !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35) !important;
+}
+
+.gk-success-title-box {
+    flex: 1 !important;
+}
+
+.gk-success-title {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+    font-size: 1.95rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin: 0 0 6px 0 !important;
+    line-height: 1.25 !important;
+}
+
+.gk-success-subtitle {
+    font-size: 0.96rem !important;
+    color: #64748b !important;
+    margin: 0 !important;
+    line-height: 1.6 !important;
+    font-weight: 700 !important;
+}
+
+/* 2. Order Overview Strip */
+ul.woocommerce-order-overview.woocommerce-thankyou-order-details {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    list-style: none !important;
+    margin: 0 0 26px 0 !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+ul.woocommerce-order-overview li {
+    flex: 1 1 0 !important;
+    text-align: center !important;
+    font-size: 0.9rem !important;
+    color: #64748b !important;
+    font-weight: 800 !important;
+    padding: 20px 14px !important;
+    background: transparent !important;
+    border: none !important;
+    border-left: 1.5px solid #f1f5f9 !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+ul.woocommerce-order-overview li:last-child {
+    border-left: none !important;
+}
+
+ul.woocommerce-order-overview li strong {
+    font-size: 1.1rem !important;
+    color: #0f172a !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+    line-height: 1.3 !important;
+    margin-top: 2px !important;
+}
+
+ul.woocommerce-order-overview li.woocommerce-order-overview__order strong {
+    color: #0284c7 !important;
+    font-size: 1.35rem !important;
+}
+
+ul.woocommerce-order-overview li.woocommerce-order-overview__total strong {
+    color: #16a34a !important;
+    font-size: 1.3rem !important;
+    white-space: nowrap !important;
+}
+
+/* 3. Realistic Bank Debit Card UI */
+.gk-bank-card-container {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 30px !important;
+    padding: 28px !important;
+    margin-bottom: 26px !important;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.05) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.gk-bank-card-visual {
+    background: linear-gradient(135deg, #1e1b4b 0%, #1e3a8a 50%, #0369a1 100%) !important;
+    border-radius: 24px !important;
+    padding: 26px 28px !important;
+    color: #ffffff !important;
+    box-shadow: 0 20px 40px -10px rgba(30, 58, 138, 0.45) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    margin-bottom: 22px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.gk-bank-card-visual::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -40px !important;
+    left: -40px !important;
+    width: 140px !important;
+    height: 140px !important;
+    background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%) !important;
+    border-radius: 50% !important;
+    pointer-events: none !important;
+}
+
+.gk-card-top-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 24px !important;
+}
+
+.gk-card-bank-name {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+    font-size: 1.6rem !important;
+    font-weight: 900 !important;
+    color: #fef08a !important;
+    display: block !important;
+    line-height: 1.1 !important;
+}
+
+.gk-card-bank-sub {
+    font-size: 0.8rem !important;
+    color: #93c5fd !important;
+    font-weight: 700 !important;
+    display: block !important;
+    margin-top: 2px !important;
+}
+
+.gk-card-chip {
+    width: 44px !important;
+    height: 34px !important;
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%) !important;
+    border-radius: 8px !important;
+    border: 1.5px solid #fef08a !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+    padding: 3px 5px !important;
+    box-sizing: border-box !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+.gk-chip-line {
+    height: 1.5px !important;
+    background: rgba(0,0,0,0.25) !important;
+    width: 100% !important;
+}
+
+.gk-card-number-box {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: rgba(0, 0, 0, 0.28) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 16px !important;
+    padding: 12px 18px !important;
+    margin-bottom: 22px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    gap: 12px !important;
+}
+
+.gk-card-number {
+    font-family: 'IRANSansXFaNum', 'Courier New', monospace, sans-serif !important;
+    font-size: 1.4rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px !important;
+    color: #ffffff !important;
+    direction: ltr !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+}
+
+.gk-btn-copy-card {
+    background: #ffffff !important;
+    color: #1e3a8a !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 8px 16px !important;
+    font-size: 0.88rem !important;
+    font-weight: 900 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+    font-family: inherit !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-btn-copy-card:hover {
+    background: #fef08a !important;
+    color: #854d0e !important;
+    transform: translateY(-2px) !important;
+}
+
+.gk-card-bottom-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+}
+
+.gk-card-label {
+    font-size: 0.78rem !important;
+    color: #93c5fd !important;
+    display: block !important;
+}
+
+.gk-card-holder {
+    font-size: 1.15rem !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    margin-top: 2px !important;
+    display: block !important;
+}
+
+.gk-card-verified-badge {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border: 1px solid rgba(16, 185, 129, 0.4) !important;
+    color: #6ee7b7 !important;
+    font-size: 0.82rem !important;
+    font-weight: 800 !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+}
+
+/* 3-Step Guide */
+.gk-payment-guide-box {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
+.gk-guide-step {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 12px 16px !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+}
+
+.gk-step-badge {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.9rem !important;
+    font-weight: 900 !important;
+    flex-shrink: 0 !important;
+}
+
+/* 4. Order Details Table Card */
+.woocommerce-order-details {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 30px !important;
+    padding: 28px 24px !important;
+    margin-bottom: 26px !important;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.04) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.woocommerce-order-details__title {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+    font-size: 1.75rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin: 0 0 18px 0 !important;
+    padding-bottom: 12px !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+    text-align: right !important;
+}
+
+table.woocommerce-table--order-details {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-box !important;
+}
+
+table.woocommerce-table--order-details th,
+table.woocommerce-table--order-details td {
+    padding: 12px 10px !important;
+    border-bottom: 1.5px solid #f1f5f9 !important;
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+    text-align: right !important;
+}
+
+table.woocommerce-table--order-details td.woocommerce-table__product-name {
+    font-size: 0.98rem !important;
+    font-weight: 900 !important;
+    color: #0284c7 !important;
+}
+
+table.woocommerce-table--order-details td.woocommerce-table__product-total,
+table.woocommerce-table--order-details tfoot td {
+    text-align: left !important;
+    font-family: 'IRANSansXFaNum', Tahoma, sans-serif !important;
+    color: #0284c7 !important;
+    font-size: 1.05rem !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+}
+
+table.woocommerce-table--order-details tfoot tr:last-child th {
+    font-size: 1.15rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    border-top: 2px solid #e2e8f0 !important;
+    padding-top: 16px !important;
+}
+
+table.woocommerce-table--order-details tfoot tr:last-child td {
+    border-top: 2px solid #e2e8f0 !important;
+    font-size: 1.25rem !important;
+    font-weight: 900 !important;
+    color: #16a34a !important;
+    padding-top: 16px !important;
+    white-space: nowrap !important;
+}
+
+.woocommerce-customer-details,
+section.woocommerce-bacs-bank-details {
+    display: none !important;
+}
+
+/* =========================================================
+   5. Mobile-First Perfection (< 768px) (Rule 9)
+   ========================================================= */
+@media (max-width: 768px) {
+    .woocommerce-order {
+        margin: 15px auto 50px auto !important;
+        padding: 0 10px !important;
+    }
+
+    .gk-order-success-header {
+        flex-direction: column !important;
+        text-align: center !important;
+        padding: 20px 14px !important;
+        border-radius: 22px !important;
+        gap: 12px !important;
+    }
+
+    .gk-success-icon-badge {
+        width: 52px !important;
+        height: 52px !important;
+        border-radius: 18px !important;
+        font-size: 1.6rem !important;
+    }
+
+    .gk-success-title {
+        font-size: 1.55rem !important;
+    }
+
+    .gk-success-subtitle {
+        font-size: 0.88rem !important;
+    }
+
+    /* Row by Row Key-Value Strip on Mobile */
+    ul.woocommerce-order-overview.woocommerce-thankyou-order-details {
+        flex-direction: column !important;
+        border-radius: 20px !important;
+    }
+
+    ul.woocommerce-order-overview li {
+        flex: 1 1 100% !important;
+        border-left: none !important;
+        border-bottom: 1.5px solid #f1f5f9 !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 12px 16px !important;
+        font-size: 0.86rem !important;
+    }
+
+    ul.woocommerce-order-overview li:last-child {
+        border-bottom: none !important;
+    }
+
+    ul.woocommerce-order-overview li strong {
+        font-size: 0.98rem !important;
+    }
+
+    ul.woocommerce-order-overview li.woocommerce-order-overview__order strong {
+        font-size: 1.15rem !important;
+    }
+
+    ul.woocommerce-order-overview li.woocommerce-order-overview__total strong {
+        font-size: 1.15rem !important;
+    }
+
+    /* Bank Debit Card Mobile */
+    .gk-bank-card-container {
+        padding: 16px 12px !important;
+        border-radius: 22px !important;
+    }
+
+    .gk-bank-card-visual {
+        padding: 18px 14px !important;
+        border-radius: 18px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .gk-card-top-row {
+        margin-bottom: 16px !important;
+    }
+
+    .gk-card-bank-name {
+        font-size: 1.35rem !important;
+    }
+
+    .gk-card-number-box {
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 12px 10px !important;
+        gap: 10px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .gk-card-number {
+        font-size: 1.1rem !important;
+        letter-spacing: 1px !important;
+        text-align: center !important;
+    }
+
+    .gk-btn-copy-card {
+        width: 100% !important;
+        height: 40px !important;
+        justify-content: center !important;
+    }
+
+    .gk-card-holder {
+        font-size: 1rem !important;
+    }
+
+    .gk-guide-step {
+        padding: 10px 12px !important;
+        font-size: 0.85rem !important;
+        border-radius: 14px !important;
+    }
+
+    /* Order Details Table Mobile */
+    .woocommerce-order-details {
+        padding: 18px 12px !important;
+        border-radius: 22px !important;
+    }
+
+    .woocommerce-order-details__title {
+        font-size: 1.45rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    table.woocommerce-table--order-details th,
+    table.woocommerce-table--order-details td {
+        padding: 10px 6px !important;
+        font-size: 0.88rem !important;
+    }
+
+    table.woocommerce-table--order-details td.woocommerce-table__product-name {
+        font-size: 0.9rem !important;
+    }
+
+    table.woocommerce-table--order-details tfoot tr:last-child th {
+        font-size: 1rem !important;
+    }
+
+    table.woocommerce-table--order-details tfoot tr:last-child td {
+        font-size: 1.15rem !important;
+    }
+}
+
+/* =========================================================
+   Direct Card & Row System for Order Details Template Override
+   ========================================================= */
+.gk-order-details-card {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 28px !important;
+    padding: 26px 24px !important;
+    margin-bottom: 26px !important;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+.gk-order-items-list,
+.gk-order-totals-list {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.gk-order-item-row,
+.gk-order-total-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 14px 0 !important;
+    border-bottom: 1.5px solid #f1f5f9 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    gap: 12px !important;
+}
+
+.gk-order-item-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex: 1 !important;
+    text-align: right !important;
+}
+
+.gk-order-item-name {
+    color: #0284c7 !important;
+    font-size: 0.98rem !important;
+    font-weight: 800 !important;
+}
+
+.gk-order-item-qty {
+    color: #64748b !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+}
+
+.gk-order-item-price {
+    text-align: left !important;
+    font-family: 'IRANSansXFaNum', Tahoma, sans-serif !important;
+    color: #16a34a !important;
+    font-weight: 900 !important;
+    font-size: 1.05rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-total-label {
+    color: #475569 !important;
+    font-size: 0.94rem !important;
+    font-weight: 800 !important;
+    text-align: right !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-total-value {
+    color: #0f172a !important;
+    font-size: 0.96rem !important;
+    font-weight: 800 !important;
+    text-align: left !important;
+    font-family: 'IRANSansXFaNum', Tahoma, sans-serif !important;
+}
+
+.gk-order-total-row.is-final-total {
+    border-top: 2px solid #e2e8f0 !important;
+    border-bottom: none !important;
+    padding-top: 18px !important;
+    margin-top: 4px !important;
+}
+
+.gk-order-total-row.is-final-total .gk-total-label {
+    font-size: 1.1rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+}
+
+.gk-order-total-row.is-final-total .gk-total-value {
+    font-size: 1.3rem !important;
+    font-weight: 900 !important;
+    color: #16a34a !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 768px) {
+    .gk-order-details-card {
+        padding: 18px 14px !important;
+        border-radius: 22px !important;
+    }
+    .gk-order-item-row,
+    .gk-order-total-row {
+        padding: 11px 0 !important;
+    }
+    .gk-order-item-name {
+        font-size: 0.92rem !important;
+    }
+    .gk-total-label {
+        font-size: 0.88rem !important;
+    }
+    .gk-total-value {
+        font-size: 0.92rem !important;
+    }
+    .gk-order-total-row.is-final-total .gk-total-value {
+        font-size: 1.15rem !important;
+    }
+}
+/* Bale Receipt Banner on Order Received Page */
+.gk-bale-receipt-banner {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+    border: 2px solid #6ee7b7 !important;
+    border-radius: 24px !important;
+    padding: 22px 26px !important;
+    margin: 0 auto 24px auto !important;
+    max-width: 1000px !important;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.12) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.gk-bale-banner-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+
+.gk-bale-banner-icon {
+    flex-shrink: 0 !important;
+}
+
+.gk-bale-banner-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+
+.gk-bale-banner-title {
+    font-size: 1.2rem !important;
+    font-weight: 900 !important;
+    color: #065f46 !important;
+    margin: 0 !important;
+}
+
+.gk-bale-banner-desc {
+    font-size: 0.9rem !important;
+    color: #047857 !important;
+    margin: 0 !important;
+    line-height: 1.5 !important;
+}
+
+.gk-btn-bale-send-receipt {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    padding: 14px 24px !important;
+    border-radius: 16px !important;
+    font-size: 1.08rem !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35) !important;
+    transition: all 0.22s ease !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+
+.gk-btn-bale-send-receipt:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45) !important;
+    color: #ffffff !important;
+}
