@@ -365,6 +365,34 @@ class GK_Teacher_Portal {
                 border-color: #7c3aed;
                 box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
             }
+            .gk-btn-delete {
+                background: #fff1f2;
+                color: #e11d48 !important;
+                border-color: #fecdd3;
+            }
+            .gk-btn-delete:hover {
+                background: #e11d48;
+                color: #ffffff !important;
+                border-color: #e11d48;
+                box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+            }
+            .gk-btn-arena {
+                background: linear-gradient(135deg, #4f46e5, #4338ca);
+                color: #ffffff !important;
+                padding: 8px 14px;
+                border-radius: 12px;
+                font-size: 12.5px;
+                font-weight: 900;
+                text-decoration: none !important;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+                transition: transform 0.2s;
+            }
+            .gk-btn-arena:hover {
+                transform: translateY(-1px);
+            }
 
             .gk-podium-grid {
                 display: grid;
@@ -1121,19 +1149,22 @@ class GK_Teacher_Portal {
                                             🎮 شامل <?php echo count($l_games); ?> بازی منتخب | 📅 ایجاد شده: <?php echo date_i18n('j F Y', strtotime($l->created_at)); ?>
                                         </span>
                                     </div>
-                                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                                        <a href="<?php echo esc_url($league_url); ?>" target="_blank" class="gk-btn-tool" style="background:#4f46e5; padding:8px 12px; font-size:12px;">
-                                            🔗 سالن مسابقه
+                                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                        <a href="<?php echo esc_url($league_url); ?>" target="_blank" class="gk-btn-arena" title="ورود مستقیم به سالن مسابقه">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                            <span>سالن مسابقه</span>
                                         </a>
-                                        <a href="<?php echo esc_url($bale_league_bulk_share); ?>" target="_blank" class="gk-btn-tool" style="background:#16a34a; padding:8px 12px; font-size:12px;" title="ارسال یکجای لینک‌های اختصاصی تمام نوآموزان این مسابقه به گروه بله">
-                                            📢 ارسال گروهی لینک‌ها (بله)
-                                        </a>
-                                        <button type="button" class="gk-btn-tool" style="background:#f1f5f9; color:#475569 !important; border:1px solid #cbd5e1; padding:8px 10px; font-size:12px;" onclick="navigator.clipboard.writeText('<?php echo esc_url($league_url); ?>'); alert('لینک عمومی مسابقه کپی شد!');">
-                                            📋 کپی لینک
-                                        </button>
-                                        <button type="button" style="background:#fff1f2; border:1.5px solid #fecdd3; color:#e11d48; border-radius:10px; padding:0 10px; cursor:pointer; font-weight:bold; font-size:13px;" title="حذف مسابقه" onclick="if(confirm('آیا از حذف مسابقه «<?php echo esc_js($l->title); ?>» اطمینان دارید؟')) gkDeleteLeague(<?php echo $l->id; ?>);">
-                                            🗑️
-                                        </button>
+                                        <div class="gk-action-icons-group">
+                                            <a href="<?php echo esc_url($bale_league_bulk_share); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال گروهی لینک‌های اختصاصی مسابقه به بله مادران">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                            </a>
+                                            <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک سالن مسابقه" onclick="gkCopyText('<?php echo esc_js($league_url); ?>', this);">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                            </button>
+                                            <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف مسابقه" onclick="if(confirm('آیا از حذف مسابقه «<?php echo esc_js($l->title); ?>» اطمینان دارید؟')) gkDeleteLeague(<?php echo $l->id; ?>);">
+                                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1310,32 +1341,30 @@ class GK_Teacher_Portal {
                                         </div>
                                     </div>
 
-                                    <!-- Action Buttons with High Contrast & Polished Look -->
+                                    <!-- Action Buttons with Compact Icons & Tooltips -->
                                     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                                        
-                                        <button type="button" class="gk-btn-tool" onclick="jQuery('#gk-ex-scores-<?php echo $ex->id; ?>').slideToggle(200);" style="background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#ffffff !important; padding:9px 15px; font-size:12.5px; font-weight:900; border-radius:10px; box-shadow:0 3px 10px rgba(124,58,237,0.3); border:none; cursor:pointer;">
-                                            📊 تابلوی نمرات کلاس (<?php echo count($ex_scores); ?> نفر) ▼
+                                        <button type="button" class="gk-btn-tool" onclick="jQuery('#gk-ex-scores-<?php echo $ex->id; ?>').slideToggle(200);" style="background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#ffffff !important; padding:8px 14px; font-size:12px; font-weight:900; border-radius:10px; border:none; cursor:pointer;">
+                                            📊 تابلوی نمرات (<?php echo count($ex_scores); ?>) ▼
                                         </button>
 
-                                        <a href="<?php echo esc_url($bale_exam_share); ?>" target="_blank" class="gk-btn-tool" style="background:linear-gradient(135deg,#10b981,#059669); color:#ffffff !important; padding:9px 15px; font-size:12.5px; font-weight:900; border-radius:10px; box-shadow:0 3px 10px rgba(16,185,129,0.3); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                                            📲 ارسال گروهی به بله مادران
-                                        </a>
-
-                                        <a href="<?php echo esc_url($exam_url); ?>" target="_blank" class="gk-btn-tool" style="background:linear-gradient(135deg,#0284c7,#0369a1); color:#ffffff !important; padding:9px 14px; font-size:12.5px; font-weight:900; border-radius:10px; box-shadow:0 3px 10px rgba(2,132,199,0.3); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                                            🏆 ورود به سالن آزمون
-                                        </a>
-
-                                        <button type="button" class="gk-btn-tool" onclick="jQuery('#gk-st-exam-links-<?php echo $ex->id; ?>').slideToggle(200);" style="background:linear-gradient(135deg,#4f46e5,#4338ca); color:#ffffff !important; padding:9px 14px; font-size:12px; font-weight:900; border-radius:10px; box-shadow:0 3px 10px rgba(79,70,229,0.3); border:none; cursor:pointer;">
+                                        <button type="button" class="gk-btn-tool" onclick="jQuery('#gk-st-exam-links-<?php echo $ex->id; ?>').slideToggle(200);" style="background:linear-gradient(135deg,#4f46e5,#4338ca); color:#ffffff !important; padding:8px 14px; font-size:12px; font-weight:900; border-radius:10px; border:none; cursor:pointer;">
                                             👶 لینک اختصاصی نوآموزان ▼
                                         </button>
 
-                                        <button type="button" class="gk-btn-tool" onclick="gkCopyText('<?php echo esc_js($exam_url); ?>', this)" style="background:linear-gradient(135deg,#475569,#334155); color:#ffffff !important; padding:9px 13px; font-size:12px; font-weight:900; border-radius:10px; box-shadow:0 3px 10px rgba(71,85,105,0.3); border:none; cursor:pointer;">
-                                            📋 کپی لینک سالن
-                                        </button>
-
-                                        <button type="button" class="gk-btn-tool" onclick="gkDeleteExam(<?php echo $ex->id; ?>)" style="background:linear-gradient(135deg,#ef4444,#dc2626); color:#ffffff !important; padding:9px 12px; font-size:12px; font-weight:900; border-radius:10px; box-shadow:0 3px 10px rgba(239,68,68,0.3); border:none; cursor:pointer;" title="حذف آزمون">
-                                            🗑️
-                                        </button>
+                                        <div class="gk-action-icons-group">
+                                            <a href="<?php echo esc_url($exam_url); ?>" target="_blank" class="gk-icon-btn gk-btn-play-link" title="ورود مستقیم به سالن آزمون">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                            </a>
+                                            <a href="<?php echo esc_url($bale_exam_share); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال گروهی لینک‌های اختصاصی آزمون به بله مادران">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                            </a>
+                                            <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک سالن آزمون" onclick="gkCopyText('<?php echo esc_js($exam_url); ?>', this);">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                            </button>
+                                            <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف این آزمون" onclick="if(confirm('آیا از حذف آزمون «<?php echo esc_js($ex->title); ?>» اطمینان دارید؟')) gkDeleteExam(<?php echo $ex->id; ?>);">
+                                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
