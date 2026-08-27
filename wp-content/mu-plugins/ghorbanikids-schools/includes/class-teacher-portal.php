@@ -920,6 +920,86 @@ class GK_Teacher_Portal {
                     border-radius: 12px !important;
                 }
 
+                /* تبدیل ردیف‌های جدول کارنامه به کارت‌های چندسطری شیک در موبایل */
+                .gk-t-rc-row {
+                    background: #ffffff !important;
+                    border: 2px solid #e2e8f0 !important;
+                    border-radius: 18px !important;
+                    padding: 14px !important;
+                    margin-bottom: 14px !important;
+                    box-shadow: 0 3px 12px rgba(0,0,0,0.03) !important;
+                    position: relative !important;
+                    display: block !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+                .gk-t-rc-row td {
+                    background: transparent !important;
+                    border: none !important;
+                    padding: 3px 0 !important;
+                    border-radius: 0 !important;
+                    text-align: right !important;
+                    display: block !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+                .gk-t-rc-row td:nth-child(1) { /* رتبه */
+                    position: absolute;
+                    top: 14px;
+                    left: 14px;
+                    width: auto !important;
+                    font-size: 11.5px;
+                    color: #64748b;
+                    background: #f1f5f9;
+                    padding: 3px 8px;
+                    border-radius: 8px;
+                    font-weight: 900;
+                }
+                .gk-t-rc-row td:nth-child(2) { /* نام */
+                    font-size: 15px !important;
+                    padding-left: 55px !important;
+                    margin-bottom: 4px;
+                }
+                .gk-t-rc-row td:nth-child(3) { /* سن */
+                    display: inline-block !important;
+                    width: auto !important;
+                    color: #475569;
+                    font-size: 11.5px;
+                    background: #f8fafc;
+                    padding: 2px 8px;
+                    border-radius: 6px;
+                    border: 1px solid #e2e8f0;
+                    margin-left: 6px;
+                    font-weight: bold;
+                }
+                .gk-t-rc-row td:nth-child(4) { /* تلفن */
+                    display: inline-block !important;
+                    width: auto !important;
+                    font-size: 12px;
+                }
+                .gk-t-rc-row td:nth-child(5) { /* امتیاز کل */
+                    margin: 8px 0 !important;
+                }
+                .gk-t-rc-row td:nth-child(6) { /* دکمه کارنامه */
+                    border-top: 1.5px dashed #e2e8f0 !important;
+                    padding-top: 12px !important;
+                    margin-top: 6px !important;
+                }
+                .gk-t-rc-row .gk-btn-view-rc {
+                    width: 100% !important;
+                    justify-content: center !important;
+                    height: 42px !important;
+                    border-radius: 12px !important;
+                    font-size: 13px !important;
+                    box-sizing: border-box !important;
+                }
+
+                #gk-teacher-search-rc {
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    margin-top: 8px;
+                }
+
                 /* تبدیل جدول‌های آزمون‌ها و لیگ‌ها به کارت‌های چندسطری شیک در موبایل */
                 .gk-table-exam-scores, 
                 .gk-table-exam-links, 
