@@ -79,15 +79,21 @@ class GK_School_Exams {
         }
 
         // Student resolution
-        $st_token = sanitize_text_field($_GET['st_token'] ?? ($_COOKIE['gk_active_student_token'] ?? ''));
+        $st_token = sanitize_text_field($_GET['st_token'] ?? '');
         $current_student = null;
         if (!empty($st_token)) {
             $current_student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_students WHERE student_token = %s", $st_token));
             if ($current_student) {
                 // Keep token cookie active
-                if (!isset($_COOKIE['gk_active_student_token']) || $_COOKIE['gk_active_student_token'] !== $st_token) {
-                    setcookie('gk_active_student_token', $st_token, time() + (86400 * 30), '/');
-                }
+                setcookie('gk_active_student_token', $st_token, time() + (86400 * 30), '/');
+            }
+        } elseif (!empty($_COOKIE['gk_active_student_token'])) {
+            // Only auto-bind from cookie if student belongs to THIS specific class
+            $cookie_token = sanitize_text_field($_COOKIE['gk_active_student_token']);
+            $candidate = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_students WHERE student_token = %s AND class_id = %d", $cookie_token, $exam->class_id));
+            if ($candidate) {
+                $current_student = $candidate;
+                $st_token = $cookie_token;
             }
         }
 
@@ -178,10 +184,23 @@ class GK_School_Exams {
                             </div>
                         </div>
                     </div>
-                    <span style="background: #16a34a; color: #ffffff; padding: 7px 16px; border-radius: 12px; font-weight: 900; font-size: 12.5px;">
-                        ⭐ متصل به پنل کلاس
-                    </span>
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <button type="button" onclick="gkChangeExamStudent();" style="background:#fff1f2; color:#b91c1c; border:1.5px solid #fecdd3; padding:7px 14px; border-radius:12px; font-weight:900; font-size:12px; cursor:pointer; font-family:inherit;">
+                            🔄 تغییر / انتخاب نوآموز دیگر
+                        </button>
+                        <span style="background: #16a34a; color: #ffffff; padding: 7px 16px; border-radius: 12px; font-weight: 900; font-size: 12.5px;">
+                            ⭐ متصل به پنل کلاس
+                        </span>
+                    </div>
                 </div>
+                <script>
+                function gkChangeExamStudent() {
+                    document.cookie = 'gk_active_student_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+                    var url = new URL(window.location.href);
+                    url.searchParams.delete('st_token');
+                    window.location.href = url.toString();
+                }
+                </script>
             <?php elseif (!empty($all_class_students)): ?>
                 <!-- Student Picker for Parents opening general link -->
                 <div style="background: #fffbeb; border: 2px dashed #f59e0b; border-radius: 20px; padding: 16px 22px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.1);">
