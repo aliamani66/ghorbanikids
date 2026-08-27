@@ -391,6 +391,349 @@ class GK_Teacher_Portal {
                 background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
                 border-color: #f97316;
             }
+
+            /* استایل‌های کارنامه جامع و گزارش پیشرفت */
+            .gk-btn-view-rc {
+                background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+                color: #ffffff !important;
+                font-size: 12px;
+                font-weight: 900;
+                padding: 7px 14px;
+                border-radius: 10px;
+                border: none;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+                transition: all 0.2s ease;
+                text-decoration: none !important;
+            }
+            .gk-btn-view-rc:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+            }
+
+            .gk-rc-letterhead {
+                background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                border: 2px solid #e2e8f0;
+                border-radius: 20px;
+                padding: 18px 22px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+            .gk-rc-brand-meta {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+            .gk-rc-logo {
+                width: 60px;
+                height: 60px;
+                border-radius: 14px;
+                object-fit: cover;
+                border: 1.5px solid #cbd5e1;
+            }
+            .gk-rc-logo-fallback {
+                width: 54px;
+                height: 54px;
+                background: #e0e7ff;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 26px;
+            }
+            .gk-rc-org-title {
+                margin: 0 0 4px 0;
+                font-size: 18px;
+                font-weight: 900;
+                color: #1e1b4b;
+            }
+            .gk-rc-subhead {
+                font-size: 12.5px;
+                color: #64748b;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .gk-rc-dot { color: #cbd5e1; font-weight: bold; }
+            .gk-rc-actions-box {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 6px;
+            }
+            .gk-rc-btn-print {
+                background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                color: #ffffff !important;
+                font-size: 13px;
+                font-weight: 900;
+                padding: 9px 18px;
+                border-radius: 12px;
+                border: none;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+            }
+            .gk-rc-date-badge {
+                font-size: 11.5px;
+                color: #64748b;
+                font-weight: 600;
+            }
+
+            .gk-rc-student-card {
+                background: #f8fafc;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 18px;
+                padding: 16px 20px;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+            .gk-rc-st-avatar {
+                width: 50px;
+                height: 50px;
+                background: #ffffff;
+                border: 1.5px solid #cbd5e1;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            }
+            .gk-rc-st-name-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-bottom: 4px;
+            }
+            .gk-rc-st-name {
+                font-size: 18px;
+                font-weight: 900;
+                color: #0f172a;
+                margin: 0;
+            }
+            .gk-rc-st-age {
+                background: #e2e8f0;
+                color: #334155;
+                font-size: 11.5px;
+                font-weight: 800;
+                padding: 2px 8px;
+                border-radius: 6px;
+            }
+            .gk-rc-overall-badge {
+                font-size: 12px;
+                font-weight: 900;
+                padding: 3px 10px;
+                border-radius: 8px;
+                border: 1px solid currentColor;
+            }
+            .gk-rc-st-meta-row {
+                font-size: 12px;
+                color: #64748b;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .gk-rc-kpi-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 14px;
+                margin-bottom: 24px;
+            }
+            .gk-rc-kpi-item {
+                background: #ffffff;
+                border: 1.5px solid #e2e8f0;
+                border-top: 4px solid #6366f1;
+                border-radius: 16px;
+                padding: 14px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            }
+            .gk-rc-kpi-icon {
+                width: 42px;
+                height: 42px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+            }
+            .gk-rc-kpi-label {
+                font-size: 11.5px;
+                color: #64748b;
+                display: block;
+                margin-bottom: 2px;
+            }
+            .gk-rc-kpi-val {
+                font-size: 15px;
+                font-weight: 900;
+                color: #0f172a;
+            }
+
+            .gk-rc-section {
+                background: #ffffff;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 18px;
+                padding: 18px;
+                margin-bottom: 20px;
+            }
+            .gk-rc-sec-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 14px;
+                border-bottom: 1.5px solid #f1f5f9;
+                padding-bottom: 10px;
+            }
+            .gk-rc-sec-title {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .gk-rc-sec-title h3 {
+                margin: 0;
+                font-size: 15px;
+                font-weight: 900;
+                color: #1e1b4b;
+            }
+            .gk-rc-sec-badge {
+                background: #f1f5f9;
+                color: #475569;
+                font-size: 11.5px;
+                font-weight: 800;
+                padding: 3px 9px;
+                border-radius: 8px;
+            }
+            .gk-rc-empty-box {
+                text-align: center;
+                padding: 24px;
+                color: #94a3b8;
+                font-size: 13px;
+            }
+            .gk-rc-empty-box span { font-size: 32px; display: block; margin-bottom: 6px; }
+            .gk-rc-table-responsive { overflow-x: auto; }
+            .gk-rc-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 12.5px;
+            }
+            .gk-rc-table th {
+                background: #f8fafc;
+                color: #475569;
+                font-weight: 800;
+                padding: 10px 12px;
+                border-bottom: 1.5px solid #e2e8f0;
+                text-align: right;
+            }
+            .gk-rc-table td {
+                padding: 11px 12px;
+                border-bottom: 1px solid #f1f5f9;
+                vertical-align: middle;
+            }
+            .gk-rc-score-pill {
+                padding: 3px 9px;
+                border-radius: 8px;
+                font-weight: 900;
+                font-size: 12px;
+                display: inline-block;
+            }
+            .gk-badge-excel { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+            .gk-badge-good  { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+            .gk-badge-need  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+            .gk-rc-topic-chips {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            .gk-rc-topic-chip {
+                font-size: 11px;
+                padding: 2px 7px;
+                border-radius: 6px;
+                border: 1px solid #e2e8f0;
+            }
+            .gk-rc-topic-chip.is-correct {
+                background: #f0fdf4;
+                color: #15803d;
+                border-color: #bbf7d0;
+            }
+            .gk-rc-topic-chip.is-review {
+                background: #fffbeb;
+                color: #b45309;
+                border-color: #fde68a;
+            }
+
+            .gk-rc-footer-signature {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 24px;
+                padding-top: 16px;
+                border-top: 2px dashed #cbd5e1;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+            .gk-rc-teacher-note {
+                flex: 1 1 300px;
+                font-size: 12px;
+                color: #334155;
+            }
+            .gk-rc-note-line {
+                height: 1px;
+                background: #cbd5e1;
+                margin-top: 18px;
+            }
+            .gk-rc-stamp-box {
+                text-align: center;
+            }
+            .gk-rc-stamp-circle {
+                width: 110px;
+                height: 110px;
+                border: 2.5px dashed #4f46e5;
+                border-radius: 50%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: #4f46e5;
+                font-size: 11px;
+                padding: 10px;
+                box-sizing: border-box;
+                transform: rotate(-5deg);
+            }
+
+            @media print {
+                body * {
+                    visibility: hidden !important;
+                }
+                #gkReportCardPrintArea,
+                #gkReportCardPrintArea * {
+                    visibility: visible !important;
+                }
+                #gkReportCardPrintArea {
+                    position: absolute !important;
+                    left: 0 !important;
+                    top: 0 !important;
+                    width: 100% !important;
+                    margin: 0 !important;
+                    padding: 20px !important;
+                    background: #fff !important;
+                }
+                .gk-rc-btn-print {
+                    display: none !important;
+                }
+            }
                     /* استایل‌های واکنش‌گرا موبایل پنل معلم */
             @media (max-width: 768px) {
                 .gk-teacher-wrap {
@@ -491,6 +834,10 @@ class GK_Teacher_Portal {
                 </button>
                 <button type="button" class="gk-tab-btn" data-target="tab-podium">
                     <span>🥇 سکوی قهرمانان</span>
+                </button>
+                <button type="button" class="gk-tab-btn" data-target="tab-reportcards">
+                    <span>📊 کارنامه و گزارش پیشرفت</span>
+                    <span class="gk-tab-badge"><?php echo $total_st; ?></span>
                 </button>
             </div>
 
@@ -1010,6 +1357,85 @@ class GK_Teacher_Portal {
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== تب ۵: کارنامه و گزارش پیشرفت نوآموزان ===================== -->
+            <div class="gk-tab-pane" id="tab-reportcards">
+                <div class="gk-card-box">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+                        <div>
+                            <h2 style="font-size:17px; font-weight:900; margin:0 0 4px 0; color:#1e293b;">
+                                📊 کارنامه جامع، ریز نمرات و سوابق نوآموزان
+                            </h2>
+                            <p style="font-size:12.5px; color:#64748b; margin:0;">
+                                مشاهده کارنامه تک‌تک دانش‌آموزان شامل تمامی امتحانات کلاسی، آزمون‌های کتب درسی دبستان، آزمون‌های هوش و رکوردهای بازی‌ها همراه با قابلیت چاپ رسمی.
+                            </p>
+                        </div>
+                        <div>
+                            <input type="text" id="gk-teacher-search-rc" placeholder="🔍 جستجوی نام نوآموز..." style="padding:8px 14px; border-radius:12px; border:1.5px solid #cbd5e1; font-size:12.5px; width:220px;">
+                        </div>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="gk-table-st">
+                            <thead>
+                                <tr>
+                                    <th>رتبه</th>
+                                    <th>نام و نام خانوادگی</th>
+                                    <th>سن</th>
+                                    <th>شماره والد</th>
+                                    <th>مجموع امتیاز بازی‌ها</th>
+                                    <th style="text-align:center;">کارنامه و گزارش پیشرفت</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gk-t-reportcards-tbody">
+                                <?php if (empty($students)): ?>
+                                    <tr>
+                                        <td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">
+                                            هنوز دانـش‌آموزی در این کلاس ثبت نشده است.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($students as $idx => $st): ?>
+                                        <tr class="gk-t-rc-row">
+                                            <td><strong>#<?php echo $idx + 1; ?></strong></td>
+                                            <td><strong style="font-size:14px; color:#1e293b;">👶 <?php echo esc_html($st->name); ?></strong></td>
+                                            <td><?php echo esc_html($st->age); ?> ساله</td>
+                                            <td>
+                                                <span style="font-size:12px; font-weight:bold; color:#475569;">
+                                                    📞 <?php echo esc_html($st->parent_phone ?: 'ثبت نشده'); ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:3px 8px; border-radius:8px; font-weight:900; font-size:12px;">
+                                                    🏆 <?php echo number_format($st->total_game_score); ?> امتیاز
+                                                </span>
+                                            </td>
+                                            <td style="text-align:center;">
+                                                <button type="button" class="gk-btn-view-rc" onclick="gkOpenStudentReportCard(<?php echo $st->id; ?>)">
+                                                    <span>📊 مشاهده کارنامه جامع</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- مودال کارنامه جامع نوآموز -->
+            <div id="gk-student-reportcard-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.75); z-index:9999999; backdrop-filter:blur(6px); direction:rtl; text-align:right;">
+                <div style="max-width:920px; width:95%; margin:24px auto; background:#ffffff; border-radius:24px; padding:26px; box-shadow:0 25px 50px rgba(0,0,0,0.35); max-height:92vh; overflow-y:auto; border:2px solid #e2e8f0; position:relative;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1.5px solid #f1f5f9; padding-bottom:12px;">
+                        <h3 id="gk-reportcard-modal-title" style="margin:0; font-size:18px; color:#1e1b4b; font-weight:900;">📊 کارنامه جامع و سوابق نوآموز</h3>
+                        <button type="button" onclick="gkCloseStudentReportCard();" style="background:#f1f5f9; border:none; width:34px; height:34px; border-radius:50%; font-size:16px; cursor:pointer; color:#64748b; display:flex; align-items:center; justify-content:center;">✕</button>
+                    </div>
+                    <div id="gk-reportcard-modal-body">
+                        <!-- Dynamic AJAX content loaded here -->
                     </div>
                 </div>
             </div>
@@ -1667,6 +2093,63 @@ class GK_Teacher_Portal {
                 }
             });
         }
+
+        // توابع باز و بسته کردن کارنامه جامع نوآموز
+        function gkOpenStudentReportCard(studentId) {
+            var modal = document.getElementById('gk-student-reportcard-modal');
+            var body = document.getElementById('gk-reportcard-modal-body');
+            var title = document.getElementById('gk-reportcard-modal-title');
+            if (!modal || !body) return;
+
+            if (title) title.textContent = '📊 کارنامه جامع و سوابق نوآموز';
+            body.innerHTML = '<div style="text-align:center; padding:60px 20px;"><div style="font-size:42px; margin-bottom:12px;">⏳</div><h3 style="color:#4f46e5; margin:0 0 6px 0; font-size:17px; font-weight:900;">در حال دریافت و تنظیم کارنامه جامع نوآموز...</h3><p style="color:#64748b; font-size:13px; margin:0;">سوابق امتحانات، آزمون‌های هوش و بازی‌ها در حال آماده‌سازی است.</p></div>';
+            modal.style.display = 'block';
+
+            jQuery.ajax({
+                url: '<?php echo esc_url(home_url('/?gk_ajax=1')); ?>',
+                type: 'POST',
+                data: {
+                    action: 'gk_teacher_get_student_reportcard',
+                    nonce: '<?php echo $nonce; ?>',
+                    student_id: studentId
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res.success && res.data) {
+                        if (title) title.textContent = '📊 کارنامه جامع نوآموز: ' + res.data.student_name;
+                        body.innerHTML = res.data.html;
+                    } else {
+                        var msg = (res.data && res.data.message) ? res.data.message : (res.data || 'خطا در بارگذاری کارنامه.');
+                        body.innerHTML = '<div style="text-align:center; padding:40px; color:#b91c1c; font-weight:bold;">' + msg + '</div>';
+                    }
+                },
+                error: function(xhr, status, error) {
+                    body.innerHTML = '<div style="text-align:center; padding:40px; color:#b91c1c; font-weight:bold;">خطای ارتباط با سرور در دریافت کارنامه.</div>';
+                }
+            });
+        }
+
+        function gkCloseStudentReportCard() {
+            var modal = document.getElementById('gk-student-reportcard-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // فیلتر جستجوی زنده در تب کارنامه‌ها
+        jQuery(document).ready(function($) {
+            $('#gk-teacher-search-rc').on('input', function() {
+                var val = $(this).val().trim().toLowerCase();
+                $('#gk-t-reportcards-tbody tr.gk-t-rc-row').each(function() {
+                    var txt = $(this).text().toLowerCase();
+                    if (txt.indexOf(val) !== -1) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
         </script>
         <?php
         return ob_get_clean();
