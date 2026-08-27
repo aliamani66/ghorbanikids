@@ -832,9 +832,6 @@ class GK_Teacher_Portal {
                     <span>📝 آزمون‌ها و امتحانات کلاسی</span>
                     <span class="gk-tab-badge" id="gk-exams-count-badge"><?php echo $total_exams; ?></span>
                 </button>
-                <button type="button" class="gk-tab-btn" data-target="tab-podium">
-                    <span>🥇 سکوی قهرمانان</span>
-                </button>
                 <button type="button" class="gk-tab-btn" data-target="tab-reportcards">
                     <span>📊 کارنامه و گزارش پیشرفت</span>
                     <span class="gk-tab-badge"><?php echo $total_st; ?></span>
@@ -1084,6 +1081,40 @@ class GK_Teacher_Portal {
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
+
+                <!-- سکوی قهرمانان و تابلوی لیگ امتیازی کل کلاس درون تب مسابقات -->
+                <div class="gk-card-box" style="margin-top:24px; border:2px solid #e0e7ff; background:#ffffff;">
+                    <div style="border-bottom:2px dashed #e0e7ff; padding-bottom:12px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h3 style="font-size:17px; font-weight:900; margin:0; color:#1e1b4b;">🥇 سکوی قهرمانان و تابلوی لیگ امتیازی کل کلاس</h3>
+                            <p style="font-size:12.5px; color:#64748b; margin:4px 0 0 0;">رتبه‌بندی زنده کودکان بر اساس مجموع امتیازات کسب‌شده در تمام بازی‌ها</p>
+                        </div>
+                        <span style="background:#ede9fe; color:#6d28d9; padding:4px 12px; border-radius:10px; font-size:12px; font-weight:900;">
+                            🏆 رتبه‌بندی کل کلاس (<?php echo count($students); ?> نفر)
+                        </span>
+                    </div>
+
+                    <div class="gk-podium-grid">
+                        <?php if (empty($students)): ?>
+                            <p style="grid-column:1/-1; text-align:center; padding:30px; color:#94a3b8;">هنوز نوآموزی در این کلاس ثبت نشده است.</p>
+                        <?php else: ?>
+                            <?php foreach ($students as $idx => $st): 
+                                $rank = $idx + 1;
+                                $medals = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
+                                $medal_icon = $medals[$rank] ?? "🎖️ #$rank";
+                                $card_class = ($rank <= 3) ? "rank-$rank" : "";
+                            ?>
+                                <div class="gk-podium-card <?php echo $card_class; ?>">
+                                    <span style="font-size:36px; display:block; margin-bottom:6px;"><?php echo $medal_icon; ?></span>
+                                    <div style="font-size:16px; font-weight:900; color:#0f172a; margin-bottom:4px;">👶 <?php echo esc_html($st->name); ?></div>
+                                    <div style="font-size:12px; color:#64748b; margin-bottom:6px;">سن: <?php echo esc_html($st->age); ?> ساله</div>
+                                    <div style="font-size:14px; font-weight:900; color:#6366f1;">🏆 <?php echo number_format($st->total_game_score); ?> امتیاز</div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
             </div>
 
             <!-- ===================== تب ۳: سکوی قهرمانان کلاس ===================== -->
@@ -1336,36 +1367,7 @@ class GK_Teacher_Portal {
 
             </div>
 
-            <div class="gk-tab-pane" id="tab-podium">
-                <div class="gk-card-box">
-                    <div style="border-bottom:2px dashed #e0e7ff; padding-bottom:12px; margin-bottom:18px;">
-                        <h2 style="font-size:18px; font-weight:900; margin:0; color:#1e1b4b;">🏆 تابلوی قهرمانان و لیگ امتیازی کل کلاس</h2>
-                        <p style="font-size:13px; color:#64748b; margin:4px 0 0 0;">رتبه‌بندی زنده کودکان بر اساس مجموع امتیازات کسب‌شده در تمام بازی‌ها</p>
-                    </div>
-
-                    <div class="gk-podium-grid">
-                        <?php if (empty($students)): ?>
-                            <p style="grid-column:1/-1; text-align:center; padding:30px; color:#94a3b8;">هنوز نوآموزی در این کلاس ثبت نشده است.</p>
-                        <?php else: ?>
-                            <?php foreach ($students as $idx => $st): 
-                                $rank = $idx + 1;
-                                $medals = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
-                                $medal_icon = $medals[$rank] ?? "🎖️ #$rank";
-                                $card_class = ($rank <= 3) ? "rank-$rank" : "";
-                            ?>
-                                <div class="gk-podium-card <?php echo $card_class; ?>">
-                                    <span style="font-size:36px; display:block; margin-bottom:6px;"><?php echo $medal_icon; ?></span>
-                                    <div style="font-size:16px; font-weight:900; color:#0f172a; margin-bottom:4px;">👶 <?php echo esc_html($st->name); ?></div>
-                                    <div style="font-size:12px; color:#64748b; margin-bottom:6px;">سن: <?php echo esc_html($st->age); ?> ساله</div>
-                                    <div style="font-size:14px; font-weight:900; color:#6366f1;">🏆 <?php echo number_format($st->total_game_score); ?> امتیاز</div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===================== تب ۵: کارنامه و گزارش پیشرفت نوآموزان ===================== -->
+            <!-- ===================== تب ۴: کارنامه و گزارش پیشرفت نوآموزان ===================== -->
             <div class="gk-tab-pane" id="tab-reportcards">
                 <div class="gk-card-box">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
