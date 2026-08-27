@@ -141,6 +141,511 @@ class GK_School_Reports {
         ob_start();
         ?>
         <div class="gk-reportcard-view" id="gkReportCardPrintArea">
+            <style>
+                /* استایل‌های کارنامه رسمی و جامع قربانی کیدز */
+                .gk-reportcard-view {
+                    font-family: 'IRANSansXFaNum', 'IRANSansX', 'IRANSans', -apple-system, sans-serif !important;
+                    direction: rtl;
+                    text-align: right;
+                    color: #1e293b;
+                    line-height: 1.6;
+                }
+                .gk-rc-letterhead {
+                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                    border: 2px solid #e2e8f0;
+                    border-radius: 20px;
+                    padding: 18px 22px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 16px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+                }
+                .gk-rc-brand-meta {
+                    display: flex;
+                    align-items: center;
+                    gap: 14px;
+                }
+                .gk-rc-logo {
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 14px;
+                    object-fit: cover;
+                    border: 1.5px solid #cbd5e1;
+                }
+                .gk-rc-logo-fallback {
+                    width: 54px;
+                    height: 54px;
+                    background: #e0e7ff;
+                    border-radius: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 26px;
+                }
+                .gk-rc-org-title {
+                    margin: 0 0 4px 0;
+                    font-size: 18px;
+                    font-weight: 900;
+                    color: #1e1b4b;
+                }
+                .gk-rc-subhead {
+                    font-size: 12.5px;
+                    color: #64748b;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .gk-rc-dot { color: #cbd5e1; font-weight: bold; }
+                .gk-rc-actions-box {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-end;
+                    gap: 6px;
+                }
+                .gk-rc-btn-print {
+                    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                    color: #ffffff !important;
+                    font-size: 13px;
+                    font-weight: 900;
+                    padding: 10px 20px;
+                    border-radius: 12px;
+                    border: none;
+                    cursor: pointer;
+                    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .gk-rc-date-badge {
+                    font-size: 11.5px;
+                    color: #64748b;
+                    font-weight: 600;
+                }
+
+                .gk-rc-student-card {
+                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                    border: 2px solid #e0e7ff;
+                    border-radius: 20px;
+                    padding: 18px 22px;
+                    display: flex;
+                    align-items: center;
+                    gap: 18px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.05);
+                }
+                .gk-rc-st-avatar {
+                    width: 58px;
+                    height: 58px;
+                    background: #f5f3ff;
+                    border: 2.5px solid #c4b5fd;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 28px;
+                    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+                    flex-shrink: 0;
+                }
+                .gk-rc-st-info {
+                    flex: 1;
+                }
+                .gk-rc-st-name-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                    margin-bottom: 6px;
+                }
+                .gk-rc-st-name {
+                    font-size: 19px;
+                    font-weight: 900;
+                    color: #0f172a;
+                    margin: 0;
+                }
+                .gk-rc-st-age {
+                    background: #e2e8f0;
+                    color: #334155;
+                    font-size: 12px;
+                    font-weight: 800;
+                    padding: 2px 8px;
+                    border-radius: 6px;
+                }
+                .gk-rc-overall-badge {
+                    font-size: 12px;
+                    font-weight: 900;
+                    padding: 3px 10px;
+                    border-radius: 8px;
+                    border: 1px solid currentColor;
+                }
+                .gk-rc-st-meta-row {
+                    font-size: 12px;
+                    color: #64748b;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                }
+
+                .gk-rc-kpi-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 14px;
+                    margin-bottom: 24px;
+                }
+                .gk-rc-kpi-item {
+                    background: #ffffff;
+                    border: 1.5px solid #e2e8f0;
+                    border-top: 4px solid #6366f1;
+                    border-radius: 16px;
+                    padding: 14px;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+                }
+                .gk-rc-kpi-icon {
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 18px;
+                    flex-shrink: 0;
+                }
+                .gk-rc-kpi-label {
+                    font-size: 11.5px;
+                    color: #64748b;
+                    display: block;
+                    margin-bottom: 2px;
+                }
+                .gk-rc-kpi-val {
+                    font-size: 15px;
+                    font-weight: 900;
+                    color: #0f172a;
+                }
+
+                .gk-rc-section {
+                    background: #ffffff;
+                    border: 1.5px solid #e2e8f0;
+                    border-radius: 18px;
+                    padding: 18px;
+                    margin-bottom: 20px;
+                }
+                .gk-rc-sec-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 14px;
+                    border-bottom: 1.5px solid #f1f5f9;
+                    padding-bottom: 10px;
+                }
+                .gk-rc-sec-title {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .gk-rc-sec-title h3 {
+                    margin: 0;
+                    font-size: 15px;
+                    font-weight: 900;
+                    color: #1e1b4b;
+                }
+                .gk-rc-sec-badge {
+                    background: #f1f5f9;
+                    color: #475569;
+                    font-size: 11.5px;
+                    font-weight: 800;
+                    padding: 3px 9px;
+                    border-radius: 8px;
+                }
+                .gk-rc-empty-box {
+                    text-align: center;
+                    padding: 24px;
+                    color: #94a3b8;
+                    font-size: 13px;
+                }
+                .gk-rc-empty-box span { font-size: 32px; display: block; margin-bottom: 6px; }
+                .gk-rc-table-responsive { overflow-x: auto; }
+                .gk-rc-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 12.5px;
+                }
+                .gk-rc-table th {
+                    background: #f8fafc;
+                    color: #475569;
+                    font-weight: 800;
+                    padding: 10px 12px;
+                    border-bottom: 1.5px solid #e2e8f0;
+                    text-align: right;
+                }
+                .gk-rc-table td {
+                    padding: 11px 12px;
+                    border-bottom: 1px solid #f1f5f9;
+                    vertical-align: middle;
+                }
+                .gk-rc-score-pill {
+                    padding: 3px 9px;
+                    border-radius: 8px;
+                    font-weight: 900;
+                    font-size: 12px;
+                    display: inline-block;
+                }
+                .gk-badge-excel { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+                .gk-badge-good  { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+                .gk-badge-need  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+                .gk-rc-topic-chips {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 5px;
+                }
+                .gk-rc-topic-chip {
+                    font-size: 11px;
+                    padding: 2px 7px;
+                    border-radius: 6px;
+                    border: 1px solid #e2e8f0;
+                }
+                .gk-rc-topic-chip.is-correct {
+                    background: #f0fdf4;
+                    color: #15803d;
+                    border-color: #bbf7d0;
+                }
+                .gk-rc-topic-chip.is-review {
+                    background: #fffbeb;
+                    color: #b45309;
+                    border-color: #fde68a;
+                }
+
+                .gk-rc-footer-signature {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-top: 24px;
+                    padding-top: 16px;
+                    border-top: 2px dashed #cbd5e1;
+                    flex-wrap: wrap;
+                    gap: 20px;
+                }
+                .gk-rc-teacher-note {
+                    flex: 1 1 300px;
+                    font-size: 12px;
+                    color: #334155;
+                }
+                .gk-rc-note-line {
+                    height: 1px;
+                    background: #cbd5e1;
+                    margin-top: 18px;
+                }
+                .gk-rc-stamp-box {
+                    text-align: center;
+                }
+                .gk-rc-stamp-circle {
+                    width: 110px;
+                    height: 110px;
+                    border: 2.5px dashed #4f46e5;
+                    border-radius: 50%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    color: #4f46e5;
+                    font-size: 11px;
+                    padding: 10px;
+                    box-sizing: border-box;
+                    transform: rotate(-5deg);
+                }
+
+                /* مدیا کوئری موبایل برای کارنامه */
+                @media (max-width: 768px) {
+                    .gk-rc-letterhead {
+                        flex-direction: column !important;
+                        align-items: stretch !important;
+                        text-align: center !important;
+                        padding: 14px 12px !important;
+                        gap: 12px !important;
+                        background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%) !important;
+                        border: 1.5px solid #dbeafe !important;
+                        border-radius: 16px !important;
+                    }
+                    .gk-rc-brand-meta {
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        gap: 8px !important;
+                    }
+                    .gk-rc-logo {
+                        width: 50px !important;
+                        height: 50px !important;
+                        border-radius: 12px !important;
+                    }
+                    .gk-rc-logo-fallback {
+                        width: 48px !important;
+                        height: 48px !important;
+                        font-size: 24px !important;
+                    }
+                    .gk-rc-org-title {
+                        font-size: 16px !important;
+                        margin-bottom: 2px !important;
+                    }
+                    .gk-rc-subhead {
+                        justify-content: center !important;
+                        font-size: 11.5px !important;
+                    }
+                    .gk-rc-actions-box {
+                        align-items: stretch !important;
+                        width: 100% !important;
+                    }
+                    .gk-rc-btn-print {
+                        width: 100% !important;
+                        padding: 10px 0 !important;
+                        justify-content: center !important;
+                        font-size: 13px !important;
+                        border-radius: 10px !important;
+                    }
+                    .gk-rc-date-badge {
+                        text-align: center !important;
+                        margin-top: 4px !important;
+                        font-size: 11px !important;
+                    }
+
+                    .gk-rc-student-card {
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        text-align: center !important;
+                        padding: 14px 12px !important;
+                        gap: 10px !important;
+                        background: #ffffff !important;
+                        border: 2px solid #e0e7ff !important;
+                        border-radius: 16px !important;
+                        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.06) !important;
+                    }
+                    .gk-rc-st-avatar {
+                        width: 50px !important;
+                        height: 50px !important;
+                        font-size: 26px !important;
+                    }
+                    .gk-rc-st-name-row {
+                        justify-content: center !important;
+                        gap: 6px !important;
+                    }
+                    .gk-rc-st-name {
+                        font-size: 16.5px !important;
+                        width: 100% !important;
+                        margin-bottom: 2px !important;
+                    }
+                    .gk-rc-st-meta-row {
+                        justify-content: center !important;
+                        font-size: 11.5px !important;
+                        gap: 6px !important;
+                    }
+
+                    .gk-rc-kpi-grid {
+                        grid-template-columns: 1fr 1fr !important;
+                        gap: 8px !important;
+                        margin-bottom: 16px !important;
+                    }
+                    .gk-rc-kpi-item {
+                        padding: 10px 12px !important;
+                        border-radius: 14px !important;
+                        gap: 8px !important;
+                    }
+                    .gk-rc-kpi-icon {
+                        width: 36px !important;
+                        height: 36px !important;
+                        font-size: 16px !important;
+                        border-radius: 10px !important;
+                    }
+                    .gk-rc-kpi-label {
+                        font-size: 10px !important;
+                        margin-bottom: 1px !important;
+                    }
+                    .gk-rc-kpi-val {
+                        font-size: 13.5px !important;
+                    }
+
+                    .gk-rc-section {
+                        padding: 14px 12px !important;
+                        border-radius: 16px !important;
+                        margin-bottom: 16px !important;
+                    }
+                    .gk-rc-sec-header {
+                        flex-direction: column !important;
+                        align-items: flex-start !important;
+                        gap: 6px !important;
+                    }
+                    .gk-rc-sec-title h3 {
+                        font-size: 13.5px !important;
+                    }
+                    .gk-rc-sec-badge {
+                        font-size: 11px !important;
+                        padding: 2px 8px !important;
+                    }
+
+                    .gk-rc-table-responsive {
+                        overflow: visible !important;
+                    }
+                    .gk-rc-table, 
+                    .gk-rc-table thead, 
+                    .gk-rc-table tbody, 
+                    .gk-rc-table tr, 
+                    .gk-rc-table td {
+                        display: block !important;
+                        width: 100% !important;
+                        box-sizing: border-box !important;
+                    }
+                    .gk-rc-table thead {
+                        display: none !important;
+                    }
+                    .gk-rc-table tbody tr {
+                        background: #f8fafc !important;
+                        border: 1.5px solid #e2e8f0 !important;
+                        border-radius: 14px !important;
+                        padding: 12px 14px !important;
+                        margin-bottom: 10px !important;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
+                    }
+                    .gk-rc-table td {
+                        border: none !important;
+                        background: transparent !important;
+                        padding: 3px 0 !important;
+                        text-align: right !important;
+                    }
+                    .gk-rc-table td strong {
+                        font-size: 14px !important;
+                    }
+                    .gk-rc-score-pill {
+                        margin: 4px 0 !important;
+                        font-size: 12px !important;
+                    }
+                    .gk-rc-level-text {
+                        font-size: 12px !important;
+                        font-weight: 800 !important;
+                        display: inline-block !important;
+                        margin-right: 6px !important;
+                    }
+                    .gk-rc-topic-chips {
+                        margin-top: 6px !important;
+                        gap: 4px !important;
+                    }
+                    .gk-rc-topic-chip {
+                        font-size: 10.5px !important;
+                        padding: 2px 6px !important;
+                    }
+
+                    .gk-rc-footer-signature {
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        text-align: center !important;
+                        gap: 16px !important;
+                    }
+                    .gk-rc-teacher-note {
+                        text-align: center !important;
+                    }
+                }
+            </style>
             <!-- ۱. سربرگ رسمی با مشخصات کامل مهد/مدرسه -->
             <div class="gk-rc-letterhead">
                 <div class="gk-rc-brand-meta">

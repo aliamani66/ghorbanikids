@@ -1213,6 +1213,204 @@ class GK_Teacher_Portal {
                     margin: 20px auto !important;
                     padding: 20px 16px !important;
                 }
+
+                /* =================== استایل اختصاصی کارنامه لوکس در موبایل =================== */
+                #gk-student-reportcard-modal > div {
+                    max-width: 96% !important;
+                    width: 96% !important;
+                    margin: 12px auto !important;
+                    padding: 16px 12px !important;
+                    border-radius: 22px !important;
+                }
+                .gk-rc-letterhead {
+                    flex-direction: column !important;
+                    align-items: stretch !important;
+                    text-align: center !important;
+                    padding: 14px 12px !important;
+                    gap: 12px !important;
+                    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%) !important;
+                    border: 1.5px solid #dbeafe !important;
+                    border-radius: 16px !important;
+                }
+                .gk-rc-brand-meta {
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    gap: 8px !important;
+                }
+                .gk-rc-logo {
+                    width: 50px !important;
+                    height: 50px !important;
+                    border-radius: 12px !important;
+                }
+                .gk-rc-logo-fallback {
+                    width: 48px !important;
+                    height: 48px !important;
+                    font-size: 24px !important;
+                }
+                .gk-rc-org-title {
+                    font-size: 16px !important;
+                    margin-bottom: 2px !important;
+                }
+                .gk-rc-subhead {
+                    justify-content: center !important;
+                    font-size: 11.5px !important;
+                }
+                .gk-rc-actions-box {
+                    align-items: stretch !important;
+                    width: 100% !important;
+                }
+                .gk-rc-btn-print {
+                    width: 100% !important;
+                    padding: 10px 0 !important;
+                    justify-content: center !important;
+                    display: flex !important;
+                    font-size: 13px !important;
+                    border-radius: 10px !important;
+                }
+                .gk-rc-date-badge {
+                    text-align: center !important;
+                    margin-top: 4px !important;
+                    font-size: 11px !important;
+                }
+
+                /* کارت مشخصات نوآموز */
+                .gk-rc-student-card {
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    text-align: center !important;
+                    padding: 14px 12px !important;
+                    gap: 10px !important;
+                    background: #ffffff !important;
+                    border: 2px solid #e0e7ff !important;
+                    border-radius: 16px !important;
+                    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.06) !important;
+                }
+                .gk-rc-st-avatar {
+                    width: 48px !important;
+                    height: 48px !important;
+                    font-size: 24px !important;
+                }
+                .gk-rc-st-name-row {
+                    justify-content: center !important;
+                    gap: 6px !important;
+                }
+                .gk-rc-st-name {
+                    font-size: 16.5px !important;
+                    width: 100% !important;
+                    margin-bottom: 2px !important;
+                }
+                .gk-rc-st-meta-row {
+                    justify-content: center !important;
+                    font-size: 11.5px !important;
+                    gap: 6px !important;
+                }
+
+                /* کارت‌های آماری کلیدی ۲ در ۲ (2x2 Grid) */
+                .gk-rc-kpi-grid {
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 8px !important;
+                    margin-bottom: 16px !important;
+                }
+                .gk-rc-kpi-item {
+                    padding: 10px 12px !important;
+                    border-radius: 14px !important;
+                    gap: 8px !important;
+                }
+                .gk-rc-kpi-icon {
+                    width: 36px !important;
+                    height: 36px !important;
+                    font-size: 16px !important;
+                    border-radius: 10px !important;
+                }
+                .gk-rc-kpi-label {
+                    font-size: 10px !important;
+                    margin-bottom: 1px !important;
+                }
+                .gk-rc-kpi-val {
+                    font-size: 13.5px !important;
+                }
+
+                /* سکشن‌های کارنامه */
+                .gk-rc-section {
+                    padding: 14px 12px !important;
+                    border-radius: 16px !important;
+                    margin-bottom: 16px !important;
+                }
+                .gk-rc-sec-header {
+                    flex-direction: column !important;
+                    align-items: flex-start !important;
+                    gap: 6px !important;
+                }
+                .gk-rc-sec-title h3 {
+                    font-size: 13.5px !important;
+                }
+                .gk-rc-sec-badge {
+                    font-size: 11px !important;
+                    padding: 2px 8px !important;
+                }
+
+                /* تبدیل جداول درون کارنامه به کارت‌های چندسطری لوکس در موبایل */
+                .gk-rc-table-responsive {
+                    overflow: visible !important;
+                }
+                .gk-rc-table, 
+                .gk-rc-table thead, 
+                .gk-rc-table tbody, 
+                .gk-rc-table tr, 
+                .gk-rc-table td {
+                    display: block !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+                .gk-rc-table thead {
+                    display: none !important;
+                }
+                .gk-rc-table tbody tr {
+                    background: #f8fafc !important;
+                    border: 1.5px solid #e2e8f0 !important;
+                    border-radius: 14px !important;
+                    padding: 12px 14px !important;
+                    margin-bottom: 10px !important;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
+                }
+                .gk-rc-table td {
+                    border: none !important;
+                    background: transparent !important;
+                    padding: 3px 0 !important;
+                    text-align: right !important;
+                }
+                .gk-rc-table td strong {
+                    font-size: 14px !important;
+                }
+                .gk-rc-score-pill {
+                    margin: 4px 0 !important;
+                    font-size: 12px !important;
+                }
+                .gk-rc-level-text {
+                    font-size: 12px !important;
+                    font-weight: 800 !important;
+                    display: inline-block !important;
+                    margin-right: 6px !important;
+                }
+                .gk-rc-topic-chips {
+                    margin-top: 6px !important;
+                    gap: 4px !important;
+                }
+                .gk-rc-topic-chip {
+                    font-size: 10.5px !important;
+                    padding: 2px 6px !important;
+                }
+
+                /* امضا و پاورقی */
+                .gk-rc-footer-signature {
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    text-align: center !important;
+                    gap: 16px !important;
+                }
+                .gk-rc-teacher-note {
+                    text-align: center !important;
+                }
             }
         </style>
 
