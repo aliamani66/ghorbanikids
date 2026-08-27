@@ -944,91 +944,87 @@ class GK_Teacher_Portal {
                 .gk-rc-card-item {
                     background: #ffffff !important;
                     border: 1.5px solid #e2e8f0 !important;
-                    border-radius: 14px !important;
-                    padding: 10px 12px !important;
+                    border-radius: 16px !important;
+                    padding: 12px 14px !important;
                     display: flex !important;
-                    justify-content: space-between !important;
-                    align-items: center !important;
-                    gap: 8px !important;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
+                    flex-direction: column !important;
+                    gap: 10px !important;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
                     box-sizing: border-box !important;
                     width: 100% !important;
                 }
-                .gk-st-card-info,
-                .gk-rc-card-info {
-                    flex: 1 1 auto !important;
-                    min-width: 0 !important;
+                .gk-st-card-top-row,
+                .gk-rc-card-top-row {
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    width: 100% !important;
+                }
+                .gk-st-card-user,
+                .gk-rc-card-user {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 8px !important;
                 }
                 .gk-st-card-name,
                 .gk-rc-card-name {
-                    font-size: 14.5px !important;
+                    font-size: 15px !important;
                     font-weight: 900 !important;
                     color: #1e293b !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    gap: 6px !important;
-                    margin-bottom: 2px !important;
-                    white-space: nowrap !important;
-                    overflow: hidden !important;
-                    text-overflow: ellipsis !important;
                 }
                 .gk-st-card-index,
                 .gk-rc-card-index {
-                    font-size: 11.5px !important;
-                    color: #94a3b8 !important;
-                    font-weight: 800 !important;
-                }
-                .gk-st-card-meta,
-                .gk-rc-card-meta {
-                    font-size: 11.5px !important;
+                    font-size: 12px !important;
                     color: #64748b !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    gap: 6px !important;
+                    font-weight: 900 !important;
+                    background: #f1f5f9 !important;
+                    padding: 2px 7px !important;
+                    border-radius: 6px !important;
                 }
                 .gk-st-tag-age,
                 .gk-rc-tag-age {
-                    background: #f1f5f9 !important;
-                    color: #475569 !important;
-                    padding: 1px 6px !important;
-                    border-radius: 5px !important;
-                    font-weight: 700 !important;
-                    font-size: 11px !important;
+                    background: #eff6ff !important;
+                    color: #1e40af !important;
+                    padding: 2px 8px !important;
+                    border-radius: 6px !important;
+                    font-weight: 800 !important;
+                    font-size: 11.5px !important;
                 }
-                .gk-st-meta-dot,
-                .gk-rc-meta-dot {
-                    color: #cbd5e1 !important;
-                }
-                .gk-st-meta-phone,
-                .gk-rc-meta-phone {
+                .gk-st-card-phone,
+                .gk-rc-card-phone {
+                    font-size: 12px !important;
                     color: #64748b !important;
-                    font-weight: 600 !important;
-                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    direction: ltr !important;
                 }
-                .gk-st-card-actions {
+                .gk-st-card-bottom-actions {
+                    display: grid !important;
+                    grid-template-columns: repeat(4, 1fr) !important;
+                    gap: 8px !important;
+                    border-top: 1px dashed #e2e8f0 !important;
+                    padding-top: 10px !important;
+                    width: 100% !important;
+                }
+                .gk-st-card-bottom-actions .gk-icon-btn {
+                    width: 100% !important;
+                    height: 38px !important;
+                    border-radius: 10px !important;
                     display: flex !important;
-                    align-items: center !important;
-                    gap: 6px !important;
-                    flex-shrink: 0 !important;
-                }
-                .gk-st-card-actions .gk-icon-btn {
-                    flex: 0 0 34px !important;
-                    width: 34px !important;
-                    height: 34px !important;
-                    border-radius: 9px !important;
-                    display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
                 }
-                .gk-rc-card-action {
-                    flex-shrink: 0 !important;
+                .gk-rc-card-bottom-actions {
+                    border-top: 1px dashed #e2e8f0 !important;
+                    padding-top: 10px !important;
+                    width: 100% !important;
                 }
-                .gk-rc-card-action .gk-btn-view-rc {
-                    padding: 7px 12px !important;
-                    font-size: 12px !important;
+                .gk-rc-card-bottom-actions .gk-btn-view-rc {
+                    width: 100% !important;
+                    justify-content: center !important;
+                    height: 38px !important;
                     border-radius: 10px !important;
-                    height: auto !important;
-                    width: auto !important;
+                    font-size: 13px !important;
+                    font-weight: 800 !important;
                 }
 
                 #gk-teacher-search-st,
@@ -1603,18 +1599,17 @@ class GK_Teacher_Portal {
                                 $phone_display = !empty($st->parent_phone) ? $st->parent_phone : 'ثبت نشده';
                             ?>
                                 <div class="gk-st-card-item gk-searchable-student">
-                                    <div class="gk-st-card-info">
-                                        <div class="gk-st-card-name">
+                                    <div class="gk-st-card-top-row">
+                                        <div class="gk-st-card-user">
                                             <span class="gk-st-card-index">#<?php echo $idx + 1; ?></span>
-                                            <strong>👶 <?php echo esc_html($st->name); ?></strong>
-                                        </div>
-                                        <div class="gk-st-card-meta">
+                                            <span class="gk-st-card-name">👶 <?php echo esc_html($st->name); ?></span>
                                             <span class="gk-st-tag-age"><?php echo esc_html($st->age); ?> ساله</span>
-                                            <span class="gk-st-meta-dot">•</span>
-                                            <span class="gk-st-meta-phone">📞 <?php echo esc_html($phone_display); ?></span>
+                                        </div>
+                                        <div class="gk-st-card-phone">
+                                            📞 <?php echo esc_html($phone_display); ?>
                                         </div>
                                     </div>
-                                    <div class="gk-st-card-actions">
+                                    <div class="gk-st-card-bottom-actions">
                                         <a href="<?php echo esc_url($bale_url); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال به بله مادر">
                                             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                         </a>
@@ -2150,20 +2145,19 @@ class GK_Teacher_Portal {
                                 $phone_display = !empty($st->parent_phone) ? $st->parent_phone : 'ثبت نشده';
                             ?>
                                 <div class="gk-rc-card-item gk-searchable-rc">
-                                    <div class="gk-rc-card-info">
-                                        <div class="gk-rc-card-name">
+                                    <div class="gk-rc-card-top-row">
+                                        <div class="gk-rc-card-user">
                                             <span class="gk-rc-card-index">#<?php echo $idx + 1; ?></span>
-                                            <strong>👶 <?php echo esc_html($st->name); ?></strong>
-                                        </div>
-                                        <div class="gk-rc-card-meta">
+                                            <span class="gk-rc-card-name">👶 <?php echo esc_html($st->name); ?></span>
                                             <span class="gk-rc-tag-age"><?php echo esc_html($st->age); ?> ساله</span>
-                                            <span class="gk-rc-meta-dot">•</span>
-                                            <span class="gk-rc-meta-phone">📞 <?php echo esc_html($phone_display); ?></span>
+                                        </div>
+                                        <div class="gk-rc-card-phone">
+                                            📞 <?php echo esc_html($phone_display); ?>
                                         </div>
                                     </div>
-                                    <div class="gk-rc-card-action">
+                                    <div class="gk-rc-card-bottom-actions">
                                         <button type="button" class="gk-btn-view-rc" onclick="gkOpenStudentReportCard(<?php echo $st->id; ?>)">
-                                            <span>📊 مشاهده کارنامه</span>
+                                            <span>📊 مشاهده کارنامه جامع</span>
                                         </button>
                                     </div>
                                 </div>
