@@ -360,6 +360,133 @@ class GK_School_Leagues {
                 transform: translateY(-2px) scale(1.02);
                 box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
             }
+
+            /* استایل‌های ریسپانسیو و پیشرفته لیدربورد مسابقه */
+            .gk-league-board-wrap {
+                background: #ffffff;
+                border: 2px solid #e0e7ff;
+                border-radius: 24px;
+                padding: 24px;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.03);
+            }
+            .gk-league-table-desktop {
+                width: 100%;
+            }
+            .gk-league-table-desktop table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0 8px;
+            }
+            .gk-league-cards-mobile {
+                display: none;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .gk-league-rank-card {
+                background: #f8fafc;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 18px;
+                padding: 14px 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            }
+            .gk-league-rank-card.gk-current-user {
+                background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+                border: 2px solid #6366f1;
+                box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+            }
+            .gk-league-rank-card.gk-rank-1 {
+                border-color: #fde047;
+                background: linear-gradient(135deg, #fefce8 0%, #ffffff 100%);
+            }
+            .gk-league-rank-card.gk-rank-2 {
+                border-color: #cbd5e1;
+                background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            }
+            .gk-league-rank-card.gk-rank-3 {
+                border-color: #fed7aa;
+                background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+            }
+            .gk-lr-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .gk-lr-card-user {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .gk-lr-card-medal {
+                font-size: 20px;
+                line-height: 1;
+            }
+            .gk-lr-card-name {
+                font-size: 15px;
+                font-weight: 900;
+                color: #1e293b;
+            }
+            .gk-lr-card-stats-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .gk-lr-stat-box {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 8px 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+            .gk-lr-stat-lbl {
+                font-size: 10.5px;
+                color: #64748b;
+                font-weight: 700;
+            }
+            .gk-lr-stat-val {
+                font-size: 13.5px;
+                font-weight: 900;
+                color: #0f172a;
+            }
+
+            @media (max-width: 768px) {
+                .gk-arena-wrap {
+                    padding: 0 10px !important;
+                    margin: 12px auto 40px auto !important;
+                }
+                .gk-arena-hero {
+                    padding: 18px 14px !important;
+                    border-radius: 20px !important;
+                }
+                .gk-student-stat-strip {
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 8px !important;
+                }
+                .gk-stat-pill {
+                    padding: 10px 8px !important;
+                }
+                .gk-stat-pill-val {
+                    font-size: 15px !important;
+                }
+                .gk-arena-games-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 14px !important;
+                }
+                .gk-league-board-wrap {
+                    padding: 16px 12px !important;
+                    border-radius: 18px !important;
+                }
+                .gk-league-table-desktop {
+                    display: none !important;
+                }
+                .gk-league-cards-mobile {
+                    display: flex !important;
+                }
+            }
         </style>
 
         <div class="gk-arena-wrap">
@@ -513,19 +640,71 @@ class GK_School_Leagues {
                 <?php endforeach; ?>
             </div>
 
-            <!-- جدول زنده رتبه‌بندی مسابقه شامل بهترین رکورد و مجموع امتیازات -->
-            <div style="background:#ffffff; border:2px solid #e0e7ff; border-radius:24px; padding:24px; box-shadow:0 8px 25px rgba(0,0,0,0.03);">
+            <!-- جدول و کارت‌های زنده رتبه‌بندی مسابقه شامل بهترین رکورد و مجموع امتیازات -->
+            <div class="gk-league-board-wrap">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-                    <h3 style="font-size:17px; font-weight:900; margin:0; color:#1e1b4b;">
-                        📊 تابلوی رتبه‌بندی و مجموع امتیازات مسابقه «<?php echo esc_html($league->title); ?>»:
+                    <h3 style="font-size:16px; font-weight:900; margin:0; color:#1e1b4b;">
+                        📊 تابلوی رتبه‌بندی و مجموع امتیازات مسابقه:
                     </h3>
-                    <button type="button" onclick="location.reload();" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:10px; padding:6px 12px; font-size:12px; font-weight:bold; cursor:pointer;">
+                    <button type="button" onclick="location.reload();" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-size:12px; font-weight:bold; cursor:pointer; color:#475569; display:inline-flex; align-items:center; gap:4px;">
                         🔄 بروزرسانی جدول
                     </button>
                 </div>
 
-                <div style="overflow-x:auto;">
-                    <table style="width:100%; border-collapse:separate; border-spacing:0 8px;">
+                <!-- ۱. نمایش مخصوص موبایل و تبلت: کارت‌های مدرن بدون اسکرول افقی -->
+                <div class="gk-league-cards-mobile">
+                    <?php foreach ($league_rankings as $idx => $r): 
+                        $rank = $idx + 1;
+                        $medals = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
+                        $medal = $medals[$rank] ?? "#$rank";
+                        $has_played = intval($r->attempts_count) > 0;
+                        $is_current = ($student && $student->id == $r->id);
+                        $card_cls = 'gk-league-rank-card' . ($is_current ? ' gk-current-user' : '') . ($rank <= 3 ? " gk-rank-$rank" : '');
+                    ?>
+                        <div class="<?php echo $card_cls; ?>">
+                            <div class="gk-lr-card-header">
+                                <div class="gk-lr-card-user">
+                                    <span class="gk-lr-card-medal"><?php echo $medal; ?></span>
+                                    <span class="gk-lr-card-name">👶 <?php echo esc_html($r->name); ?></span>
+                                    <?php if ($is_current): ?>
+                                        <span style="background:#2563eb; color:#ffffff; font-size:10.5px; font-weight:900; padding:2px 7px; border-radius:6px;">شما</span>
+                                    <?php endif; ?>
+                                </div>
+                                <div>
+                                    <?php if ($has_played): ?>
+                                        <span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; font-size:11px; font-weight:800; padding:3px 8px; border-radius:8px;">✅ شرکت کرده</span>
+                                    <?php else: ?>
+                                        <span style="background:#fffbeb; color:#d97706; border:1px solid #fde68a; font-size:11px; font-weight:800; padding:3px 8px; border-radius:8px;">⏳ در انتظار</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <div class="gk-lr-card-stats-grid">
+                                <div class="gk-lr-stat-box" style="border-right:3.5px solid #10b981;">
+                                    <span class="gk-lr-stat-lbl">🏆 بهترین رکورد</span>
+                                    <span class="gk-lr-stat-val" style="color:#047857;">
+                                        <?php echo ($has_played && intval($r->best_score) > 0) ? number_format(intval($r->best_score)) : 'بدون رکورد'; ?>
+                                    </span>
+                                </div>
+                                <div class="gk-lr-stat-box" style="border-right:3.5px solid #8b5cf6;">
+                                    <span class="gk-lr-stat-lbl">🌟 مجموع مسابقه</span>
+                                    <span class="gk-lr-stat-val" style="color:#6d28d9;">
+                                        <?php echo ($has_played && intval($r->total_league_score) > 0) ? number_format(intval($r->total_league_score)) . ' امتیاز' : '—'; ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#64748b; padding-top:6px; border-top:1px dashed #e2e8f0;">
+                                <span>🔄 دفعات شرکت: <strong><?php echo intval($r->attempts_count); ?> مرتبه</strong></span>
+                                <span>امتیاز کل لیگ: <strong><?php echo number_format(intval($r->total_game_score)); ?></strong></span>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- ۲. نمایش مخصوص دسکتاپ: جدول عریض با ردیف‌های شیک -->
+                <div class="gk-league-table-desktop" style="overflow-x:auto;">
+                    <table>
                         <thead>
                             <tr style="color:#64748b; font-size:13px;">
                                 <th style="padding:8px 12px;">رتبه</th>
