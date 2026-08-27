@@ -11,11 +11,18 @@ class GK_School_Exams {
     public static function init() {
         add_shortcode('gk_class_exam_arena', [__CLASS__, 'render_exam_arena']);
         add_action('template_redirect', [__CLASS__, 'disable_caching_on_exam']);
-        add_action('wp_enqueue_scripts', [__CLASS__, 'enqueue_assets'], 10);
         add_action('wp_ajax_gk_teacher_create_class_exam', [__CLASS__, 'ajax_create_exam']);
+        add_action('wp_ajax_nopriv_gk_teacher_create_class_exam', [__CLASS__, 'ajax_create_exam']);
         add_action('wp_ajax_gk_teacher_delete_class_exam', [__CLASS__, 'ajax_delete_exam']);
+        add_action('wp_ajax_nopriv_gk_teacher_delete_class_exam', [__CLASS__, 'ajax_delete_exam']);
         add_action('wp_ajax_gk_submit_class_exam_score', [__CLASS__, 'ajax_submit_exam_score']);
         add_action('wp_ajax_nopriv_gk_submit_class_exam_score', [__CLASS__, 'ajax_submit_exam_score']);
+        add_action('init', function() {
+            if (isset($_REQUEST['action']) && in_array($_REQUEST['action'], ['gk_teacher_create_class_exam', 'gk_teacher_delete_class_exam'])) {
+                if ($_REQUEST['action'] === 'gk_teacher_create_class_exam') self::ajax_create_exam();
+                if ($_REQUEST['action'] === 'gk_teacher_delete_class_exam') self::ajax_delete_exam();
+            }
+        });
     }
 
     public static function enqueue_assets() {
@@ -532,8 +539,25 @@ class GK_School_Exams {
             $expires_at = date('Y-m-d H:i:s', time() + ($validity_hours * 3600));
         }
 
-        $exam_code = 'EX-' . strtoupper(wp_generate_password(8, false));
         $table_exams = $wpdb->prefix . 'gk_class_exams';
+
+        // Check if an identical exam was created in the last 10 seconds to prevent double submit
+        $recent_exam = $wpdb->get_row($wpdb->prepare("
+            SELECT * FROM $table_exams 
+            WHERE class_id = %d AND title = %s AND created_at >= %s
+            ORDER BY id DESC LIMIT 1
+        ", $class_id, $title, date('Y-m-d H:i:s', time() - 10)));
+
+        if ($recent_exam) {
+            wp_send_json_success([
+                'message'   => 'امتحان کلاسی با موفقیت ایجاد شد! 🎉',
+                'title'     => $recent_exam->title,
+                'exam_code' => $recent_exam->exam_code,
+                'exam_url'  => home_url('/class-exam/?code=' . $recent_exam->exam_code)
+            ]);
+        }
+
+        $exam_code = 'EX-' . strtoupper(wp_generate_password(8, false));
 
         $res = $wpdb->insert($table_exams, [
             'exam_code'   => $exam_code,

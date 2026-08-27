@@ -1590,173 +1590,6 @@ class GK_Teacher_Portal {
                     </button>
                 </div>
             </div>
-            <!-- مدال ساخت لیگ کلاسی با تنظیم مهلت زمانی -->
-            
-            <!-- مودال ساخت آزمون و امتحان کلاسی جدید -->
-            <div id="gk-new-exam-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.7); z-index:9999999; backdrop-filter:blur(6px); direction:rtl; text-align:right;">
-                <div style="max-width:620px; margin:30px auto; background:#ffffff; border-radius:24px; padding:26px; box-shadow:0 25px 50px rgba(0,0,0,0.35); max-height:90vh; overflow-y:auto; border:2px solid #e2e8f0;">
-                    
-                    <!-- Modal Header -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1.5px solid #f1f5f9; padding-bottom:12px;">
-                        <h3 style="margin:0; font-size:18px; color:#1e1b4b; font-weight:900;">📝 ایجاد آزمون و امتحان کلاسی جدید</h3>
-                        <button type="button" onclick="gkCloseExamModal();" style="background:#f1f5f9; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer; color:#64748b; display:flex; align-items:center; justify-content:center;">✕</button>
-                    </div>
-
-                    <!-- 1. Exam Title -->
-                    <div style="margin-bottom:12px;">
-                        <label style="font-size:13px; font-weight:900; color:#334155; display:block; margin-bottom:6px;">عنوان آزمون کلاسی:</label>
-                        <input type="text" id="gk-exam-title" placeholder="مثلاً: آزمون ۳ فصل اول ریاضی و فارسی..." style="width:100%; padding:10px 14px; border-radius:12px; border:1.5px solid #cbd5e1; font-size:13px; box-sizing:border-box; font-family:inherit;">
-                    </div>
-
-                    <!-- 2. Validity / Expiration -->
-                    <div style="margin-bottom:14px;">
-                        <label style="font-size:13px; font-weight:900; color:#334155; display:block; margin-bottom:6px;">⏳ مهلت شرکت در آزمون (مدت اعتبار لینک):</label>
-                        <select id="gk-exam-validity" style="width:100%; padding:10px 14px; border-radius:12px; border:1.5px solid #cbd5e1; font-size:13px; box-sizing:border-box; background:#fff; font-weight:bold; font-family:inherit;">
-                            <option value="6">⏳ ۶ ساعت آینده</option>
-                            <option value="12">⏳ ۱۲ ساعت آینده</option>
-                            <option value="24" selected>⏳ ۲۴ ساعت (۱ روز) - استاندارد</option>
-                            <option value="48">⏳ ۴۸ ساعت (۲ روز)</option>
-                            <option value="72">⏳ ۷۲ ساعت (۳ روز)</option>
-                            <option value="168">⏳ ۱ هفته (۷ روز)</option>
-                            <option value="0">♾️ نامحدود (بدون انقضا)</option>
-                        </select>
-                    </div>
-
-                    <!-- 3. Smart Search & Filter Box Inside Modal -->
-                    <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:16px; padding:14px; margin-bottom:14px;">
-                        <label style="font-size:13px; font-weight:900; color:#1e1b4b; display:block; margin-bottom:8px;">🔍 فیلتر و جستجوی هوشمند دروس و آزمون‌ها:</label>
-                        
-                        <!-- Search Input -->
-                        <div style="position:relative; margin-bottom:10px;">
-                            <input type="text" id="gk-exam-modal-search" placeholder="جستجوی نام درس، کتاب یا فصل (مثلاً: چوب‌خط، حواس، تقارن، نگاره)..." oninput="gkFilterExamModalTests()" style="width:100%; padding:9px 12px 9px 32px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:12.5px; box-sizing:border-box; font-family:inherit;">
-                            <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:14px;">🔍</span>
-                        </div>
-
-                        <!-- Subject Chips -->
-                        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;" id="gkExamModalSubjectChips">
-                            <button type="button" class="gk-modal-chip is-active" data-subj="all" onclick="gkSetExamModalSubj('all', this)" style="padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:800; cursor:pointer; border:1px solid #cbd5e1; background:#7c3aed; color:#fff;">🌟 همه کتاب‌ها</button>
-                            <button type="button" class="gk-modal-chip" data-subj="hedyeh" onclick="gkSetExamModalSubj('hedyeh', this)" style="padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:800; cursor:pointer; border:1px solid #cbd5e1; background:#fff; color:#334155;">🌸 هدیه‌های آسمان</button>
-                            <button type="button" class="gk-modal-chip" data-subj="oloom" onclick="gkSetExamModalSubj('oloom', this)" style="padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:800; cursor:pointer; border:1px solid #cbd5e1; background:#fff; color:#334155;">🔬 علوم تجربی</button>
-                            <button type="button" class="gk-modal-chip" data-subj="riazi" onclick="gkSetExamModalSubj('riazi', this)" style="padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:800; cursor:pointer; border:1px solid #cbd5e1; background:#fff; color:#334155;">🔢 ریاضی هوشمند</button>
-                            <button type="button" class="gk-modal-chip" data-subj="farsi" onclick="gkSetExamModalSubj('farsi', this)" style="padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:800; cursor:pointer; border:1px solid #cbd5e1; background:#fff; color:#334155;">📖 فارسی و نگاره‌ها</button>
-                        </div>
-
-                        <!-- Quick Select Buttons -->
-                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#64748b;">
-                            <span id="gkExamModalMatchCount">۱۲ آزمون در دسترس</span>
-                            <div style="display:flex; gap:8px;">
-                                <button type="button" onclick="gkSelectAllVisibleExamTests(true)" style="background:#e0f2fe; border:none; color:#0369a1; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">☑️ انتخاب همه نمایان</button>
-                                <button type="button" onclick="gkSelectAllVisibleExamTests(false)" style="background:#fee2e2; border:none; color:#dc2626; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬜ لغو انتخاب</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. Tests Checklist -->
-                    <div style="margin-bottom:18px;">
-                        <label style="font-size:13px; font-weight:900; color:#334155; display:block; margin-bottom:8px;">لیست آزمون‌های منتخب برای این امتحان:</label>
-                        <div id="gkExamModalTestsList" style="max-height:240px; overflow-y:auto; border:1.5px solid #cbd5e1; border-radius:14px; padding:10px; background:#f8fafc;">
-                            
-                            <?php 
-                            $subjects_group = [
-                                'hedyeh' => ['title' => '🌸 هدیه‌های آسمان (پایه اول)', 'tests' => ['test-hedyeh1-dars1', 'test-hedyeh1-dars2', 'test-hedyeh1-dars3']],
-                                'oloom'  => ['title' => '🔬 علوم تجربی (پایه اول)',   'tests' => ['test-oloom1-fasl1', 'test-oloom1-fasl2', 'test-oloom1-fasl3']],
-                                'riazi'  => ['title' => '🔢 ریاضی هوشمند (پایه اول)', 'tests' => ['test-riazi1-tem1', 'test-riazi1-tem2', 'test-riazi1-tem3']],
-                                'farsi'  => ['title' => '📖 فارسی و نگاره‌ها (پایه اول)', 'tests' => ['test-farsi1-negare1', 'test-farsi1-negare2', 'test-farsi1-negare3']],
-                            ];
-
-                            foreach ($subjects_group as $s_key => $s_data): ?>
-                                <div class="gk-exam-subj-group" data-subj="<?php echo $s_key; ?>" style="margin-bottom: 12px;">
-                                    <div style="font-weight:900; font-size:12.5px; color:#1e1b4b; margin-bottom:6px; background:#e0e7ff; padding:4px 8px; border-radius:6px;">
-                                        <?php echo $s_data['title']; ?>
-                                    </div>
-                                    <?php foreach ($all_curriculum_tests as $ct_item): 
-                                        if (in_array($ct_item['id'], $s_data['tests'])): 
-                                            $search_text = mb_strtolower($ct_item['title'] . ' ' . $ct_item['desc'] . ' ' . $ct_item['subject_name'] . ' ' . $ct_item['chapter'] . ' پایه اول کلاس اول دبستان');
-                                        ?>
-                                            <label class="gk-exam-test-item" 
-                                                   data-subj="<?php echo $s_key; ?>"
-                                                   data-search="<?php echo esc_attr($search_text); ?>"
-                                                   style="display:flex; align-items:center; gap:8px; padding:6px 8px; font-size:12.5px; cursor:pointer; border-radius:6px; margin-bottom:2px; font-weight:700; color:#334155; transition:background 0.15s;">
-                                                <input type="checkbox" name="gk_exam_tests[]" value="<?php echo esc_attr($ct_item['id']); ?>" style="width:16px; height:16px; cursor:pointer;">
-                                                <span><?php echo $ct_item['icon'] . ' ' . esc_html($ct_item['title']); ?></span>
-                                            </label>
-                                        <?php endif;
-                                    endforeach; ?>
-                                </div>
-                            <?php endforeach; ?>
-
-                        </div>
-                    </div>
-
-                    <button type="button" id="gk-btn-save-new-exam" onclick="gkSubmitCreateExam(this);" class="gk-btn-tool" style="width:100%; justify-content:center; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; padding:12px; font-size:14px; border-radius:14px; font-weight:900;">
-                        🚀 ایجاد آزمون کلاسی و دریافت لینک‌ها
-                    </button>
-                </div>
-            </div>
-            <!-- مدال ساخت لیگ کلاسی با تنظیم مهلت زمانی -->
-            
-            <!-- مودال ساخت آزمون و امتحان کلاسی جدید -->
-            <div id="gk-new-exam-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.7); z-index:9999999; backdrop-filter:blur(5px); direction:rtl; text-align:right;">
-                <div style="max-width:600px; margin:40px auto; background:#ffffff; border-radius:24px; padding:28px; box-shadow:0 20px 40px rgba(0,0,0,0.3); max-height:88vh; overflow-y:auto;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1.5px solid #f1f5f9; padding-bottom:12px;">
-                        <h3 style="margin:0; font-size:18px; color:#1e293b; font-weight:900;">📝 ایجاد آزمون و امتحان کلاسی جدید</h3>
-                        <button type="button" onclick="gkCloseExamModal();" style="background:none; border:none; font-size:22px; cursor:pointer; color:#64748b;">✕</button>
-                    </div>
-
-                    <div style="margin-bottom:14px;">
-                        <label style="font-size:13px; font-weight:bold; color:#334155; display:block; margin-bottom:6px;">عنوان آزمون کلاسی (مثلاً: آزمون ۳ فصل اول ریاضی و علوم):</label>
-                        <input type="text" id="gk-exam-title" placeholder="عنوان آزمون..." style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #cbd5e1; font-size:13px; box-sizing:border-box;">
-                    </div>
-
-                    <div style="margin-bottom:14px;">
-                        <label style="font-size:13px; font-weight:bold; color:#334155; display:block; margin-bottom:6px;">⏳ مهلت شرکت در آزمون (مدت اعتبار لینک):</label>
-                        <select id="gk-exam-validity" style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #cbd5e1; font-size:13px; box-sizing:border-box; background:#fff; font-weight:bold;">
-                            <option value="6">⏳ ۶ ساعت آینده</option>
-                            <option value="12">⏳ ۱۲ ساعت آینده</option>
-                            <option value="24" selected>⏳ ۲۴ ساعت (۱ روز) - استاندارد</option>
-                            <option value="48">⏳ ۴۸ ساعت (۲ روز)</option>
-                            <option value="72">⏳ ۷۲ ساعت (۳ روز)</option>
-                            <option value="168">⏳ ۱ هفته (۷ روز)</option>
-                            <option value="0">♾️ نامحدود (بدون انقضا)</option>
-                        </select>
-                    </div>
-
-                    <div style="margin-bottom:18px;">
-                        <label style="font-size:13px; font-weight:bold; color:#334155; display:block; margin-bottom:8px;">انتخاب آزمون‌ها و دروس این امتحان:</label>
-                        <div style="max-height:260px; overflow-y:auto; border:1.5px solid #cbd5e1; border-radius:12px; padding:10px; background:#f8fafc;">
-                            
-                            <?php 
-                            $subjects_group = [
-                                '🌸 هدیه‌های آسمان' => ['test-hedyeh1-dars1', 'test-hedyeh1-dars2', 'test-hedyeh1-dars3'],
-                                '🔬 علوم تجربی' => ['test-oloom1-fasl1', 'test-oloom1-fasl2', 'test-oloom1-fasl3'],
-                                '🔢 ریاضی هوشمند' => ['test-riazi1-tem1', 'test-riazi1-tem2', 'test-riazi1-tem3'],
-                                '📖 فارسی و نگاره‌ها' => ['test-farsi1-negare1', 'test-farsi1-negare2', 'test-farsi1-negare3'],
-                            ];
-
-                            foreach ($subjects_group as $grp_title => $grp_test_ids): ?>
-                                <div style="margin-bottom: 12px;">
-                                    <div style="font-weight:900; font-size:12.5px; color:#1e1b4b; margin-bottom:6px; background:#e0e7ff; padding:4px 8px; border-radius:6px;">
-                                        <?php echo $grp_title; ?>
-                                    </div>
-                                    <?php foreach ($all_curriculum_tests as $ct_item): 
-                                        if (in_array($ct_item['id'], $grp_test_ids)): ?>
-                                            <label style="display:flex; align-items:center; gap:8px; padding:6px 8px; font-size:12.5px; cursor:pointer; border-radius:6px; margin-bottom:2px; font-weight:700; color:#334155;">
-                                                <input type="checkbox" name="gk_exam_tests[]" value="<?php echo esc_attr($ct_item['id']); ?>" style="width:16px; height:16px;">
-                                                <span><?php echo $ct_item['icon'] . ' ' . esc_html($ct_item['title']); ?></span>
-                                            </label>
-                                        <?php endif;
-                                    endforeach; ?>
-                                </div>
-                            <?php endforeach; ?>
-
-                        </div>
-                    </div>
-
-                    <button type="button" id="gk-btn-save-new-exam" onclick="gkSubmitCreateExam(this);" class="gk-btn-tool" style="width:100%; justify-content:center; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; padding:12px; font-size:14px;">
-                        🚀 ایجاد آزمون کلاسی و دریافت لینک‌ها
-                    </button>
-                </div>
-            </div>
 
             <div id="gk-new-league-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.7); z-index:9999999; backdrop-filter:blur(5px); direction:rtl; text-align:right;">
                 <div style="max-width:550px; margin:50px auto; background:#ffffff; border-radius:24px; padding:28px; box-shadow:0 20px 40px rgba(0,0,0,0.3); max-height:85vh; overflow-y:auto;">
@@ -1998,13 +1831,16 @@ class GK_Teacher_Portal {
                 }
             });
         }
+        var gkExamSubmitting = false;
         function gkSubmitCreateExam(btnEl) {
+            if (gkExamSubmitting) return;
+
             var titleEl = document.getElementById('gk-exam-title');
             var title = titleEl ? titleEl.value.trim() : '';
             var validityEl = document.getElementById('gk-exam-validity');
             var validity = validityEl ? validityEl.value : '24';
             var selectedTests = [];
-            var checkboxes = document.querySelectorAll('input[name="gk_exam_tests[]"]:checked');
+            var checkboxes = document.querySelectorAll('#gkExamModalTestsList input[name="gk_exam_tests[]"]:checked');
             for (var i = 0; i < checkboxes.length; i++) {
                 selectedTests.push(checkboxes[i].value);
             }
@@ -2019,11 +1855,12 @@ class GK_Teacher_Portal {
                 return;
             }
 
+            gkExamSubmitting = true;
             var $btn = jQuery(btnEl);
             $btn.text('⏳ در حال ایجاد آزمون...').prop('disabled', true);
 
             jQuery.ajax({
-                url: '<?php echo $ajax_url; ?>',
+                url: '<?php echo esc_url(home_url('/?gk_ajax=1')); ?>',
                 type: 'POST',
                 data: {
                     action: 'gk_teacher_create_class_exam',
@@ -2036,6 +1873,7 @@ class GK_Teacher_Portal {
                 dataType: 'json',
                 success: function(res) {
                     $btn.text('🚀 ایجاد آزمون کلاسی و دریافت لینک‌ها').prop('disabled', false);
+                    gkExamSubmitting = false;
                     if (res.success && res.data) {
                         gkCloseExamModal();
                         alert('📝 آزمون کلاسی «' + res.data.title + '» با موفقیت ساخته شد!\nلینک سالن آزمون:\n' + res.data.exam_url);
@@ -2047,6 +1885,7 @@ class GK_Teacher_Portal {
                 },
                 error: function(xhr, status, error) {
                     $btn.text('🚀 ایجاد آزمون کلاسی و دریافت لینک‌ها').prop('disabled', false);
+                    gkExamSubmitting = false;
                     console.error('Create exam error:', xhr.responseText);
                     alert('خطای ارتباط با سرور.');
                 }
