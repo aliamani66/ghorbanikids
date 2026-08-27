@@ -1286,17 +1286,17 @@ class GK_Teacher_Portal {
                                         👶 لینک اختصاصی ورود هر نوآموز به این آزمون (با ثبت خودکار نمره در کارنامه):
                                     </div>
                                     <div style="overflow-x:auto;">
-                                        <table class="gk-table-st" style="font-size:12px;">
+                                        <table class="gk-table-st" style="font-size:12.5px;">
                                             <thead>
                                                 <tr>
+                                                    <th style="width:50px;">ردیف</th>
                                                     <th>نام نوآموز</th>
-                                                    <th>لینک مستقیم اختصاصی</th>
-                                                    <th style="text-align:center;">ارسال به بله مادر</th>
-                                                    <th style="text-align:center;">کپی</th>
+                                                    <th>لینک مستقیم اختصاصی آزمون</th>
+                                                    <th style="text-align:center; width:160px;">ارسال و دسترسی اختصاصی</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach ($students as $st_obj): 
+                                                <?php foreach ($students as $st_idx => $st_obj): 
                                                     $st_ex_url = home_url('/class-exam/?code=' . $ex->exam_code . '&st_token=' . $st_obj->student_token);
                                                     $st_bale_msg = "سلام و احترام، اولیا گرامی نوآموز «" . $st_obj->name . "»🌷\n" .
                                                                    "📝 لینک اختصاصی شرکت در امتحان کلاسی «" . $ex->title . "» در " . $org_name . " (کلاس " . $class->name . "):\n" .
@@ -1305,19 +1305,23 @@ class GK_Teacher_Portal {
                                                     $st_bale_share = "https://ble.ir/share/url?url=" . urlencode($st_ex_url) . "&text=" . urlencode($st_bale_msg);
                                                 ?>
                                                     <tr>
-                                                        <td><strong>👶 <?php echo esc_html($st_obj->name); ?></strong></td>
+                                                        <td><strong>#<?php echo $st_idx + 1; ?></strong></td>
+                                                        <td><strong style="color:#1e293b;">👶 <?php echo esc_html($st_obj->name); ?></strong></td>
                                                         <td>
-                                                            <input type="text" readonly value="<?php echo esc_url($st_ex_url); ?>" style="width:100%; font-size:11px; padding:4px 8px; border-radius:6px; border:1px solid #cbd5e1; direction:ltr;" onclick="this.select();">
+                                                            <input type="text" readonly value="<?php echo esc_url($st_ex_url); ?>" style="width:100%; font-size:11px; padding:5px 10px; border-radius:8px; border:1px solid #cbd5e1; direction:ltr; background:#f8fafc; color:#334155;" onclick="this.select();">
                                                         </td>
                                                         <td style="text-align:center;">
-                                                            <a href="<?php echo esc_url($st_bale_share); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال به بله مادر">
-                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                                                            </a>
-                                                        </td>
-                                                        <td style="text-align:center;">
-                                                            <button type="button" class="gk-icon-btn" onclick="gkCopyText('<?php echo esc_js($st_ex_url); ?>', this)" title="کپی لینک اختصاصی">
-                                                                📋
-                                                            </button>
+                                                            <div class="gk-action-icons-group" style="justify-content:center;">
+                                                                <a href="<?php echo esc_url($st_bale_share); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال به بله مادر <?php echo esc_attr($st_obj->name); ?>">
+                                                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                                                </a>
+                                                                <a href="<?php echo esc_url($st_ex_url); ?>" target="_blank" class="gk-icon-btn gk-btn-play-link" title="ورود مستقیم به آزمون به عنوان <?php echo esc_attr($st_obj->name); ?>">
+                                                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                                                </a>
+                                                                <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک اختصاصی این آزمون برای <?php echo esc_attr($st_obj->name); ?>" onclick="gkCopyText('<?php echo esc_js($st_ex_url); ?>', this);">
+                                                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>
