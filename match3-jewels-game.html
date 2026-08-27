@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>جواهرات جادویی کودکانه | Magic Jewels</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at center, #2e1053 0%, #0d021a 100%);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.22);
+      --glass-glow: rgba(255, 105, 180, 0.35);
+      --accent-gold: #ffe600;
+      --board-size: min(88vw, 440px);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    #fx-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      z-index: 10;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: var(--board-size);
+    }
+
+    .stat-card {
+      background: var(--glass-bg);
+      border: 2px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      padding: 8px 12px;
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 8px 24px var(--glass-glow);
+    }
+
+    .stat-title {
+      font-size: 0.85rem;
+      color: #ffccf2;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--accent-gold);
+      text-shadow: 0 0 12px rgba(255, 230, 0, 0.7);
+    }
+
+    .progress-wrapper {
+      width: var(--board-size);
+      height: 12px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff007f, #00f2fe, #ffe600);
+      box-shadow: 0 0 15px #00f2fe;
+      transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .board-frame {
+      padding: 12px;
+      background: rgba(30, 10, 50, 0.75);
+      border: 3px solid rgba(255, 150, 255, 0.4);
+      border-radius: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(230, 80, 255, 0.3);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 7px;
+      width: var(--board-size);
+      height: var(--board-size);
+      position: relative;
+    }
+
+    .cell {
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s;
+    }
+
+    .cell:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.04);
+    }
+
+    .gem {
+      width: 84%;
+      height: 84%;
+      border-radius: 32%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.75),
+                  inset 0 -5px 10px rgba(0, 0, 0, 0.5),
+                  0 8px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .gem::after {
+      content: '';
+      position: absolute;
+      top: 12%;
+      left: 18%;
+      width: 35%;
+      height: 22%;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      filter: blur(0.5px);
+    }
+
+    .gem-0 { background: linear-gradient(135deg, #ff2a5f, #a00028); box-shadow: 0 0 16px #ff2a5f; }
+    .gem-1 { background: linear-gradient(135deg, #00d9ff, #00569e); box-shadow: 0 0 16px #00d9ff; }
+    .gem-2 { background: linear-gradient(135deg, #00ff66, #047a32); box-shadow: 0 0 16px #00ff66; }
+    .gem-3 { background: linear-gradient(135deg, #ffe259, #e67e00); box-shadow: 0 0 16px #ffe259; }
+    .gem-4 { background: linear-gradient(135deg, #cc00ff, #550080); box-shadow: 0 0 16px #cc00ff; }
+    .gem-5 { background: linear-gradient(135deg, #ff00b7, #ff80bf); box-shadow: 0 0 16px #ff00b7; }
+
+    .gem.selected {
+      transform: scale(1.22);
+      animation: pulse-glow 0.8s infinite alternate;
+      z-index: 20;
+    }
+
+    @keyframes pulse-glow {
+      from { filter: brightness(1.15) drop-shadow(0 0 8px #fff); }
+      to { filter: brightness(1.6) drop-shadow(0 0 22px #ffe600); }
+    }
+
+    .gem.matched {
+      animation: gem-pop 0.32s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes gem-pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4) rotate(20deg); filter: brightness(2.5); }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    .gem.shake-wrong {
+      animation: shake 0.35s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px) rotate(-6deg); }
+      40% { transform: translateX(8px) rotate(6deg); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #3d0d66, #801399);
+      border: 3px solid rgba(255, 230, 0, 0.5);
+      padding: 35px 45px;
+      border-radius: 32px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(255, 105, 180, 0.6);
+      transform: scale(0.8);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: #fff;
+      text-shadow: 0 0 20px #ffe600;
+    }
+
+    .btn {
+      margin-top: 22px;
+      padding: 14px 38px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #3b0047;
+      background: linear-gradient(90deg, #ffe600, #ff8c00);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(255, 140, 0, 0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 12px 30px rgba(255, 140, 0, 0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="fx-canvas"></canvas>
+
+  <div class="game-container">
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-title">⭐ مرحله</div>
+        <div class="stat-value" id="ui-level">۱</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">💎 امتیاز</div>
+        <div class="stat-value" id="ui-score">۰</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">🎯 فرصت‌ها</div>
+        <div class="stat-value" id="ui-moves">۲۰</div>
+      </div>
+    </div>
+
+    <div class="progress-wrapper">
+      <div class="progress-fill" id="ui-progress"></div>
+    </div>
+
+    <div class="board-frame">
+      <div class="board" id="board"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="game-modal">
+    <div class="modal-content">
+      <h2 class="modal-title" id="modal-title">🎉 هورااا مرحله رد شد!</h2>
+      <p id="modal-desc" style="color: #ffddf4; font-size: 1.2rem; font-weight: 700;">تو فوق‌العاده‌ای قهرمان!</p>
+      <button class="btn" id="modal-btn">بزن بریم مرحله بعد 🚀</button>
+    </div>
+  </div>
+
+  <script>
+    const KidAudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+
+      playSelect() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(750, now + 0.08);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      },
+
+      playMatch(combo = 1) {
+        this.init();
+        const baseFrequencies = [
+          [523.25, 659.25],
+          [659.25, 783.99],
+          [783.99, 1046.50],
+          [1046.50, 1318.51, 1567],
+          [1318.51, 1567.98, 2093]
+        ];
+
+        const notes = baseFrequencies[Math.min(combo - 1, baseFrequencies.length - 1)];
+        notes.forEach((freq, idx) => {
+          const now = this.ctx.currentTime + (idx * 0.06);
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.05, now + 0.18);
+
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        });
+      },
+
+      playWrongMove() {
+        this.init();
+        const now = this.ctx.currentTime;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(120, now + 0.12);
+        osc.frequency.linearRampToValueAtTime(160, now + 0.22);
+        osc.frequency.linearRampToValueAtTime(80, now + 0.38);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.38);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.38);
+      },
+
+      playLevelUp() {
+        this.init();
+        const victoryMelody = [
+          { f: 523.25, d: 0.12 },
+          { f: 659.25, d: 0.12 },
+          { f: 783.99, d: 0.12 },
+          { f: 1046.50, d: 0.28 },
+          { f: 880.00, d: 0.14 },
+          { f: 1046.50, d: 0.45 }
+        ];
+
+        let timeOffset = 0;
+        victoryMelody.forEach((note) => {
+          const now = this.ctx.currentTime + timeOffset;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(note.f, now);
+
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + note.d);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + note.d);
+
+          timeOffset += note.d * 0.85;
+        });
+      },
+
+      playGameOver() {
+        this.init();
+        const failNotes = [400, 350, 300, 220];
+        failNotes.forEach((freq, idx) => {
+          const now = this.ctx.currentTime + (idx * 0.14);
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.85, now + 0.16);
+
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.18);
+        });
+      }
+    };
+
+    const CanvasFX = {
+      canvas: document.getElementById('fx-canvas'),
+      ctx: document.getElementById('fx-canvas').getContext('2d'),
+      particles: [],
+      init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.loop();
+      },
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      },
+      createSparks(x, y, color) {
+        for (let i = 0; i < 22; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 6 + 2;
+          this.particles.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            size: Math.random() * 6 + 3,
+            alpha: 1,
+            color
+          });
+        }
+      },
+      loop() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const p = this.particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.14;
+          p.alpha -= 0.024;
+
+          if (p.alpha <= 0) {
+            this.particles.splice(i, 1);
+            continue;
+          }
+
+          this.ctx.save();
+          this.ctx.globalAlpha = p.alpha;
+          this.ctx.fillStyle = p.color;
+          this.ctx.shadowBlur = 12;
+          this.ctx.shadowColor = p.color;
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.restore();
+        }
+        requestAnimationFrame(() => this.loop());
+      }
+    };
+    CanvasFX.init();
+
+    const GRID_SIZE = 7;
+    const GEM_COLORS = ['#ff2a5f', '#00d9ff', '#00ff66', '#ffe259', '#cc00ff', '#ff00b7'];
+
+    const LEVEL_CONFIGS = [
+      { target: 1000, moves: 22, gemTypes: 4 },
+      { target: 2200, moves: 20, gemTypes: 5 },
+      { target: 4000, moves: 18, gemTypes: 5 },
+      { target: 6500, moves: 16, gemTypes: 6 },
+      { target: 9500, moves: 14, gemTypes: 6 }
+    ];
+
+    let currentLevel = 0;
+    let score = 0;
+    let movesLeft = 0;
+    let board = [];
+    let selectedCell = null;
+    let isProcessing = false;
+
+    const boardEl = document.getElementById('board');
+    const scoreEl = document.getElementById('ui-score');
+    const levelEl = document.getElementById('ui-level');
+    const movesEl = document.getElementById('ui-moves');
+    const progressEl = document.getElementById('ui-progress');
+    const modalEl = document.getElementById('game-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalBtn = document.getElementById('modal-btn');
+
+    function startLevel(lvlIndex) {
+      currentLevel = lvlIndex;
+      const conf = LEVEL_CONFIGS[currentLevel] || {
+        target: 10000 + (currentLevel - 4) * 3500,
+        moves: 14,
+        gemTypes: 6
+      };
+      
+      score = 0;
+      movesLeft = conf.moves;
+      updateUI();
+      initBoard(conf.gemTypes);
+    }
+
+    function initBoard(typesCount) {
+      boardEl.innerHTML = '';
+      board = [];
+
+      for (let r = 0; r < GRID_SIZE; r++) {
+        board[r] = [];
+        for (let c = 0; c < GRID_SIZE; c++) {
+          let type;
+          do {
+            type = Math.floor(Math.random() * typesCount);
+          } while (
+            (c >= 2 && board[r][c - 1] === type && board[r][c - 2] === type) ||
+            (r >= 2 && board[r - 1][c] === type && board[r - 2][c] === type)
+          );
+
+          board[r][c] = type;
+
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.addEventListener('click', () => handleCellClick(r, c));
+
+          const gem = document.createElement('div');
+          gem.className = `gem gem-${type}`;
+          cell.appendChild(gem);
+
+          boardEl.appendChild(cell);
+        }
+      }
+    }
+
+    function handleCellClick(r, c) {
+      if (isProcessing || movesLeft <= 0) return;
+
+      if (!selectedCell) {
+        selectedCell = { r, c };
+        getGemElement(r, c).classList.add('selected');
+        KidAudioEngine.playSelect();
+      } else {
+        const prev = selectedCell;
+        const isNeighbor = Math.abs(prev.r - r) + Math.abs(prev.c - c) === 1;
+
+        getGemElement(prev.r, prev.c).classList.remove('selected');
+        selectedCell = null;
+
+        if (isNeighbor) {
+          executeSwap(prev, { r, c });
+        } else {
+          selectedCell = { r, c };
+          getGemElement(r, c).classList.add('selected');
+          KidAudioEngine.playSelect();
+        }
+      }
+    }
+
+    async function executeSwap(pos1, pos2) {
+      isProcessing = true;
+      swapBoardData(pos1, pos2);
+      renderBoard();
+
+      const matches = findMatches();
+      if (matches.length > 0) {
+        movesLeft--;
+        updateUI();
+        await resolveMatches(1);
+        checkGameStatus();
+      } else {
+        KidAudioEngine.playWrongMove();
+        const gem1 = getGemElement(pos1.r, pos1.c);
+        const gem2 = getGemElement(pos2.r, pos2.c);
+        if (gem1) gem1.classList.add('shake-wrong');
+        if (gem2) gem2.classList.add('shake-wrong');
+
+        await delay(360);
+        swapBoardData(pos1, pos2);
+        renderBoard();
+      }
+      isProcessing = false;
+    }
+
+    function swapBoardData(p1, p2) {
+      const temp = board[p1.r][p1.c];
+      board[p1.r][p1.c] = board[p2.r][p2.c];
+      board[p2.r][p2.c] = temp;
+    }
+
+    function findMatches() {
+      const matched = new Set();
+
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE - 2; c++) {
+          const type = board[r][c];
+          if (type !== null && type === board[r][c + 1] && type === board[r][c + 2]) {
+            matched.add(`${r},${c}`);
+            matched.add(`${r},${c + 1}`);
+            matched.add(`${r},${c + 2}`);
+          }
+        }
+      }
+
+      for (let c = 0; c < GRID_SIZE; c++) {
+        for (let r = 0; r < GRID_SIZE - 2; r++) {
+          const type = board[r][c];
+          if (type !== null && type === board[r + 1][c] && type === board[r + 2][c]) {
+            matched.add(`${r},${c}`);
+            matched.add(`${r + 1},${c}`);
+            matched.add(`${r + 2},${c}`);
+          }
+        }
+      }
+
+      return Array.from(matched).map(coord => {
+        const [r, c] = coord.split(',').map(Number);
+        return { r, c, type: board[r][c] };
+      });
+    }
+
+    async function resolveMatches(combo = 1) {
+      const matches = findMatches();
+      if (matches.length === 0) return;
+
+      KidAudioEngine.playMatch(combo);
+
+      matches.forEach(m => {
+        const gemEl = getGemElement(m.r, m.c);
+        if (gemEl) {
+          gemEl.classList.add('matched');
+          const rect = gemEl.getBoundingClientRect();
+          CanvasFX.createSparks(rect.left + rect.width / 2, rect.top + rect.height / 2, GEM_COLORS[m.type]);
+        }
+        board[m.r][m.c] = null;
+      });
+
+      score += matches.length * 50 * combo;
+      updateUI();
+      await delay(280);
+
+      dropGems();
+      renderBoard();
+      await delay(250);
+
+      await resolveMatches(combo + 1);
+    }
+
+    function dropGems() {
+      const conf = LEVEL_CONFIGS[currentLevel] || LEVEL_CONFIGS[LEVEL_CONFIGS.length - 1];
+      for (let c = 0; c < GRID_SIZE; c++) {
+        let emptyRow = GRID_SIZE - 1;
+        for (let r = GRID_SIZE - 1; r >= 0; r--) {
+          if (board[r][c] !== null) {
+            if (emptyRow !== r) {
+              board[emptyRow][c] = board[r][c];
+              board[r][c] = null;
+            }
+            emptyRow--;
+          }
+        }
+        for (let r = emptyRow; r >= 0; r--) {
+          board[r][c] = Math.floor(Math.random() * conf.gemTypes);
+        }
+      }
+    }
+
+    function renderBoard() {
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const cell = boardEl.children[r * GRID_SIZE + c];
+          cell.innerHTML = '';
+          if (board[r][c] !== null) {
+            const gem = document.createElement('div');
+            gem.className = `gem gem-${board[r][c]}`;
+            cell.appendChild(gem);
+          }
+        }
+      }
+    }
+
+    function getGemElement(r, c) {
+      const cell = boardEl.children[r * GRID_SIZE + c];
+      return cell ? cell.querySelector('.gem') : null;
+    }
+
+    function updateUI() {
+      const conf = LEVEL_CONFIGS[currentLevel] || { target: 10000 };
+      scoreEl.textContent = score.toLocaleString('fa-IR');
+      levelEl.textContent = (currentLevel + 1).toLocaleString('fa-IR');
+      movesEl.textContent = movesLeft.toLocaleString('fa-IR');
+
+      const pct = Math.min((score / conf.target) * 100, 100);
+      progressEl.style.width = `${pct}%`;
+    }
+
+    function checkGameStatus() {
+      const conf = LEVEL_CONFIGS[currentLevel] || { target: 10000 };
+
+      if (score >= conf.target) {
+        KidAudioEngine.playLevelUp();
+        modalTitle.textContent = '🎉 هورااا مرحله رد شد!';
+        modalDesc.textContent = `آفرین به تو! امتیاز این مرحله رو کامل گرفتی!`;
+        modalBtn.textContent = 'بزن بریم مرحله بعد 🚀';
+        modalBtn.onclick = () => {
+          modalEl.classList.remove('active');
+          startLevel(currentLevel + 1);
+        };
+        modalEl.classList.add('active');
+      } else if (movesLeft <= 0) {
+        KidAudioEngine.playGameOver();
+        modalTitle.textContent = 'ای وای! فرصت تموم شد 🎈';
+        modalDesc.textContent = 'اشکالی نداره قهرمان، یه بار دیگه امتحان کن!';
+        modalBtn.textContent = 'شروع دوباره 🔄';
+        modalBtn.onclick = () => {
+          modalEl.classList.remove('active');
+          startLevel(currentLevel);
+        };
+        modalEl.classList.add('active');
+      }
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    startLevel(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ماتریس نشانه‌های جاده‌ای | Traffic Signs Matrix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% 20%, #1e293b, #0f172a, #020617);
+      --primary: #38bdf8;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border-glow: rgba(56, 189, 248, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: var(--bg-gradient);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Container */
+    .game-viewport {
+      width: min(94vw, 440px);
+      min-height: min(92vh, 720px);
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glow);
+      border-radius: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.15);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      perspective: 1000px;
+    }
+
+    /* Header & Stats */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 12px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .hud-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    /* Progress & Timer */
+    .timer-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+      margin: 14px 0 6px;
+      overflow: hidden;
+    }
+
+    .timer-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transform-origin: right;
+      transition: transform 0.1s linear;
+    }
+
+    .guide-text {
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #94a3b8;
+      min-height: 24px;
+    }
+
+    /* 3D Grid */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 12px;
+      aspect-ratio: 1 / 1;
+      margin: 10px 0;
+      perspective: 800px;
+    }
+
+    .cell {
+      position: relative;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      box-shadow: 5px 5px 12px #0a0f1d, -5px -5px 12px #26354d;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+    }
+
+    .cell:active {
+      transform: scale(0.95);
+    }
+
+    .cell.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .cell-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .cell-front {
+      background: radial-gradient(circle at 30% 30%, #334155, #0f172a);
+    }
+
+    .cell-front::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+    }
+
+    .cell-back {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      transform: rotateY(180deg);
+      padding: 10px;
+    }
+
+    .cell-back svg {
+      width: 80%;
+      height: 80%;
+      filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.5));
+      transition: transform 0.3s;
+    }
+
+    /* Target Indicator */
+    .target-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      min-height: 60px;
+    }
+
+    .target-preview {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    }
+
+    .target-preview svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Modals / Screens */
+    .screen-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 15, 29, 0.92);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+      text-align: center;
+      z-index: 50;
+      transition: opacity 0.4s ease, visibility 0.4s;
+    }
+
+    .screen-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .main-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: white;
+      border: none;
+      padding: 14px 40px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      font-family: inherit;
+      border-radius: 99px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.7);
+    }
+
+    .btn-action:active {
+      transform: translateY(1px);
+    }
+
+    /* Cell Validation FX */
+    .cell.correct {
+      box-shadow: 0 0 20px var(--success), inset 0 0 10px var(--success);
+    }
+
+    .cell.wrong {
+      animation: shake 0.4s ease;
+      box-shadow: 0 0 20px var(--danger), inset 0 0 10px var(--danger);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px) rotate(-2deg); }
+      75% { transform: translateX(6px) rotate(2deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-viewport">
+    <!-- Top Bar -->
+    <div class="hud">
+      <div class="hud-item">
+        <span>مرحله</span>
+        <span class="hud-value" id="level-display">۱</span>
+      </div>
+      <div class="hud-item">
+        <span>امتیاز</span>
+        <span class="hud-value" id="score-display">۰</span>
+      </div>
+      <div class="hud-item">
+        <span>فرصت</span>
+        <span class="hud-value" id="lives-display">❤️❤️❤️</span>
+      </div>
+    </div>
+
+    <!-- Timer & Guide -->
+    <div>
+      <div class="timer-container">
+        <div class="timer-bar" id="timer-bar"></div>
+      </div>
+      <p class="guide-text" id="guide-text">جایگاه تابلوها را به خاطر بسپارید...</p>
+    </div>
+
+    <!-- Matrix 3x3 -->
+    <div class="matrix-grid" id="grid"></div>
+
+    <!-- Target Placement Clue -->
+    <div class="target-bar" id="target-bar">
+      <span style="font-size: 0.9rem; color: #94a3b8;">جایگاه این تابلو کجا بود؟</span>
+      <div class="target-preview" id="target-preview"></div>
+    </div>
+
+    <!-- Start / Game Over Screen -->
+    <div class="screen-overlay" id="start-screen">
+      <h1 class="main-title">ماتریس علائم راهنمایی</h1>
+      <p class="subtitle">
+        در هر مرحله ۴ تابلوی جاده‌ای در جدول ۹ تایی ظاهر می‌شوند. پس از پایان زمان حفظ کردن، جایگاه تابلوی مشخص‌شده را به درستی پیدا کنید!
+      </p>
+      <button class="btn-action" id="start-btn">شروع بازی</button>
+    </div>
+  </div>
+
+  <script>
+    // --- صوتی با Web Audio API (بدون وابستگی خارجی) ---
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      },
+      play(type) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        if (type === 'flip') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'correct') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'win') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.4);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        }
+      }
+    };
+
+    // --- آیکون‌های وکتوری علائم رانندگی ---
+    const SIGNS = [
+      { id: 'stop', svg: `<svg viewBox="0 0 100 100"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="#dc2626" stroke="#ffffff" stroke-width="4"/><text x="50" y="58" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">STOP</text></svg>` },
+      { id: 'yield', svg: `<svg viewBox="0 0 100 100"><polygon points="50,90 10,20 90,20" fill="#ffffff" stroke="#dc2626" stroke-width="12"/><polygon points="50,75 25,30 75,30" fill="#dc2626"/></svg>` },
+      { id: 'speed', svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="#ffffff" stroke="#dc2626" stroke-width="10"/><text x="50" y="60" font-size="32" font-weight="900" fill="#0f172a" text-anchor="middle" font-family="sans-serif">60</text></svg>` },
+      { id: 'turn_right', svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#2563eb" stroke="#ffffff" stroke-width="4"/><path d="M40,70 L40,45 L58,45 L58,32 L78,52 L58,72 L58,58 L52,58 L52,70 Z" fill="#ffffff"/></svg>` },
+      { id: 'warning', svg: `<svg viewBox="0 0 100 100"><polygon points="50,12 90,82 10,82" fill="#facc15" stroke="#000000" stroke-width="4"/><rect x="46" y="38" width="8" height="24" rx="4" fill="#000000"/><circle cx="50" cy="71" r="5" fill="#000000"/></svg>` },
+      { id: 'no_entry', svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#dc2626" stroke="#ffffff" stroke-width="4"/><rect x="20" y="42" width="60" height="16" rx="4" fill="#ffffff"/></svg>` }
+    ];
+
+    // --- مدیریت وضعیت بازی ---
+    const STATE = {
+      level: 1,
+      score: 0,
+      lives: 3,
+      phase: 'IDLE', // MEMORIZE, GUESS, RESULT
+      placedItems: {}, // index -> sign object
+      targetSign: null,
+      targetIndex: null
+    };
+
+    // المان‌های DOM
+    const gridEl = document.getElementById('grid');
+    const levelDisplay = document.getElementById('level-display');
+    const scoreDisplay = document.getElementById('score-display');
+    const livesDisplay = document.getElementById('lives-display');
+    const timerBar = document.getElementById('timer-bar');
+    const guideText = document.getElementById('guide-text');
+    const targetBar = document.getElementById('target-bar');
+    const targetPreview = document.getElementById('target-preview');
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+
+    // ساخت ماتریس ۹ خانه
+    function buildGrid() {
+      gridEl.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.index = i;
+        cell.innerHTML = `
+          <div class="cell-face cell-front"></div>
+          <div class="cell-face cell-back"></div>
+        `;
+        cell.addEventListener('click', () => handleCellClick(i));
+        gridEl.appendChild(cell);
+      }
+    }
+
+    // شروع مرحله جدید
+    function startLevel() {
+      STATE.phase = 'MEMORIZE';
+      STATE.placedItems = {};
+      targetBar.style.opacity = '0.3';
+      targetPreview.innerHTML = '';
+      guideText.textContent = 'مکان تابلوها را به خاطر بسپارید...';
+
+      // برگرداندن همه به پشت
+      const cells = document.querySelectorAll('.cell');
+      cells.forEach(cell => {
+        cell.className = 'cell';
+        cell.querySelector('.cell-back').innerHTML = '';
+      });
+
+      // انتخاب تصادفی ۴ جایگاه در ماتریس ۹ تایی
+      const positions = [0,1,2,3,4,5,6,7,8].sort(() => 0.5 - Math.random()).slice(0, 4);
+      
+      // انتخاب ۴ تابلوی رندوم
+      const shuffledSigns = [...SIGNS].sort(() => 0.5 - Math.random()).slice(0, 4);
+
+      positions.forEach((pos, idx) => {
+        const sign = shuffledSigns[idx];
+        STATE.placedItems[pos] = sign;
+        const cell = cells[pos];
+        cell.querySelector('.cell-back').innerHTML = sign.svg;
+      });
+
+      // هدف: یکی از ۴ تابلوی چیده شده
+      const chosenPos = positions[Math.floor(Math.random() * positions.length)];
+      STATE.targetIndex = chosenPos;
+      STATE.targetSign = STATE.placedItems[chosenPos];
+
+      // انیمیشن چرخش و نمایش تابلوها
+      setTimeout(() => {
+        positions.forEach(pos => {
+          cells[pos].classList.add('flipped');
+          AudioEngine.play('flip');
+        });
+      }, 300);
+
+      // محاسبه زمان بر اساس مرحله (آسان به سخت: از ۳.۵ ثانیه تا ۱.۲ ثانیه)
+      const memorizeTime = Math.max(1200, 3600 - (STATE.level - 1) * 300);
+      
+      // نوار زمان
+      timerBar.style.transition = 'none';
+      timerBar.style.transform = 'scaleX(1)';
+      setTimeout(() => {
+        timerBar.style.transition = `transform ${memorizeTime}ms linear`;
+        timerBar.style.transform = 'scaleX(0)';
+      }, 50);
+
+      // مخفی کردن و ورود به فاز حدس
+      setTimeout(() => {
+        positions.forEach(pos => cells[pos].classList.remove('flipped'));
+        AudioEngine.play('flip');
+        
+        setTimeout(() => {
+          STATE.phase = 'GUESS';
+          guideText.textContent = 'جایگاه تابلوی زیر را انتخاب کنید:';
+          targetBar.style.opacity = '1';
+          targetPreview.innerHTML = STATE.targetSign.svg;
+        }, 600);
+
+      }, memorizeTime);
+    }
+
+    // انتخاب خانه توسط بازیکن
+    function handleCellClick(index) {
+      if (STATE.phase !== 'GUESS') return;
+
+      const cell = document.querySelectorAll('.cell')[index];
+      STATE.phase = 'RESULT';
+
+      // نمایش پشت کارت
+      if (STATE.placedItems[index]) {
+        cell.querySelector('.cell-back').innerHTML = STATE.placedItems[index].svg;
+      }
+      cell.classList.add('flipped');
+
+      if (index === STATE.targetIndex) {
+        // پاسخ صحیح
+        cell.classList.add('correct');
+        AudioEngine.play('correct');
+        STATE.score += 100 * STATE.level;
+        STATE.level += 1;
+        guideText.textContent = 'آفرین! کاملاً درست بود.';
+      } else {
+        // پاسخ غلط
+        cell.classList.add('wrong');
+        AudioEngine.play('wrong');
+        STATE.lives -= 1;
+        
+        // نمایش جایگاه واقعی
+        const correctCell = document.querySelectorAll('.cell')[STATE.targetIndex];
+        correctCell.querySelector('.cell-back').innerHTML = STATE.targetSign.svg;
+        correctCell.classList.add('flipped', 'correct');
+        
+        guideText.textContent = 'اشتباه بود!';
+      }
+
+      updateHUD();
+
+      // تاخیر برای مشاهده نتیجه و ورود به مرحله بعد یا پایان
+      setTimeout(() => {
+        if (STATE.lives > 0) {
+          startLevel();
+        } else {
+          gameOver();
+        }
+      }, 1500);
+    }
+
+    function updateHUD() {
+      levelDisplay.textContent = STATE.level;
+      scoreDisplay.textContent = STATE.score;
+      livesDisplay.textContent = '❤️'.repeat(Math.max(0, STATE.lives));
+    }
+
+    function gameOver() {
+      startScreen.classList.remove('hidden');
+      startScreen.querySelector('.main-title').textContent = 'پایان بازی!';
+      startScreen.querySelector('.subtitle').innerHTML = `
+        امتیاز نهایی شما: <b>${STATE.score}</b><br>
+        تا مرحله <b>${STATE.level}</b> پیش رفتید.
+      `;
+      startBtn.textContent = 'تلاش مجدد';
+    }
+
+    // راه‌اندازی و تعاملات دکمه شروع
+    startBtn.addEventListener('click', () => {
+      AudioEngine.init();
+      STATE.level = 1;
+      STATE.score = 0;
+      STATE.lives = 3;
+      updateHUD();
+      startScreen.classList.add('hidden');
+      startLevel();
+    });
+
+    // بارگذاری اولیه ساختار
+    buildGrid();
+  </script>
+</body>
+</html>

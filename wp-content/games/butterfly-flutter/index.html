@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ترتیب پرواز پروانه‌ها | Butterfly Flutter</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Tahoma, sans-serif;
+        }
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        /* لایه رابط کاربری (HUD) */
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 8px 18px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        /* بستهٔ پایین صفحه: راهنما + دکمه‌های انتخاب، به‌صورت ستونی تا هرگز روی هم نیفتند */
+        #bottom-ui {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            max-width: 96%;
+        }
+        /* پیام راهنما */
+        #instruction {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+            font-size: 0.92rem;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 7px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: opacity 0.3s;
+            pointer-events: none;
+            max-width: 100%;
+            white-space: nowrap;
+        }
+        /* منوی ورودی و پایان */
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(15,23,42,0.85) 0%, rgba(2,6,23,0.95) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            backdrop-filter: blur(8px);
+            transition: opacity 0.4s ease;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 36px 48px;
+            text-align: center;
+            color: #fff;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .card h1 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #38bdf8, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            color: white;
+            border: none;
+            outline: none;
+            padding: 14px 36px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(6, 182, 212, 0.6);
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        /* دکمه‌های انتخاب پاسخ - کوچک‌تر تا روی متن راهنما نیفتند */
+        #selection-panel {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            z-index: 10;
+            max-width: 100%;
+        }
+        .select-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            color: #fff;
+            backdrop-filter: blur(10px);
+            transition: transform 0.15s, opacity 0.2s;
+            white-space: nowrap;
+        }
+        .select-btn:hover {
+            transform: translateY(-2px);
+        }
+        .color-dot {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1.5px solid #fff;
+            flex-shrink: 0;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+    <!-- لود کتابخانه Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    // GhorbaniKids Score Submission Protocol
+    function gkSendScore(finalScore) {
+        try {
+            var sc = parseInt(finalScore) || 0;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'GK_SUBMIT_SCORE',
+                    score: sc
+                }, '*');
+            }
+        } catch(e) { console.error('GK postMessage error:', e); }
+    }
+    </script>
+</head>
+<body>
+
+    <div id="hud">
+        <div class="glass-panel">مرحله: <span id="level-display">۱</span></div>
+        <div class="glass-panel">امتیاز: <span id="score-display">۰</span></div>
+    </div>
+
+    <div id="bottom-ui">
+        <div id="instruction">با دقت مسیر و ترتیب نشستن پروانه‌ها را دنبال کنید!</div>
+        <!-- پنل انتخاب نهایی بازیکن -->
+        <div id="selection-panel" class="hidden"></div>
+    </div>
+
+    <!-- منوی شروع بازی -->
+    <div id="start-screen" class="overlay-screen">
+        <div class="card">
+            <h1>ترتیب پروانه‌ها</h1>
+            <p>۲ پروانه همزمان پرواز می‌کنند و به نوبت روی گل‌ها می‌نشینند. دقت کنید کدام یک <b>اول</b> و کدام <b>دوم</b> فرود می‌آید!</p>
+            <button class="btn" id="start-btn">شروع بازی</button>
+        </div>
+    </div>
+
+    <!-- منوی اتمام بازی -->
+    <div id="game-over-screen" class="overlay-screen hidden">
+        <div class="card">
+            <h1>پایان بازی!</h1>
+            <p>امتیاز نهایی شما: <span id="final-score" style="font-weight:bold; color:#38bdf8;">0</span></p>
+            <button class="btn" id="restart-btn">تلاش مجدد</button>
+        </div>
+    </div>
+
+    <canvas id="game-canvas"></canvas>
+
+    <script>
+        // --- مولد افکت‌های صوتی پیشرفته با Web Audio API ---
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playFlutter() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.1);
+            }
+            playLand() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(560, this.ctx.currentTime + 0.18);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.18);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.18);
+            }
+            playCorrect() {
+                if (!this.ctx) return;
+                const notes = [440, 554.37, 659.25];
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + (i * 0.08));
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime + (i * 0.08));
+                    gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + (i * 0.08) + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + (i * 0.08));
+                    osc.stop(this.ctx.currentTime + (i * 0.08) + 0.25);
+                });
+            }
+            playWrong() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(90, this.ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+        }
+
+        const sfx = new SoundFX();
+
+        // --- متغیرهای بازی ---
+        let scene, camera, renderer;
+        let butterflies = [];
+        let flowers = [];
+        let particles;
+        let level = 1;
+        let score = 0;
+        let gameState = 'START'; // START, FLYING, INPUT, GAMEOVER
+        let landSequence = []; // ترتیبی که پروانه‌ها می‌نشینند
+        let playerSequence = []; // انتخاب‌های بازیکن
+
+        const BUTTERFLY_CONFIGS = [
+            { name: 'پروانه آبی', color: 0x00d2ff, hexStr: '#00d2ff' },
+            { name: 'پروانه صورتی', color: 0xff007f, hexStr: '#ff007f' },
+            { name: 'پروانه زرد طلایی', color: 0xffd700, hexStr: '#ffd700' },
+            { name: 'پروانه سبز نئون', color: 0x00ff88, hexStr: '#00ff88' },
+            { name: 'پروانه بنفش', color: 0xa855f7, hexStr: '#a855f7' },
+            { name: 'پروانه نارنجی', color: 0xff6b1a, hexStr: '#ff6b1a' }
+        ];
+
+        // --- راه‌اندازی صحنه Three.js ---
+        function initScene() {
+            const canvas = document.getElementById('game-canvas');
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x0f172a, 0.035);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 4, 10);
+            camera.lookAt(0, 1, 0);
+
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+            // نورپردازی
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.8);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            dirLight.position.set(5, 12, 7);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            // زمین (چمنزار تیره نئونی)
+            const groundGeo = new THREE.PlaneGeometry(30, 30);
+            const groundMat = new THREE.MeshStandardMaterial({ 
+                color: 0x091e14, 
+                roughness: 0.8,
+                metalness: 0.1
+            });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -1.2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // گل‌های محل فرود
+            createFlowers(2);
+
+            // سیستم ذرات معلق در هوا
+            createAmbientParticles();
+
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createFlowers(count) {
+            flowers.forEach(f => scene.remove(f));
+            flowers = [];
+
+            // موقعیت گل‌ها بر اساس تعداد پروانه‌های مرحله (۲ یا ۳) به‌صورت متقارن چیده می‌شود
+            const positions = [];
+            if (count === 3) {
+                positions.push(new THREE.Vector3(-2.1, -1.2, 0));
+                positions.push(new THREE.Vector3(0, -1.2, 0.6));
+                positions.push(new THREE.Vector3(2.1, -1.2, 0));
+            } else {
+                positions.push(new THREE.Vector3(-1.6, -1.2, 0));
+                positions.push(new THREE.Vector3(1.6, -1.2, 0));
+            }
+            positions.forEach((pos) => {
+                const group = new THREE.Group();
+                group.scale.set(0.62, 0.62, 0.62);
+                
+                // ساقه
+                const stemMat = new THREE.MeshStandardMaterial({ color: 0x22c55e });
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.8), stemMat);
+                stem.position.y = 0.4;
+                group.add(stem);
+
+                // گلبرگ‌ها
+                const petalMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3, emissive: 0x222222 });
+                for(let i=0; i<6; i++) {
+                    const petal = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), petalMat);
+                    petal.scale.set(1.4, 0.3, 0.8);
+                    const angle = (i / 6) * Math.PI * 2;
+                    petal.position.set(Math.cos(angle)*0.28, 0.8, Math.sin(angle)*0.28);
+                    petal.rotation.y = -angle;
+                    group.add(petal);
+                }
+
+                // مرکز گل
+                const centerMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xd97706, emissiveIntensity: 0.5 });
+                const center = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), centerMat);
+                center.position.y = 0.82;
+                group.add(center);
+
+                group.position.copy(pos);
+                scene.add(group);
+                flowers.push(group);
+            });
+        }
+
+        function createAmbientParticles() {
+            const pCount = 100;
+            const geo = new THREE.BufferGeometry();
+            const positions = new Float32Array(pCount * 3);
+            for(let i=0; i<pCount*3; i+=3) {
+                positions[i] = (Math.random() - 0.5) * 16;
+                positions[i+1] = Math.random() * 6 - 1;
+                positions[i+2] = (Math.random() - 0.5) * 12;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const mat = new THREE.PointsMaterial({ size: 0.05, color: 0x38bdf8, transparent: true, opacity: 0.6 });
+            particles = new THREE.Points(geo, mat);
+            scene.add(particles);
+        }
+
+        // --- ساخت مدل سه‌بعدی پروانه ---
+        function createButterflyModel(colorHex) {
+            const group = new THREE.Group();
+
+            // بدن
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 });
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.02, 0.35, 8), bodyMat);
+            body.rotation.x = Math.PI / 2;
+            group.add(body);
+
+            // متریال نئونی درخشان بال‌ها - رنگ پررنگ و درخشش قوی برای دیده‌شدن واضح
+            const wingMat = new THREE.MeshStandardMaterial({ 
+                color: colorHex, 
+                roughness: 0.35, 
+                metalness: 0.0, 
+                side: THREE.DoubleSide,
+                emissive: colorHex,
+                emissiveIntensity: 1.1
+            });
+
+            // بال چپ (بزرگ‌تر برای وضوح بهتر رنگ)
+            const leftWing = new THREE.Group();
+            const lWingMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.62), wingMat);
+            lWingMesh.position.set(-0.24, 0, 0);
+            leftWing.add(lWingMesh);
+            group.add(leftWing);
+
+            // بال راست
+            const rightWing = new THREE.Group();
+            const rWingMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.62), wingMat);
+            rWingMesh.position.set(0.24, 0, 0);
+            rightWing.add(rWingMesh);
+            group.add(rightWing);
+
+            // نور رنگی همراه پروانه که خودش را روشن نگه می‌دارد و رنگش را واضح می‌کند
+            const glowLight = new THREE.PointLight(colorHex, 1.4, 3.2);
+            glowLight.position.set(0, 0, 0.15);
+            group.add(glowLight);
+
+            return {
+                mesh: group,
+                leftWing: leftWing,
+                rightWing: rightWing,
+                color: colorHex
+            };
+        }
+
+        // --- منطق مراحل و پرواز ---
+        function startLevel() {
+            document.getElementById('instruction').innerText = "با دقت پرواز و فرود پروانه‌ها را نگاه کنید...";
+            document.getElementById('selection-panel').classList.add('hidden');
+            playerSequence = [];
+            landSequence = [];
+
+            // پاکسازی پروانه‌های قبلی
+            butterflies.forEach(b => scene.remove(b.mesh));
+            butterflies = [];
+
+            // از مرحله ۶ به بعد: حالت سخت با ۳ پروانه هم‌زمان و فاصله فرود کمتر
+            const isHardMode = level >= 6;
+            const hardLevel = Math.max(0, level - 5);
+            const butterflyCount = isHardMode ? 3 : 2;
+
+            createFlowers(butterflyCount);
+
+            // انتخاب تصادفی رنگ‌های متفاوت برای مرحله
+            const shuffledConfigs = [...BUTTERFLY_CONFIGS].sort(() => 0.5 - Math.random());
+            const currentConfigs = shuffledConfigs.slice(0, butterflyCount);
+
+            // ترتیب تصادفی فرود روی گل‌ها
+            const landOrder = [...Array(butterflyCount).keys()].sort(() => 0.5 - Math.random());
+
+            // فاصلهٔ زمانی بین فرودها: هرچه مرحله بالاتر (به‌خصوص از مرحله ۶) این فاصله کمتر می‌شود و تشخیص سخت‌تر می‌شود
+            const landGap = isHardMode
+                ? Math.max(0.32, 0.8 - hardLevel * 0.06)
+                : Math.max(0.55, 0.95 - (level - 1) * 0.08);
+
+            const baseFlightTime = isHardMode
+                ? Math.max(1.9, 3.1 - hardLevel * 0.14)
+                : Math.max(2.5, 4.5 - (level * 0.3));
+
+            landSequence = landOrder.map(idx => currentConfigs[idx]);
+
+            currentConfigs.forEach((cfg, index) => {
+                const b = createButterflyModel(cfg.color);
+                b.name = cfg.name;
+                b.hexStr = cfg.hexStr;
+                b.index = index;
+
+                const rank = landOrder.indexOf(index); // ۰ یعنی اولین فرود
+                const delay = rank * landGap;
+
+                // ایجاد مسیر تصادفی نرم (CatmullRomCurve3) با نقطهٔ شروع پخش‌شده متناسب با تعداد پروانه‌ها
+                const startX = butterflyCount > 1
+                    ? THREE.MathUtils.lerp(-4, 4, index / (butterflyCount - 1))
+                    : 0;
+                const startPos = new THREE.Vector3(startX, 2.5 + Math.random() * 0.5, -2 - Math.random());
+                const targetFlowerPos = flowers[index].position.clone().add(new THREE.Vector3(0, 0.53, 0));
+                
+                const mid1 = new THREE.Vector3((Math.random() - 0.5) * 4, 2 + Math.random() * 2, (Math.random() - 0.5) * 3);
+                const mid2 = new THREE.Vector3((Math.random() - 0.5) * 3, 1 + Math.random() * 1.5, Math.random() * 2);
+                
+                const curve = new THREE.CatmullRomCurve3([startPos, mid1, mid2, targetFlowerPos]);
+                
+                b.curve = curve;
+                b.progress = 0;
+                b.totalDuration = baseFlightTime + delay;
+                b.hasLanded = false;
+                b.mesh.position.copy(startPos);
+
+                scene.add(b.mesh);
+                butterflies.push(b);
+            });
+
+            gameState = 'FLYING';
+        }
+
+        function showSelectionUI() {
+            gameState = 'INPUT';
+            document.getElementById('instruction').innerText = "ترتیب فرود را انتخاب کنید:";
+            const panel = document.getElementById('selection-panel');
+            panel.innerHTML = '';
+
+            // دکمه برای هر پروانه حاضر در صحنه
+            butterflies.forEach((b) => {
+                const btn = document.createElement('button');
+                btn.className = 'glass-panel select-btn';
+                btn.style.borderColor = b.hexStr;
+                btn.innerHTML = `<span class="color-dot" style="background:${b.hexStr}"></span> ${b.name}`;
+                btn.onclick = () => handleChoice(b);
+                panel.appendChild(btn);
+            });
+
+            panel.classList.remove('hidden');
+        }
+
+        function handleChoice(chosenButterfly) {
+            if (gameState !== 'INPUT') return;
+
+            playerSequence.push(chosenButterfly);
+            sfx.playLand();
+
+            // غیرفعال کردن دکمه فشرده شده
+            event.target.closest('button').style.opacity = '0.4';
+            event.target.closest('button').style.pointerEvents = 'none';
+
+            if (playerSequence.length === landSequence.length) {
+                // بررسی صحت کامل ترتیب برای هر تعداد پروانه
+                const isCorrect = playerSequence.every((b, i) => b.name === landSequence[i].name);
+
+                if (isCorrect) {
+                    sfx.playCorrect();
+                    score += 100 * level;
+                    level++;
+                    document.getElementById('score-display').innerText = score;
+                    document.getElementById('level-display').innerText = level;
+
+                    if (level === 6) {
+                        document.getElementById('instruction').innerText = "عالی! از این مرحله ۳ پروانه با هم پرواز می‌کنند ⚡";
+                    } else {
+                        document.getElementById('instruction').innerText = "آفرین! کاملاً درست بود 🎉";
+                    }
+                    
+                    setTimeout(() => {
+                        startLevel();
+                    }, 1600);
+                } else {
+                    sfx.playWrong();
+                    gameState = 'GAMEOVER'; try { gkSendScore(typeof score !== 'undefined' ? score : 0); } catch(e){}
+                    document.getElementById('final-score').innerText = score;
+                    document.getElementById('game-over-screen').classList.remove('hidden');
+                    document.getElementById('selection-panel').classList.add('hidden');
+                }
+            }
+        }
+
+        // --- حلقه رندر و انیمیشن ---
+        let clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            // انیمیشن ذرات معلق
+            if (particles) {
+                particles.rotation.y = time * 0.05;
+            }
+
+            if (gameState === 'FLYING') {
+                let allLanded = true;
+
+                butterflies.forEach((b) => {
+                    if (b.progress < 1) {
+                        allLanded = false;
+                        b.progress += delta / b.totalDuration;
+                        if (b.progress > 1) b.progress = 1;
+
+                        const pos = b.curve.getPointAt(b.progress);
+                        b.mesh.position.copy(pos);
+
+                        // نگاه به سمت جلو در مسیر
+                        if (b.progress < 0.99) {
+                            const lookAtPos = b.curve.getPointAt(Math.min(b.progress + 0.01, 1));
+                            b.mesh.lookAt(lookAtPos);
+                        }
+
+                        // بال زدن با فرکانس متغیر
+                        const flapSpeed = 24;
+                        const wingAngle = Math.sin(time * flapSpeed) * 0.75;
+                        b.leftWing.rotation.y = wingAngle;
+                        b.rightWing.rotation.y = -wingAngle;
+
+                        if (Math.random() < 0.08) sfx.playFlutter();
+                    } else if (!b.hasLanded) {
+                        b.hasLanded = true;
+                        sfx.playLand();
+                        // بسته شدن آرام بال‌ها هنگام نشستن
+                        b.leftWing.rotation.y = 0.2;
+                        b.rightWing.rotation.y = -0.2;
+                    }
+                });
+
+                if (allLanded) {
+                    setTimeout(() => {
+                        if (gameState === 'FLYING') showSelectionUI();
+                    }, 400);
+                }
+            } else if (gameState === 'INPUT') {
+                // بال زدن ملایم پروانه‌ها هنگام نشستن روی گل
+                butterflies.forEach((b, i) => {
+                    const slowFlap = Math.sin(time * 3 + i) * 0.25;
+                    b.leftWing.rotation.y = slowFlap;
+                    b.rightWing.rotation.y = -slowFlap;
+                });
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- شروع رویدادها ---
+        document.getElementById('start-btn').addEventListener('click', () => {
+            sfx.init();
+            document.getElementById('start-screen').classList.add('hidden');
+            score = 0;
+            level = 1;
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('level-display').innerText = level;
+            startLevel();
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            document.getElementById('game-over-screen').classList.add('hidden');
+            score = 0;
+            level = 1;
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('level-display').innerText = level;
+            startLevel();
+        });
+
+        window.onload = () => {
+            initScene();
+            animate();
+        };
+    </script>
+</body>
+</html>

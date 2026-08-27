@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ردپای رنگین‌کمان | Rainbow Steps</title>
+  <style>
+    :root {
+      --water-deep: #0a3d62;
+      --water-mid: #1e6f9f;
+      --water-light: #60a3bc;
+      --text-main: #f8f9fa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, #1b4d3e 0%, #081c15 100%);
+    }
+
+    #game-container {
+      position: relative;
+      width: min(760px, 96vw);
+      height: min(580px, 94vh);
+      background: rgba(10, 30, 45, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: clamp(16px, 3vw, 28px);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(10px, 2vw, 18px) clamp(12px, 2.5vw, 22px);
+      overflow: hidden;
+      animation: containerIntro 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes containerIntro {
+      from { opacity: 0; transform: scale(0.92) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      color: var(--text-main);
+      font-size: clamp(0.78rem, 2vw, 1rem);
+      z-index: 5;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 6px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s;
+    }
+
+    .badge.pulse {
+      animation: badgePulse 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes badgePulse {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.22); background: rgba(255, 255, 255, 0.28); }
+      100% { transform: scale(1); }
+    }
+
+    .progress-wrapper {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      z-index: 5;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 10%;
+      background: linear-gradient(90deg, #ff4757, #ffa502, #2ed573, #1e90ff, #9b59b6, #ff4757);
+      background-size: 300% 100%;
+      animation: rainbowFlow 3s linear infinite;
+      border-radius: 10px;
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes rainbowFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    .river-stage {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      margin: 10px 0;
+      border-radius: 20px;
+      background: linear-gradient(180deg, var(--water-deep) 0%, var(--water-mid) 60%, var(--water-light) 100%);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      perspective: 800px;
+    }
+
+    .water-wave {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background:
+        radial-gradient(circle, rgba(255,255,255,0.07) 10%, transparent 20%),
+        radial-gradient(circle, rgba(255,255,255,0.04) 8%, transparent 18%);
+      background-size: 30px 30px, 46px 46px;
+      background-position: 0 0, 15px 15px;
+      animation: waveDrift 16s linear infinite;
+      pointer-events: none;
+    }
+
+    .water-wave.turn-glow {
+      animation: waveDrift 16s linear infinite, waterTint 1.8s ease-in-out infinite;
+    }
+
+    @keyframes waveDrift {
+      from { transform: translateY(-20%) rotate(0deg); }
+      to { transform: translateY(20%) rotate(360deg); }
+    }
+
+    @keyframes waterTint {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.25); }
+    }
+
+    .stepping-stones-grid {
+      display: grid;
+      gap: clamp(8px, 2.2vw, 16px);
+      z-index: 4;
+      padding: 10px;
+      width: 100%;
+      height: 100%;
+      align-content: center;
+      justify-content: center;
+      justify-items: center;
+      align-items: center;
+    }
+
+    .stone {
+      position: relative;
+      width: clamp(52px, 12vw, 86px);
+      height: clamp(52px, 12vw, 86px);
+      background: #2f3542;
+      border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
+      border: 3px solid rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 18px rgba(0,0,0,0.4), inset 0 -6px 10px rgba(0,0,0,0.5);
+      transform-style: preserve-3d;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, background-color 0.2s;
+      opacity: 0;
+      animation: stoneRise 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      animation-delay: calc(var(--stone-i, 0) * 60ms);
+    }
+
+    @keyframes stoneRise {
+      from { opacity: 0; transform: translateY(24px) scale(0.6) rotate(-8deg); }
+      to { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    }
+
+    .stone:hover {
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    .stone:active {
+      transform: translateY(2px) scale(0.94);
+    }
+
+    .stone::after {
+      content: '';
+      position: absolute;
+      width: 28%;
+      height: 14%;
+      top: 16%;
+      left: 20%;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      transform: rotate(-25deg);
+      filter: blur(1px);
+    }
+
+    .stone.active-glow {
+      transform: translateY(-10px) scale(1.18) !important;
+      border-color: #fff !important;
+      box-shadow: 0 0 40px var(--glow-color), 0 0 70px var(--glow-color), inset 0 0 15px rgba(255,255,255,0.85) !important;
+      background-color: var(--glow-color) !important;
+      animation: glowPulse 0.5s ease-in-out;
+    }
+
+    @keyframes glowPulse {
+      0% { filter: brightness(1); }
+      50% { filter: brightness(1.4); }
+      100% { filter: brightness(1); }
+    }
+
+    .stone.correct-hit {
+      animation: correctBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes correctBounce {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.25) rotate(6deg); }
+      65% { transform: scale(0.95) rotate(-3deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .stone.wrong-hit {
+      animation: wrongShake 0.45s ease;
+    }
+
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0) rotate(0); }
+      20% { transform: translateX(-8px) rotate(-6deg); }
+      40% { transform: translateX(8px) rotate(6deg); }
+      60% { transform: translateX(-6px) rotate(-4deg); }
+      80% { transform: translateX(6px) rotate(4deg); }
+    }
+
+    #game-container.shake {
+      animation: containerShake 0.4s ease;
+    }
+
+    @keyframes containerShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .order-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(1.1rem, 3.2vw, 1.8rem);
+      font-weight: 900;
+      color: #0d211a;
+      text-shadow: 0 1px 4px rgba(255,255,255,0.5);
+      z-index: 6;
+      animation: orderPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+
+    @keyframes orderPop {
+      from { opacity: 0; transform: scale(0.4); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .ripple {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.8);
+      pointer-events: none;
+      animation: rippleExpand 0.6s ease-out forwards;
+    }
+
+    .ripple.ripple-2 {
+      animation: rippleExpand 0.7s ease-out 0.08s forwards;
+      opacity: 0;
+    }
+
+    @keyframes rippleExpand {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+
+    .info-footer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      z-index: 5;
+      min-height: 48px;
+      flex-shrink: 0;
+    }
+
+    .status-msg {
+      font-size: clamp(0.85rem, 2.4vw, 1.15rem);
+      font-weight: 800;
+      color: #f1f2f6;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      text-align: center;
+      transition: opacity 0.2s;
+      animation: msgIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sub-indicator {
+      font-size: clamp(0.75rem, 2vw, 0.9rem);
+      color: #a4b0be;
+      font-weight: 600;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 28, 21, 0.92);
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 20;
+      border-radius: clamp(16px, 3vw, 28px);
+      color: white;
+      text-align: center;
+      padding: 24px;
+      animation: overlayIn 0.4s ease;
+    }
+
+    @keyframes overlayIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .overlay h1 {
+      animation: titleFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes titleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      color: #0d211a;
+      font-size: 1.25rem;
+      font-weight: 900;
+      border: none;
+      padding: 14px 44px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0, 206, 201, 0.4);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn-start:hover {
+      transform: scale(1.06);
+      box-shadow: 0 14px 30px rgba(0, 206, 201, 0.6);
+    }
+
+    .btn-start:active {
+      transform: scale(0.96);
+    }
+
+    #confetti-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+    <canvas id="confetti-canvas"></canvas>
+
+    <div style="width: 100%;">
+      <div class="top-bar">
+        <div class="badge" id="level-badge">مرحله: <span id="level-num">۱</span></div>
+        <div class="badge" id="score-badge">امتیاز: <span id="score-num">۰</span></div>
+        <div class="badge" id="lives-badge">فرصت: <span id="lives-num">❤️❤️❤️</span></div>
+      </div>
+      <div class="progress-wrapper">
+        <div class="progress-fill" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div class="river-stage">
+      <div class="water-wave" id="water-wave"></div>
+      <div class="stepping-stones-grid" id="stones-grid"></div>
+    </div>
+
+    <div class="info-footer">
+      <div class="status-msg" id="status-text">توالی نورها را تماشا کنید...</div>
+      <div class="sub-indicator" id="step-indicator"></div>
+    </div>
+
+    <div class="overlay" id="menu-overlay">
+      <h1 style="font-size: 2.2rem; color: #55efc4;">🌈 ردپای رنگین‌کمان</h1>
+      <p style="max-width: 420px; line-height: 1.6; color: #dfe6e9; font-size: 1rem;">
+        سنگ‌های رودخانه به ترتیب روشن می‌شوند. به ترتیب و رنگ آن‌ها دقت کنید و سپس با گام برداشتن روی سنگ‌ها همان مسیر را بازتولید کنید!
+      </p>
+      <button class="btn-start" id="start-btn">شروع ماجراجویی</button>
+    </div>
+  </div>
+
+  <script>
+    const STONES_DATA = [
+      { id: 0, name: 'یاقوتی', color: '#ff4757', freq: 261.63 },
+      { id: 1, name: 'نارنجی', color: '#ffa502', freq: 293.66 },
+      { id: 2, name: 'زمردی', color: '#2ed573', freq: 329.63 },
+      { id: 3, name: 'فیروزه‌ای', color: '#1e90ff', freq: 392.00 },
+      { id: 4, name: 'بنفش', color: '#9b59b6', freq: 440.00 },
+      { id: 5, name: 'صورتی', color: '#ff6b81', freq: 523.25 },
+      { id: 6, name: 'لیمویی', color: '#eccc68', freq: 587.33 },
+      { id: 7, name: 'آسمانی', color: '#70a1ff', freq: 659.25 }
+    ];
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(freq, duration = 0.25, type = 'sine', gainVal = 0.2) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function soundSplash() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function soundSuccess() {
+      const arpeggio = [523.25, 659.25, 783.99, 1046.50];
+      arpeggio.forEach((f, i) => {
+        setTimeout(() => playTone(f, 0.18, 'triangle', 0.15), i * 55);
+      });
+    }
+
+    function soundFail() {
+      playTone(220, 0.2, 'sawtooth', 0.2);
+      setTimeout(() => playTone(146, 0.28, 'sawtooth', 0.25), 110);
+    }
+
+    // ---- وضعیت بازی ----
+    let level = 1;
+    let score = 0;
+    let lives = 3;
+    let sequence = [];
+    let playerStep = 0;
+    let isPlayerTurn = false;
+    let activeStonesCount = 4;
+
+    const stonesGrid = document.getElementById('stones-grid');
+    const statusText = document.getElementById('status-text');
+    const stepIndicator = document.getElementById('step-indicator');
+    const progressBar = document.getElementById('progress-bar');
+    const overlay = document.getElementById('menu-overlay');
+    const startBtn = document.getElementById('start-btn');
+    const waterWave = document.getElementById('water-wave');
+    const gameContainer = document.getElementById('game-container');
+    const levelBadge = document.getElementById('level-badge');
+    const scoreBadge = document.getElementById('score-badge');
+    const livesBadge = document.getElementById('lives-badge');
+
+    startBtn.onclick = () => {
+      overlay.style.display = 'none';
+      initGame();
+    };
+
+    function initGame() {
+      level = 1;
+      score = 0;
+      lives = 3;
+      updateStatusHeader();
+      startLevel();
+    }
+
+    function toPersianDigits(num) {
+      const persianDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return String(num).replace(/[0-9]/g, d => persianDigits[d]);
+    }
+
+    function pulse(el) {
+      el.classList.remove('pulse');
+      void el.offsetWidth;
+      el.classList.add('pulse');
+    }
+
+    function updateStatusHeader(pulseLevel, pulseScore, pulseLives) {
+      document.getElementById('level-num').innerText = toPersianDigits(level);
+      document.getElementById('score-num').innerText = toPersianDigits(score);
+      document.getElementById('lives-num').innerText = '❤️'.repeat(Math.max(lives, 0));
+      const progressPercent = Math.min(100, (level / 10) * 100);
+      progressBar.style.width = `${progressPercent}%`;
+      if (pulseLevel) pulse(levelBadge);
+      if (pulseScore) pulse(scoreBadge);
+      if (pulseLives) pulse(livesBadge);
+    }
+
+    function renderStones() {
+      // تعداد سنگ‌ها: در مراحل اول ۴ سنگ، با بالاتر رفتن تا ۸ سنگ
+      activeStonesCount = level >= 6 ? 8 : (level >= 3 ? 6 : 4);
+      stonesGrid.innerHTML = '';
+
+      const cols = activeStonesCount <= 4 ? 2 : (activeStonesCount <= 6 ? 3 : 4);
+      stonesGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+      for (let i = 0; i < activeStonesCount; i++) {
+        const stoneData = STONES_DATA[i];
+        const stone = document.createElement('div');
+        stone.className = 'stone';
+        stone.id = `stone-${i}`;
+        stone.style.setProperty('--glow-color', stoneData.color);
+        stone.style.setProperty('--stone-i', i);
+        stone.onclick = () => handlePlayerStep(i);
+        stonesGrid.appendChild(stone);
+      }
+    }
+
+    async function startLevel() {
+      isPlayerTurn = false;
+      playerStep = 0;
+      waterWave.classList.remove('turn-glow');
+      renderStones();
+      statusText.innerText = '👀 توالی رنگ‌ها را با دقت نگاه کنید...';
+      stepIndicator.innerText = '';
+      updateStatusHeader();
+
+      const sequenceLength = Math.min(7, 2 + Math.ceil(level / 2));
+      sequence = [];
+      for (let i = 0; i < sequenceLength; i++) {
+        sequence.push(Math.floor(Math.random() * activeStonesCount));
+      }
+
+      await new Promise(r => setTimeout(r, 1000));
+
+      // ریتم آرام‌تر: هر سنگ مدت بیشتری روشن می‌ماند و مکث بین‌شان بیشتر است
+      const speed = Math.max(650, 1050 - level * 25);
+      for (let i = 0; i < sequence.length; i++) {
+        await activateStoneGlow(sequence[i], speed * 0.7, i + 1);
+        await new Promise(r => setTimeout(r, speed * 0.55));
+      }
+
+      isPlayerTurn = true;
+      waterWave.classList.add('turn-glow');
+      statusText.innerText = '👉 نوبت شماست! روی سنگ‌ها گام بردارید';
+      updateStepIndicator();
+    }
+
+    function activateStoneGlow(stoneIndex, duration = 400, orderNum = null) {
+      return new Promise(resolve => {
+        const stoneEl = document.getElementById(`stone-${stoneIndex}`);
+        if (!stoneEl) return resolve();
+
+        const stoneData = STONES_DATA[stoneIndex];
+        playTone(stoneData.freq, duration / 1000, 'sine', 0.2);
+
+        const ripple = document.createElement('div');
+        ripple.className = 'ripple';
+        stoneEl.appendChild(ripple);
+        const ripple2 = document.createElement('div');
+        ripple2.className = 'ripple ripple-2';
+        stoneEl.appendChild(ripple2);
+        setTimeout(() => { ripple.remove(); ripple2.remove(); }, 700);
+
+        let orderLabel = null;
+        if (orderNum !== null) {
+          orderLabel = document.createElement('div');
+          orderLabel.className = 'order-label';
+          orderLabel.innerText = toPersianDigits(orderNum);
+          stoneEl.appendChild(orderLabel);
+        }
+
+        stoneEl.classList.add('active-glow');
+        setTimeout(() => {
+          stoneEl.classList.remove('active-glow');
+          if (orderLabel) orderLabel.remove();
+          resolve();
+        }, duration);
+      });
+    }
+
+    function updateStepIndicator() {
+      stepIndicator.innerText = `گام ${toPersianDigits(playerStep + 1)} از ${toPersianDigits(sequence.length)}`;
+    }
+
+    async function handlePlayerStep(stoneIndex) {
+      if (!isPlayerTurn) return;
+
+      const stoneEl = document.getElementById(`stone-${stoneIndex}`);
+      activateStoneGlow(stoneIndex, 200);
+
+      if (stoneIndex === sequence[playerStep]) {
+        stoneEl.classList.add('correct-hit');
+        setTimeout(() => stoneEl.classList.remove('correct-hit'), 400);
+
+        playerStep++;
+        if (playerStep === sequence.length) {
+          isPlayerTurn = false;
+          waterWave.classList.remove('turn-glow');
+          soundSuccess();
+          score += 100 + (level * 30);
+          statusText.innerText = '✨ عالی بود! مسیر رنگین‌کمان کامل شد.';
+          stepIndicator.innerText = '';
+          triggerConfetti();
+          level++;
+          updateStatusHeader(true, true, false);
+          setTimeout(startLevel, 1600);
+        } else {
+          updateStepIndicator();
+        }
+      } else {
+        isPlayerTurn = false;
+        waterWave.classList.remove('turn-glow');
+        stoneEl.classList.add('wrong-hit');
+        gameContainer.classList.add('shake');
+        setTimeout(() => {
+          stoneEl.classList.remove('wrong-hit');
+          gameContainer.classList.remove('shake');
+        }, 450);
+
+        soundFail();
+        soundSplash();
+        lives--;
+        statusText.innerText = '❌ لغزیدی! توالی اشتباه بود.';
+        stepIndicator.innerText = '';
+        updateStatusHeader(false, false, true);
+
+        if (lives <= 0) {
+          setTimeout(showGameOver, 1300);
+        } else {
+          setTimeout(startLevel, 1600);
+        }
+      }
+    }
+
+    function showGameOver() {
+      overlay.style.display = 'flex';
+      overlay.querySelector('h1').innerText = 'پایان بازی!';
+      overlay.querySelector('p').innerText = `امتیاز شما: ${toPersianDigits(score)} | به مرحله ${toPersianDigits(level)} رسیدی.`;
+      startBtn.innerText = 'شروع دوباره';
+
+      // ارسال امتیاز بازی به سیستم قربانی کیدز
+      if (window.parent) {
+        window.parent.postMessage({
+          type: 'GK_SUBMIT_SCORE',
+          score: score
+        }, '*');
+      }
+    }
+
+    function triggerConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+
+      const particles = Array.from({ length: 46 }, () => ({
+        x: canvas.width / 2,
+        y: canvas.height / 2 + 40,
+        vx: (Math.random() - 0.5) * 13,
+        vy: (Math.random() - 0.8) * 12,
+        rot: Math.random() * 360,
+        vr: (Math.random() - 0.5) * 20,
+        size: Math.random() * 7 + 4,
+        color: STONES_DATA[Math.floor(Math.random() * STONES_DATA.length)].color
+      }));
+
+      let frame = 0;
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.28;
+          p.rot += p.vr;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        });
+        if (++frame < 55) requestAnimationFrame(render);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      render();
+    }
+  </script>
+</body>
+</html>

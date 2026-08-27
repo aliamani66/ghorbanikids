@@ -1,0 +1,490 @@
+/* =========================================================
+   GhorbaniKids Ultra-Luxury Sidebar with Flyout Submenus (Zero Scrollbar - Elevated Menu Position)
+   ========================================================= */
+
+/* 1. Desktop Fixed Sidebar with Single Continuous Sky-Blue & Pastel Yellow Background (یک‌تیکه) */
+aside.gk-desktop-sidebar,
+.gk-desktop-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 275px !important;
+    height: 100vh !important;
+    background: radial-gradient(circle at 20% 10%, rgba(224, 242, 254, 0.95) 0%, transparent 55%),
+                radial-gradient(circle at 80% 90%, rgba(254, 240, 138, 0.85) 0%, transparent 60%),
+                linear-gradient(180deg, #f0f9ff 0%, #ffffff 45%, #fefce8 100%) !important;
+    border-left: 2px solid rgba(186, 230, 253, 0.9) !important;
+    box-shadow: -10px 0 35px rgba(2, 132, 199, 0.1) !important;
+    z-index: 999999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    direction: rtl !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', 'Vazirmatn', Tahoma, sans-serif !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+aside.gk-desktop-sidebar.is-collapsed,
+.gk-desktop-sidebar.is-collapsed {
+    right: -285px !important;
+}
+
+/* Floating Open Sidebar Pill Button */
+.gk-floating-open-sidebar-btn {
+    position: fixed !important;
+    top: 90px !important;
+    right: -110px !important;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    border-radius: 20px 0 0 20px !important;
+    padding: 9px 16px 9px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    box-shadow: -4px 6px 20px rgba(2, 132, 199, 0.45) !important;
+    z-index: 999990 !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.gk-floating-open-sidebar-btn.is-visible {
+    right: 0 !important;
+}
+
+.gk-floating-open-sidebar-btn:hover {
+    background: #0369a1 !important;
+    padding-right: 20px !important;
+    box-shadow: -6px 8px 26px rgba(2, 132, 199, 0.6) !important;
+}
+
+.gk-f-icon {
+    font-size: 1.2rem !important;
+}
+
+.gk-sidebar-backdrop {
+    display: none !important;
+}
+
+.gk-sidebar-inner-wrap {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    position: relative !important;
+    padding: 0 !important;
+}
+
+/* 1. Header (Seamless / Compact) */
+.gk-sidebar-brand-box {
+    position: relative !important;
+    background: transparent !important;
+    padding: 16px 14px 10px 14px !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border-bottom: 1.5px solid rgba(186, 230, 253, 0.45) !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-sidebar-minimize-btn {
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1.5px solid rgba(186, 230, 253, 0.8) !important;
+    color: #0369a1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.22s ease !important;
+    padding: 0 !important;
+    z-index: 10 !important;
+    box-shadow: 0 2px 5px rgba(2, 132, 199, 0.08) !important;
+}
+
+.gk-sidebar-minimize-btn:hover {
+    background: #ffffff !important;
+    color: #0284c7 !important;
+    transform: scale(1.06) !important;
+    border-color: #38bdf8 !important;
+}
+
+.gk-sidebar-logo-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    padding: 4px 8px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: all 0.25s ease !important;
+    text-decoration: none !important;
+    margin-bottom: 2px !important;
+    box-sizing: border-box !important;
+}
+
+.gk-sidebar-logo-link:hover {
+    transform: translateY(-2px) scale(1.04) !important;
+}
+
+.gk-sidebar-logo-img {
+    width: auto !important;
+    height: 52px !important;
+    max-height: 56px !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+    border-radius: 0 !important;
+    display: block !important;
+    filter: drop-shadow(0 4px 12px rgba(2, 132, 199, 0.18)) !important;
+    transition: filter 0.25s ease !important;
+}
+
+.gk-sidebar-logo-link:hover .gk-sidebar-logo-img {
+    filter: drop-shadow(0 6px 16px rgba(2, 132, 199, 0.3)) !important;
+}
+
+.gk-sidebar-brand-title {
+    font-family: 'aviny', 'Aviny', 'IRANSansXFaNum', sans-serif !important;
+    font-size: 1.55rem !important;
+    font-weight: 900 !important;
+    color: #0284c7 !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.5px !important;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+    margin-top: 0 !important;
+}
+
+/* 2. Middle Navigation with Flyout Submenus (Elevated Position - 25% Higher) */
+.gk-sidebar-nav {
+    flex: 1 1 auto !important;
+    padding: 16px 12px 10px 12px !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+}
+
+.gk-sidebar-menu-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    position: relative !important;
+}
+
+.gk-sidebar-menu-list li {
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+}
+
+/* Menu Item Card Design (Kept exactly as requested) */
+.gk-sidebar-menu-list li a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 9px 12px !important;
+    background: #ffffff !important;
+    border: 1.8px solid #e0f2fe !important;
+    border-radius: 16px !important;
+    color: #1e293b !important;
+    font-weight: 800 !important;
+    font-size: 0.92rem !important;
+    text-decoration: none !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 3px 10px rgba(2, 132, 199, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+    position: relative !important;
+}
+
+.gk-sidebar-menu-icon {
+    font-size: 1.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-sidebar-menu-title {
+    flex: 1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.gk-sidebar-menu-list li a:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%) !important;
+    border-color: #38bdf8 !important;
+    transform: translateX(-4px) !important;
+    box-shadow: 0 6px 18px rgba(2, 132, 199, 0.15) !important;
+    color: #0284c7 !important;
+}
+
+/* Arrow indicator pointing to left for flyout */
+.gk-sidebar-menu-list li.menu-item-has-children > a::after {
+    content: "‹" !important;
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    color: #0284c7 !important;
+    margin-right: auto !important;
+    margin-left: 2px !important;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: inline-block !important;
+    line-height: 1 !important;
+}
+
+.gk-sidebar-menu-list li.menu-item-has-children:hover > a::after {
+    transform: translateX(-4px) !important;
+    color: #0369a1 !important;
+}
+
+/* =========================================================
+   Luxury Flyout Submenu Popup (Floating to the Left - Zero Menu Shift)
+   ========================================================= */
+.gk-sidebar-menu-list .sub-menu {
+    position: absolute !important;
+    right: calc(100% + 10px) !important;
+    top: 0 !important;
+    min-width: 235px !important;
+    background: #ffffff !important;
+    border: 2px solid #bae6fd !important;
+    border-radius: 20px !important;
+    box-shadow: 0 16px 45px rgba(2, 132, 199, 0.22), 0 4px 14px rgba(15, 23, 42, 0.08) !important;
+    padding: 8px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    z-index: 9999999 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateX(12px) !important;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease !important;
+    list-style: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* Hover bridge to keep flyout open */
+.gk-sidebar-menu-list .sub-menu::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -10px !important;
+    bottom: -10px !important;
+    right: -20px !important;
+    width: 24px !important;
+    background: transparent !important;
+    display: block !important;
+}
+
+.gk-sidebar-menu-list li.menu-item-has-children:hover > .sub-menu,
+.gk-sidebar-menu-list li.menu-item-has-children.is-expanded > .sub-menu,
+.gk-sidebar-menu-list li.menu-item-has-children:focus-within > .sub-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateX(0) !important;
+}
+
+.gk-sidebar-menu-list .sub-menu li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.gk-sidebar-menu-list .sub-menu li a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 9px 12px !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    font-size: 0.9rem !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    box-shadow: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.gk-sidebar-menu-list .sub-menu li a:hover {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+    border-color: #0284c7 !important;
+    color: #0284c7 !important;
+    transform: translateX(-4px) !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12) !important;
+}
+
+/* 3. Footer (Vibrant Brand Colors & Zero White Background) */
+.gk-sidebar-footer {
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+    padding: 12px 14px 16px 14px !important;
+    border-top: 1.5px solid rgba(186, 230, 253, 0.4) !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: center !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+}
+
+.gk-sidebar-socials {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    justify-content: center !important;
+    width: 100% !important;
+}
+
+.gk-side-s-btn {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    border: none !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Bale Official Emerald Green */
+.gk-side-s-btn.gk-s-ble {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.35) !important;
+}
+
+.gk-side-s-btn.gk-s-ble:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    transform: translateY(-3px) scale(1.1) !important;
+    box-shadow: 0 8px 22px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Instagram Official Vibrant Sunset Gradient */
+.gk-side-s-btn.gk-s-ig {
+    background: linear-gradient(135deg, #f58529 0%, #dd2a7b 50%, #8134af 100%) !important;
+    box-shadow: 0 5px 15px rgba(221, 42, 123, 0.38) !important;
+}
+
+.gk-side-s-btn.gk-s-ig:hover {
+    background: linear-gradient(135deg, #fa7e1e 0%, #d62976 50%, #962fbf 100%) !important;
+    transform: translateY(-3px) scale(1.1) !important;
+    box-shadow: 0 8px 22px rgba(221, 42, 123, 0.55) !important;
+}
+
+/* Telegram Official Sky-Blue */
+.gk-side-s-btn.gk-s-tg {
+    background: linear-gradient(135deg, #2AABEE 0%, #229ED9 100%) !important;
+    box-shadow: 0 5px 15px rgba(34, 158, 217, 0.38) !important;
+}
+
+.gk-side-s-btn.gk-s-tg:hover {
+    background: linear-gradient(135deg, #229ed9 0%, #0088cc 100%) !important;
+    transform: translateY(-3px) scale(1.1) !important;
+    box-shadow: 0 8px 22px rgba(34, 158, 217, 0.55) !important;
+}
+
+/* Luxury Solid Blue Phone Pill Button (No White Background) */
+.gk-sidebar-phone-btn {
+    width: 100% !important;
+    padding: 9px 14px !important;
+    border-radius: 18px !important;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    text-decoration: none !important;
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-sizing: border-box !important;
+}
+
+.gk-phone-icon-circle {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    transition: transform 0.25s ease !important;
+}
+
+.gk-phone-text-box {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    line-height: 1.15 !important;
+}
+
+.gk-phone-label {
+    font-size: 10.5px !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 700 !important;
+}
+
+.gk-phone-digits {
+    font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+    font-size: 14.5px !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    letter-spacing: 0.5px !important;
+    direction: ltr !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+.gk-sidebar-phone-btn:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 9px 25px rgba(2, 132, 199, 0.45) !important;
+}
+
+.gk-sidebar-phone-btn:hover .gk-phone-icon-circle {
+    transform: scale(1.1) rotate(-12deg) !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 4. Hide completely on mobile (< 1024px) */
+@media (max-width: 1023px) {
+    aside.gk-desktop-sidebar,
+    .gk-desktop-sidebar,
+    .gk-floating-open-sidebar-btn {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+}

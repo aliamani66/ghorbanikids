@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>بازی چای‌خانه سنتی کلمات - فارسی اول</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+      background: radial-gradient(circle, #fce4ec 0%, #f8bbd0 50%, #e1bee7 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 14px;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: #ffffff;
+      padding: 8px 18px;
+      border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #6a1b9a;
+      border: 2px solid #ce93d8;
+      white-space: nowrap;
+    }
+
+    .group-track {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .group-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #ce93d8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #8e24aa;
+      transition: all 0.25s;
+    }
+
+    .group-dot.done {
+      background: #66bb6a;
+      border-color: #388e3c;
+      color: #fff;
+    }
+
+    .group-dot.active {
+      background: #ffb300;
+      border-color: #ff8f00;
+      color: #fff;
+      transform: scale(1.15);
+    }
+
+    .order-board {
+      background: #5d4037;
+      border: 5px solid #3e2723;
+      border-radius: 20px;
+      padding: 12px 24px;
+      color: #fffde7;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      margin-bottom: 14px;
+      max-width: 600px;
+      width: 92%;
+      animation: bounceIn 0.5s ease-out;
+    }
+
+    .order-title {
+      font-size: 0.95rem;
+      color: #ffd54f;
+      margin-bottom: 6px;
+    }
+
+    .order-text {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .order-highlight {
+      color: #ffeb3b;
+      font-weight: 900;
+    }
+
+    .teahouse-area {
+      position: relative;
+      width: 100%;
+      max-width: 650px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 6px 0 20px;
+    }
+
+    .tray-target {
+      width: 290px;
+      height: 190px;
+      background: #8d6e63;
+      border: 8px solid #4e342e;
+      border-radius: 40px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 10px 25px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.25s;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .tray-target.dragover,
+    .tray-target.ready-for-tap {
+      background: #a1887f;
+      transform: scale(1.05);
+      border-color: #ffb300;
+    }
+
+    .tray-cloth {
+      width: 85%;
+      height: 75%;
+      background: #fff8e1;
+      border-radius: 20px;
+      border: 2px dashed #bcaaa4;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #8d6e63;
+      font-weight: bold;
+      font-size: 1rem;
+      pointer-events: none;
+      padding: 6px;
+    }
+
+    .items-shelf {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      justify-content: center;
+      width: 100%;
+      max-width: 560px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 24px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    }
+
+    @media (max-width: 560px) {
+      .items-shelf {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 320px;
+      }
+      .tray-target { width: 250px; height: 170px; }
+    }
+
+    .item-card {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #ffffff;
+      border-radius: 20px;
+      border: 3px solid #ab47bc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: grab;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      touch-action: none;
+      padding: 6px;
+    }
+
+    .item-card.dragging-source {
+      opacity: 0.35;
+    }
+
+    .item-card.selected {
+      border-color: #ffb300;
+      box-shadow: 0 0 0 4px rgba(255,179,0,0.35), 0 6px 14px rgba(0,0,0,0.1);
+      transform: translateY(-4px);
+    }
+
+    .drag-ghost {
+      position: fixed;
+      width: 100px;
+      height: 100px;
+      background: #ffffff;
+      border-radius: 20px;
+      border: 3px solid #ab47bc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      z-index: 1000;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+
+    .item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    .item-card:focus-visible {
+      outline: 3px solid #6a1b9a;
+      outline-offset: 3px;
+    }
+
+    .item-card:active {
+      cursor: grabbing;
+    }
+
+    .item-icon {
+      font-size: 2.2rem;
+      margin-bottom: 4px;
+    }
+
+    .item-word {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #4a148c;
+      text-align: center;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #7b1fa2;
+      opacity: 0.75;
+      text-align: center;
+      max-width: 500px;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      70% { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .tray-success {
+      animation: successPop 0.4s ease;
+    }
+
+    @keyframes successPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+
+    .finale {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 30px;
+      text-align: center;
+      max-width: 500px;
+      width: 92%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 4px solid #ab47bc;
+    }
+
+    .finale h2 {
+      color: #6a1b9a;
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+
+    .finale p {
+      color: #4a148c;
+      margin-bottom: 18px;
+      font-size: 1.05rem;
+    }
+
+    .finale button {
+      background: #ab47bc;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .finale button:hover {
+      background: #8e24aa;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">⭐ امتیاز: <span id="score-val">۰</span></div>
+    <div class="badge">🫖 گروه <span id="level-val">۱</span> از <span id="level-total">۶</span></div>
+  </header>
+
+  <div class="group-track" id="group-track"></div>
+
+  <div id="game-wrap">
+    <div class="order-board" id="order-board">
+      <div class="order-title">مشتری چای‌خانه می‌گوید:</div>
+      <div class="order-text">لطفاً <span class="order-highlight" id="target-word">قاشق</span> را در سینی بگذار!</div>
+    </div>
+
+    <div class="teahouse-area">
+      <div class="tray-target" id="tray-target" tabindex="0" role="button" aria-label="سینی پذیرایی">
+        <div class="tray-cloth" id="tray-cloth">
+          <span>سینی پذیرایی</span>
+          <span style="font-size: 0.8rem; color: #a1887f; margin-top: 4px;">وسیله را بکِش یا لمس کن، بعد این‌جا بگذار</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="items-shelf" id="items-shelf"></div>
+    <div class="hint">می‌توانی کلمه را بکِشی و در سینی رها کنی، یا فقط روی آن ضربه بزن و بعد روی سینی ضربه بزن.</div>
+  </div>
+
+  <div class="finale" id="finale" style="display:none;">
+    <h2>🎉 آفرین! همه‌ی گروه‌ها را کامل کردی!</h2>
+    <p>تو یک استاد کلمات فارسی شدی. دوباره بازی می‌کنی؟</p>
+    <button id="restart-btn">شروع دوباره</button>
+  </div>
+
+  <script>
+    // شش گروه کلمه، مطابق درس‌های فارسی اول
+    const WORD_GROUPS = [
+      [
+        { word: 'ایران', icon: '🇮🇷' },
+        { word: 'سیب', icon: '🍎' },
+        { word: 'سینی', icon: '🍽️' },
+        { word: 'آبی', icon: '🔵' },
+        { word: 'شیر', icon: '🦁' },
+        { word: 'دایی', icon: '🧔' }
+      ],
+      [
+        { word: 'موش', icon: '🐭' },
+        { word: 'گوش', icon: '👂' },
+        { word: 'کوه', icon: '⛰️' },
+        { word: 'دود', icon: '💨' },
+        { word: 'بو', icon: '👃' },
+        { word: 'دوست', icon: '🤝' },
+        { word: 'نور', icon: '💡' }
+      ],
+      [
+        { word: 'کفش', icon: '👞' },
+        { word: 'کودک', icon: '🧒' },
+        { word: 'کبوتر', icon: '🕊️' },
+        { word: 'پاک', icon: '✨' },
+        { word: 'پروانه', icon: '🦋' },
+        { word: 'پرده', icon: '🪟' }
+      ],
+      [
+        { word: 'گرگ', icon: '🐺' },
+        { word: 'برگ', icon: '🍃' },
+        { word: 'سگ', icon: '🐶' },
+        { word: 'انگور', icon: '🍇' },
+        { word: 'گاز', icon: '🔥' },
+        { word: 'گل', icon: '🌸' }
+      ],
+      [
+        { word: 'فیل', icon: '🐘' },
+        { word: 'برف', icon: '❄️' },
+        { word: 'آفتاب', icon: '☀️' },
+        { word: 'درخت', icon: '🌳' },
+        { word: 'شاخه', icon: '🌿' },
+        { word: 'خرگوش', icon: '🐰' }
+      ],
+      [
+        { word: 'قایق', icon: '🚤' },
+        { word: 'قاشق', icon: '🥄' },
+        { word: 'قندان', icon: '🍬' },
+        { word: 'چتر', icon: '☂️' },
+        { word: 'پرچم', icon: '🚩' },
+        { word: 'چشم', icon: '👁️' }
+      ]
+    ];
+
+    let score = 0;
+    let groupIndex = 0;          // کدام گروه (۰ تا ۵)
+    let remainingInGroup = [];   // کلماتی که هنوز در این گروه هدف نشده‌اند
+    let targetItem = null;
+    let selectedCard = null;     // برای حالت لمس/کلیک بدون کشیدن
+
+    const scoreVal = document.getElementById('score-val');
+    const levelVal = document.getElementById('level-val');
+    const levelTotal = document.getElementById('level-total');
+    const targetWordEl = document.getElementById('target-word');
+    const itemsShelf = document.getElementById('items-shelf');
+    const trayTarget = document.getElementById('tray-target');
+    const trayCloth = document.getElementById('tray-cloth');
+    const orderBoard = document.getElementById('order-board');
+    const groupTrack = document.getElementById('group-track');
+    const gameWrap = document.getElementById('game-wrap');
+    const finale = document.getElementById('finale');
+
+    let audioCtx = null;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(130, now + 0.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'finale') {
+        [523, 659, 784, 1046].forEach((f, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.type = 'triangle';
+          const t = now + i * 0.15;
+          o.frequency.setValueAtTime(f, t);
+          g.gain.setValueAtTime(0.25, t);
+          g.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+          o.start(t); o.stop(t + 0.3);
+        });
+      }
+    }
+
+    function toPersianDigits(num) {
+      const digits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return num.toString().replace(/\d/g, d => digits[d]);
+    }
+
+    function buildGroupTrack() {
+      groupTrack.innerHTML = '';
+      WORD_GROUPS.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'group-dot';
+        dot.id = 'dot-' + i;
+        dot.textContent = toPersianDigits(i + 1);
+        groupTrack.appendChild(dot);
+      });
+    }
+
+    function refreshGroupTrack() {
+      WORD_GROUPS.forEach((_, i) => {
+        const dot = document.getElementById('dot-' + i);
+        dot.classList.remove('done', 'active');
+        if (i < groupIndex) dot.classList.add('done');
+        else if (i === groupIndex) dot.classList.add('active');
+      });
+    }
+
+    function resetShelfCloth() {
+      trayCloth.innerHTML = '<span>سینی پذیرایی</span><span style="font-size: 0.8rem; color: #a1887f; margin-top: 4px;">وسیله را بکِش یا لمس کن، بعد این‌جا بگذار</span>';
+    }
+
+    function startGroup(idx) {
+      groupIndex = idx;
+      remainingInGroup = [...WORD_GROUPS[groupIndex]].sort(() => 0.5 - Math.random());
+      levelVal.textContent = toPersianDigits(groupIndex + 1);
+      refreshGroupTrack();
+      nextRoundInGroup();
+    }
+
+    function nextRoundInGroup() {
+      if (remainingInGroup.length === 0) {
+        // این گروه تمام شد، برو گروه بعد
+        if (groupIndex + 1 < WORD_GROUPS.length) {
+          setTimeout(() => startGroup(groupIndex + 1), 300);
+        } else {
+          setTimeout(showFinale, 300);
+        }
+        return;
+      }
+
+      selectedCard = null;
+      resetShelfCloth();
+      itemsShelf.innerHTML = '';
+
+      targetItem = remainingInGroup.pop();
+
+      // چیدمان: کلمه‌ی هدف + سه کلمه‌ی دیگر از همین گروه (جمعاً ۴ گزینه) تا در صفحه جا شود
+      const others = WORD_GROUPS[groupIndex]
+        .filter(it => it.word !== targetItem.word)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3);
+      const shelfItems = [...others, targetItem].sort(() => 0.5 - Math.random());
+
+      targetWordEl.textContent = targetItem.word;
+
+      orderBoard.style.animation = 'none';
+      void orderBoard.offsetWidth;
+      orderBoard.style.animation = 'bounceIn 0.5s ease-out';
+
+      shelfItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.dataset.word = item.word;
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', item.word);
+
+        card.innerHTML = `
+          <span class="item-icon">${item.icon}</span>
+          <span class="item-word">${item.word}</span>
+        `;
+
+        attachPointerDrag(card, item);
+        attachKeyboard(card, item);
+        itemsShelf.appendChild(card);
+      });
+    }
+
+    function isOverTray(x, y) {
+      const rect = trayTarget.getBoundingClientRect();
+      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    }
+
+    function handleDropResult(droppedItem, cardEl) {
+      if (droppedItem.word === targetItem.word) {
+        playSound('success');
+        score += 15;
+        scoreVal.textContent = toPersianDigits(score);
+
+        trayCloth.innerHTML = `
+          <span style="font-size: 2.6rem;">${droppedItem.icon}</span>
+          <span style="font-size: 1.3rem; color: #2e7d32; font-weight: bold; margin-top: 4px;">${droppedItem.word} آماده شد!</span>
+        `;
+
+        trayTarget.classList.add('tray-success');
+        setTimeout(() => trayTarget.classList.remove('tray-success'), 400);
+
+        setTimeout(nextRoundInGroup, 1100);
+      } else {
+        playSound('wrong');
+        trayTarget.style.borderColor = '#e53935';
+        if (cardEl) {
+          cardEl.style.borderColor = '#e53935';
+          setTimeout(() => { cardEl.style.borderColor = '#ab47bc'; }, 350);
+        }
+        setTimeout(() => {
+          trayTarget.style.borderColor = '#4e342e';
+        }, 400);
+      }
+    }
+
+    function clearSelection() {
+      if (selectedCard) {
+        selectedCard.classList.remove('selected');
+        selectedCard = null;
+      }
+      trayTarget.classList.remove('ready-for-tap');
+    }
+
+    // درگ با Pointer Events - هم برای ماوس روی کامپیوتر و هم لمس روی موبایل کار می‌کند
+    function attachPointerDrag(card, item) {
+      let ghost = null;
+      let dragging = false;
+      let moved = false;
+      let startX = 0, startY = 0;
+
+      function movePointer(clientX, clientY) {
+        if (!ghost) return;
+        ghost.style.left = `${clientX}px`;
+        ghost.style.top = `${clientY}px`;
+
+        if (isOverTray(clientX, clientY)) {
+          trayTarget.classList.add('dragover');
+        } else {
+          trayTarget.classList.remove('dragover');
+        }
+      }
+
+      function endDrag(clientX, clientY) {
+        if (!dragging) return;
+        dragging = false;
+
+        card.classList.remove('dragging-source');
+        trayTarget.classList.remove('dragover');
+
+        if (ghost) {
+          ghost.remove();
+          ghost = null;
+        }
+
+        if (moved && isOverTray(clientX, clientY)) {
+          handleDropResult(item, card);
+        } else if (!moved) {
+          // این یک "ضربه ساده" بود، نه کشیدن -> حالت انتخاب/تأیید با ضربه
+          handleTapSelect(card, item);
+        }
+      }
+
+      card.addEventListener('pointerdown', (e) => {
+        ensureAudio();
+        dragging = true;
+        moved = false;
+        startX = e.clientX;
+        startY = e.clientY;
+        card.classList.add('dragging-source');
+        try { card.setPointerCapture(e.pointerId); } catch (err) {}
+
+        ghost = document.createElement('div');
+        ghost.className = 'drag-ghost';
+        ghost.innerHTML = `
+          <span class="item-icon">${item.icon}</span>
+          <span class="item-word">${item.word}</span>
+        `;
+        document.body.appendChild(ghost);
+        movePointer(e.clientX, e.clientY);
+      });
+
+      card.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        if (Math.abs(e.clientX - startX) > 6 || Math.abs(e.clientY - startY) > 6) {
+          moved = true;
+        }
+        movePointer(e.clientX, e.clientY);
+      });
+
+      card.addEventListener('pointerup', (e) => {
+        endDrag(e.clientX, e.clientY);
+      });
+
+      card.addEventListener('pointercancel', () => {
+        dragging = false;
+        card.classList.remove('dragging-source');
+        trayTarget.classList.remove('dragover');
+        if (ghost) { ghost.remove(); ghost = null; }
+      });
+    }
+
+    // حالت جایگزین: روی کارت ضربه بزن (بدون کشیدن)، سپس روی سینی ضربه بزن
+    function handleTapSelect(card, item) {
+      if (selectedCard === card) {
+        clearSelection();
+        return;
+      }
+      clearSelection();
+      selectedCard = card;
+      card.classList.add('selected');
+      trayTarget.classList.add('ready-for-tap');
+    }
+
+    function attachKeyboard(card, item) {
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          ensureAudio();
+          handleTapSelect(card, item);
+        }
+      });
+    }
+
+    trayTarget.addEventListener('click', () => {
+      if (selectedCard) {
+        const word = selectedCard.dataset.word;
+        const item = { word, icon: selectedCard.querySelector('.item-icon').textContent };
+        const cardEl = selectedCard;
+        clearSelection();
+        handleDropResult(item, cardEl);
+      }
+    });
+
+    trayTarget.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && selectedCard) {
+        e.preventDefault();
+        trayTarget.click();
+      }
+    });
+
+    function showFinale() {
+      playSound('finale');
+      gameWrap.style.display = 'none';
+      groupTrack.style.display = 'none';
+      finale.style.display = 'block';
+    }
+
+    document.getElementById('restart-btn').addEventListener('click', () => {
+      score = 0;
+      scoreVal.textContent = toPersianDigits(score);
+      finale.style.display = 'none';
+      gameWrap.style.display = '';
+      groupTrack.style.display = '';
+      startGroup(0);
+    });
+
+    levelTotal.textContent = toPersianDigits(WORD_GROUPS.length);
+    buildGroupTrack();
+    startGroup(0);
+  </script>
+</body>
+</html>

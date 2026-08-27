@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>جعبه جواهرات جادویی</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 50% 30%, #3a156e 0%, #15052a 100%);
+      --shelf-wood: #4a2211;
+      --shelf-border: #ffd700;
+      --accent-glow: rgba(255, 215, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: min(92vw, 480px);
+      gap: 10px;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #ffe600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .timer-container {
+      width: min(92vw, 480px);
+      height: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff007f, #00f2fe);
+      box-shadow: 0 0 10px #00f2fe;
+      transform-origin: right;
+    }
+
+    .timer-anim {
+      animation: countdown 5s linear forwards;
+    }
+
+    @keyframes countdown {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
+
+    .instruction-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffe285;
+      text-align: center;
+      min-height: 1.6rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .shelf-frame {
+      background: linear-gradient(145deg, #5c2c16, #2d1409);
+      border: 4px solid var(--shelf-border);
+      border-radius: 24px;
+      padding: 12px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .grid-board {
+      display: grid;
+      gap: 10px;
+      width: min(85vw, 360px);
+      height: min(85vw, 360px);
+    }
+
+    .grid-3x3 {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+
+    .grid-4x4 {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
+
+    .slot {
+      background: rgba(0, 0, 0, 0.35);
+      border: 2px dashed rgba(255, 215, 0, 0.4);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .slot.hovered {
+      background: rgba(255, 215, 0, 0.25);
+      border-color: #fff;
+      transform: scale(1.03);
+    }
+
+    .tray-container {
+      width: min(92vw, 480px);
+      min-height: 86px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 10px;
+      flex-wrap: wrap;
+      box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .magic-item {
+      width: 65px;
+      height: 65px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      cursor: grab;
+      touch-action: none;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3), inset 0 2px 5px rgba(255, 255, 255, 0.5);
+      position: relative;
+    }
+
+    .grid-4x4 .magic-item {
+      width: 52px;
+      height: 52px;
+      font-size: 1.8rem;
+      border-radius: 14px;
+    }
+
+    .magic-item:active {
+      cursor: grabbing;
+      transform: scale(1.15);
+    }
+
+    .magic-item.dragging {
+      opacity: 0.85;
+      z-index: 1000;
+      position: fixed;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(1.2);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px #ffd700;
+    }
+
+    .magic-item.placed {
+      cursor: default;
+      animation: lock-pulse 0.4s ease;
+    }
+
+    @keyframes lock-pulse {
+      0% { transform: scale(0.7); }
+      70% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .shake-error {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px) rotate(-5deg); }
+      75% { transform: translateX(8px) rotate(5deg); }
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 3, 26, 0.88);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      transition: opacity 0.3s;
+    }
+
+    .modal.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal-box {
+      background: linear-gradient(135deg, #441477, #84189e);
+      border: 3px solid #ffd700;
+      border-radius: 30px;
+      padding: 30px 40px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4);
+      max-width: 90vw;
+    }
+
+    .btn-main {
+      margin-top: 20px;
+      padding: 12px 36px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #310a4e;
+      background: linear-gradient(90deg, #ffe600, #ff9900);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.5);
+      transition: transform 0.2s ease;
+    }
+
+    .btn-main:hover {
+      transform: scale(1.06);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="badge" id="ui-level">مرحله: ۱</div>
+    <div class="badge" id="ui-score">امتیاز: ۰</div>
+  </div>
+
+  <div class="instruction-text" id="ui-instruction">خوب نگاه کن و جای وسایل رو حفظ کن!</div>
+
+  <div class="timer-container">
+    <div class="timer-bar" id="timer-bar"></div>
+  </div>
+
+  <div class="shelf-frame">
+    <div class="grid-board grid-3x3" id="board"></div>
+  </div>
+
+  <div class="tray-container" id="tray"></div>
+
+  <div class="modal" id="game-modal">
+    <div class="modal-box">
+      <h2 style="font-size: 2rem; color: #fff; margin-bottom: 10px;" id="modal-title">جعبه جواهرات جادویی ✨</h2>
+      <p style="color: #ffd8fb; font-size: 1.1rem;" id="modal-desc">اشیای داخل قفسه را خوب به خاطر بسپار و بعد از مخفی شدن سر جای اصلی‌شان قرار بده!</p>
+      <button class="btn-main" id="modal-btn" onclick="startCurrentLevel()">شروع بازی 🚀</button>
+    </div>
+  </div>
+
+  <script>
+    const AudioFX = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+      playPick() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(540, now + 0.08);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      },
+      playCorrect() {
+        this.init();
+        [523.25, 659.25, 783.99].forEach((freq, idx) => {
+          const now = this.ctx.currentTime + idx * 0.07;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        });
+      },
+      playWrong() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(100, now + 0.25);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      },
+      playLevelWin() {
+        this.init();
+        const melody = [523.25, 659.25, 783.99, 1046.50];
+        melody.forEach((freq, i) => {
+          const now = this.ctx.currentTime + i * 0.12;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        });
+      }
+    };
+
+    const ITEMS_PALETTE = [
+      { id: 'star', icon: '⭐' },
+      { id: 'clock', icon: '⏰' },
+      { id: 'apple', icon: '🍎' },
+      { id: 'key', icon: '🔑' },
+      { id: 'diamond', icon: '💎' },
+      { id: 'crown', icon: '👑' },
+      { id: 'ring', icon: '💍' },
+      { id: 'bell', icon: '🔔' }
+    ];
+
+    const LEVELS = [
+      { size: 3, itemCount: 3, similar: false },
+      { size: 3, itemCount: 4, similar: false },
+      { size: 4, itemCount: 5, similar: false },
+      { size: 4, itemCount: 6, similar: true },
+      { size: 4, itemCount: 8, similar: true }
+    ];
+
+    let currentLevelIndex = 0;
+    let score = 0;
+    let targetPositions = {};
+    let remainingToPlace = 0;
+    let isMemorizePhase = true;
+
+    const boardEl = document.getElementById('board');
+    const trayEl = document.getElementById('tray');
+    const timerBar = document.getElementById('timer-bar');
+    const instructionEl = document.getElementById('ui-instruction');
+    const scoreEl = document.getElementById('ui-score');
+    const levelEl = document.getElementById('ui-level');
+    const modalEl = document.getElementById('game-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalBtn = document.getElementById('modal-btn');
+
+    function startCurrentLevel() {
+      modalEl.classList.add('hidden');
+      AudioFX.init();
+
+      const conf = LEVELS[currentLevelIndex];
+      remainingToPlace = conf.itemCount;
+      targetPositions = {};
+      isMemorizePhase = true;
+
+      levelEl.textContent = `مرحله: ${(currentLevelIndex + 1).toLocaleString('fa-IR')}`;
+      instructionEl.textContent = 'خوب نگاه کن و جای وسایل رو حفظ کن!';
+
+      boardEl.className = `grid-board ${conf.size === 3 ? 'grid-3x3' : 'grid-4x4'}`;
+      boardEl.innerHTML = '';
+      trayEl.innerHTML = '';
+
+      const totalSlots = conf.size * conf.size;
+      for (let i = 0; i < totalSlots; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.index = i;
+        boardEl.appendChild(slot);
+      }
+
+      const chosenSlots = shuffle([...Array(totalSlots).keys()]).slice(0, conf.itemCount);
+      const chosenItems = shuffle([...ITEMS_PALETTE]).slice(0, conf.itemCount);
+
+      chosenSlots.forEach((slotIdx, i) => {
+        const itemData = chosenItems[i];
+        targetPositions[slotIdx] = itemData;
+
+        const itemEl = createItemElement(itemData);
+        boardEl.children[slotIdx].appendChild(itemEl);
+      });
+
+      timerBar.classList.remove('timer-anim');
+      void timerBar.offsetWidth;
+      timerBar.classList.add('timer-anim');
+
+      setTimeout(() => {
+        hideAndTransferToTray();
+      }, 5000);
+    }
+
+    function hideAndTransferToTray() {
+      isMemorizePhase = false;
+      instructionEl.textContent = 'حالا هر شیء رو سر جای قبلیش بذار!';
+
+      Object.keys(targetPositions).forEach(slotIdx => {
+        boardEl.children[slotIdx].innerHTML = '';
+      });
+
+      const itemsToPlace = shuffle(Object.values(targetPositions));
+      itemsToPlace.forEach(itemData => {
+        const itemEl = createItemElement(itemData);
+        enableDrag(itemEl, itemData);
+        trayEl.appendChild(itemEl);
+      });
+    }
+
+    function createItemElement(itemData) {
+      const div = document.createElement('div');
+      div.className = 'magic-item';
+      div.textContent = itemData.icon;
+      div.dataset.id = itemData.id;
+      return div;
+    }
+
+    function enableDrag(elem, itemData) {
+      let isDragging = false;
+
+      function onStart(e) {
+        if (isMemorizePhase || elem.classList.contains('placed')) return;
+        isDragging = true;
+        AudioFX.playPick();
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        elem.classList.add('dragging');
+        moveAt(clientX, clientY);
+
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchend', onEnd);
+      }
+
+      function moveAt(x, y) {
+        elem.style.left = x + 'px';
+        elem.style.top = y + 'px';
+      }
+
+      function onMove(e) {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        moveAt(clientX, clientY);
+
+        elem.hidden = true;
+        const elemBelow = document.elementFromPoint(clientX, clientY);
+        elem.hidden = false;
+
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('hovered'));
+        const slot = elemBelow ? elemBelow.closest('.slot') : null;
+        if (slot) slot.classList.add('hovered');
+      }
+
+      function onEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchend', onEnd);
+
+        elem.classList.remove('dragging');
+        elem.style.left = '';
+        elem.style.top = '';
+
+        const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+        const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+        elem.hidden = true;
+        const elemBelow = document.elementFromPoint(clientX, clientY);
+        elem.hidden = false;
+
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('hovered'));
+        const slot = elemBelow ? elemBelow.closest('.slot') : null;
+
+        if (slot) {
+          const slotIdx = slot.dataset.index;
+          const correctItem = targetPositions[slotIdx];
+
+          if (correctItem && correctItem.id === itemData.id && slot.children.length === 0) {
+            AudioFX.playCorrect();
+            elem.classList.add('placed');
+            slot.appendChild(elem);
+            score += 100;
+            scoreEl.textContent = `امتیاز: ${score.toLocaleString('fa-IR')}`;
+            remainingToPlace--;
+
+            if (remainingToPlace === 0) {
+              handleLevelComplete();
+            }
+            return;
+          }
+        }
+
+        AudioFX.playWrong();
+        elem.classList.add('shake-error');
+        setTimeout(() => elem.classList.remove('shake-error'), 400);
+        trayEl.appendChild(elem);
+      }
+
+      elem.addEventListener('mousedown', onStart);
+      elem.addEventListener('touchstart', onStart, { passive: false });
+    }
+
+    function handleLevelComplete() {
+      AudioFX.playLevelWin();
+      instructionEl.textContent = '🎉 آفرین! حافظه‌ات عالی کار کرد!';
+
+      setTimeout(() => {
+        if (currentLevelIndex < LEVELS.length - 1) {
+          currentLevelIndex++;
+          modalTitle.textContent = '⭐ مرحله بعد!';
+          modalDesc.textContent = 'عالی بود! حالا قفسه کمی شلوغ‌تر و جادویی‌تر می‌شه!';
+          modalBtn.textContent = 'مرحله بعدی 🚀';
+          modalEl.classList.remove('hidden');
+      if (window.parent && score > 0) { window.parent.postMessage({ type: 'GK_SUBMIT_SCORE', score: score }, '*'); }
+        } else {
+          modalTitle.textContent = '🏆 قهرمان حافظه جادویی!';
+          modalDesc.textContent = `تمام مراحل رو با موفقیت فتح کردی! امتیاز نهایی تو: ${score.toLocaleString('fa-IR')}`;
+          modalBtn.textContent = 'شروع مجدد 🔄';
+          modalBtn.onclick = () => {
+            currentLevelIndex = 0;
+            score = 0;
+            scoreEl.textContent = 'امتیاز: ۰';
+            startCurrentLevel();
+          };
+          modalEl.classList.remove('hidden');
+      if (window.parent && score > 0) { window.parent.postMessage({ type: 'GK_SUBMIT_SCORE', score: score }, '*'); }
+        }
+      }, 700);
+    }
+
+    function shuffle(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
+  </script>
+</body>
+</html>

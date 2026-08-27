@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>مسیرساز نئونی | Neon Pathmaker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #080313;
+      --cyan-neon: #00f3ff;
+      --pink-neon: #ff0077;
+      --yellow-neon: #ffe600;
+      --green-neon: #39ff14;
+      --board-size: min(88vw, 420px);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #1a0836 0%, var(--bg-color) 80%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    #fx-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    .top-stats {
+      display: flex;
+      justify-content: space-between;
+      width: var(--board-size);
+      gap: 10px;
+    }
+
+    .stat-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      padding: 6px 14px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
+      text-align: center;
+      flex: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #9d8ec2;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--cyan-neon);
+      text-shadow: 0 0 8px var(--cyan-neon);
+    }
+
+    .status-banner {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--yellow-neon);
+      text-shadow: 0 0 10px rgba(255, 230, 0, 0.5);
+      text-align: center;
+      min-height: 1.6rem;
+      transition: all 0.3s ease;
+    }
+
+    .board-wrapper {
+      position: relative;
+      width: var(--board-size);
+      height: var(--board-size);
+      perspective: 1000px;
+    }
+
+    .board-container {
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 6, 33, 0.85);
+      border: 2px solid rgba(255, 0, 119, 0.4);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 0, 119, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.8);
+      position: relative;
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      padding: 10px;
+    }
+
+    .grid-board {
+      display: grid;
+      width: 100%;
+      height: 100%;
+      gap: 8px;
+    }
+
+    .grid-4 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); }
+    .grid-5 { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); }
+    .grid-6 { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); }
+
+    #path-canvas {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: calc(100% - 20px);
+      height: calc(100% - 20px);
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    .cell {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 5;
+    }
+
+    .cell:hover:not(.obstacle) {
+      background: rgba(0, 243, 255, 0.15);
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+
+    .cell.obstacle {
+      background: rgba(255, 30, 80, 0.15);
+      border-color: rgba(255, 30, 80, 0.4);
+      cursor: not-allowed;
+    }
+
+    .cell.obstacle::after {
+      content: '✖';
+      color: rgba(255, 50, 100, 0.6);
+      font-size: 1.1rem;
+    }
+
+    .cell.start-cell {
+      background: rgba(57, 255, 20, 0.2);
+      border-color: var(--green-neon);
+      box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+    }
+
+    .cell.end-cell {
+      background: rgba(255, 230, 0, 0.2);
+      border-color: var(--yellow-neon);
+      box-shadow: 0 0 15px rgba(255, 230, 0, 0.5);
+    }
+
+    .cell.lit {
+      background: var(--pink-neon) !important;
+      box-shadow: 0 0 25px var(--pink-neon), inset 0 0 10px #fff;
+      transform: scale(1.08);
+      z-index: 20;
+    }
+
+    .cell.correct {
+      background: var(--cyan-neon) !important;
+      box-shadow: 0 0 25px var(--cyan-neon), inset 0 0 10px #fff;
+      transform: scale(1.06);
+      z-index: 20;
+    }
+
+    .cell.wrong {
+      background: #ff0033 !important;
+      box-shadow: 0 0 30px #ff0033;
+      animation: cell-shake 0.35s ease;
+    }
+
+    @keyframes cell-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px) rotate(-4deg); }
+      75% { transform: translateX(8px) rotate(4deg); }
+    }
+
+    .traveler {
+      width: 60%;
+      height: 60%;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 20px var(--cyan-neon), 0 0 35px var(--pink-neon);
+      animation: pulse-traveler 0.6s infinite alternate;
+    }
+
+    @keyframes pulse-traveler {
+      from { transform: scale(0.85); }
+      to { transform: scale(1.2); }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 1, 15, 0.88);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal-card {
+      background: linear-gradient(145deg, #180836, #3b0a59);
+      border: 2px solid var(--cyan-neon);
+      border-radius: 28px;
+      padding: 32px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(0, 243, 255, 0.4), inset 0 0 20px rgba(255, 0, 119, 0.3);
+      max-width: 90vw;
+    }
+
+    .btn-cyber {
+      margin-top: 24px;
+      padding: 14px 40px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #090217;
+      background: linear-gradient(90deg, var(--cyan-neon), var(--green-neon));
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
+      transition: transform 0.2s ease;
+    }
+
+    .btn-cyber:hover {
+      transform: scale(1.08);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="fx-canvas"></canvas>
+
+  <div class="top-stats">
+    <div class="stat-badge">
+      <div class="stat-label">مرحله</div>
+      <div class="stat-value" id="ui-level">۱</div>
+    </div>
+    <div class="stat-badge">
+      <div class="stat-label">امتیاز</div>
+      <div class="stat-value" id="ui-score">۰</div>
+    </div>
+    <div class="stat-badge">
+      <div class="stat-label">گام‌ها</div>
+      <div class="stat-value" id="ui-steps">۰ / ۰</div>
+    </div>
+  </div>
+
+  <div class="status-banner" id="ui-status">مسیر نئونی در حال ترسیم است...</div>
+
+  <div class="board-wrapper">
+    <div class="board-container" id="board-container">
+      <canvas id="path-canvas"></canvas>
+      <div class="grid-board" id="board"></div>
+    </div>
+  </div>
+
+  <div style="height: 10px;"></div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal-card">
+      <h2 style="font-size: 2.1rem; color: #fff; margin-bottom: 12px; text-shadow: 0 0 15px var(--cyan-neon);" id="modal-title">مسیرساز نئونی ⚡</h2>
+      <p style="color: #d1baff; font-size: 1.05rem; line-height: 1.6;" id="modal-desc">
+        مسیر درخشان نور را از نقطه شروع (سبز 🟢) تا پایان (زرد 🏁) به دقت به یاد بسپار و سپس به همان ترتیب بازسازی کن!
+      </p>
+      <button class="btn-cyber" id="modal-btn" onclick="startCurrentLevel()">ورود به بازی 🚀</button>
+    </div>
+  </div>
+
+  <script>
+    const CyberAudio = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      },
+      playTone(freq, duration = 0.15, type = 'sine', gainVal = 0.3) {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(gainVal, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      },
+      playPathStep(step) {
+        const base = 350 + (step * 85);
+        this.playTone(base, 0.18, 'sawtooth', 0.2);
+      },
+      playCorrectStep(step) {
+        const base = 500 + (step * 95);
+        this.playTone(base, 0.12, 'sine', 0.35);
+      },
+      playWrong() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(70, now + 0.3);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      },
+      playVictory() {
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => this.playTone(freq, 0.25, 'triangle', 0.35), idx * 80);
+        });
+      }
+    };
+
+    const FX = {
+      canvas: document.getElementById('fx-canvas'),
+      ctx: document.getElementById('fx-canvas').getContext('2d'),
+      particles: [],
+      init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.loop();
+      },
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      },
+      burst(x, y, color) {
+        for (let i = 0; i < 20; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 5 + 2;
+          this.particles.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            size: Math.random() * 5 + 2,
+            alpha: 1,
+            color
+          });
+        }
+      },
+      loop() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const p = this.particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= 0.025;
+          if (p.alpha <= 0) {
+            this.particles.splice(i, 1);
+            continue;
+          }
+          this.ctx.save();
+          this.ctx.globalAlpha = p.alpha;
+          this.ctx.fillStyle = p.color;
+          this.ctx.shadowBlur = 10;
+          this.ctx.shadowColor = p.color;
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.restore();
+        }
+        requestAnimationFrame(() => this.loop());
+      }
+    };
+    FX.init();
+
+    const LEVELS = [
+      { grid: 4, pathLength: 4, obstacles: 1, rotate: 0, desc: 'آشنایی با نقشه نئونی' },
+      { grid: 4, pathLength: 6, obstacles: 2, rotate: 0, desc: 'مسیر پرپیچ‌وخم‌تر' },
+      { grid: 5, pathLength: 7, obstacles: 4, rotate: 0, desc: 'نقشه بزرگتر با موانع بیشتر' },
+      { grid: 5, pathLength: 8, obstacles: 5, rotate: 90, desc: '⚠️ چالش چرخش ۹۰ درجه صفحه!' },
+      { grid: 6, pathLength: 10, obstacles: 8, rotate: 180, desc: '⚡ چالش فوق‌سخت: چرخش کامل ۱۸۰ درجه!' }
+    ];
+
+    let currentLevelIdx = 0;
+    let score = 0;
+    let gridDim = 4;
+    let path = [];
+    let obstacles = [];
+    let playerStep = 0;
+    let isShowingDemo = false;
+    let isGameActive = false;
+
+    const boardEl = document.getElementById('board');
+    const boardContainer = document.getElementById('board-container');
+    const pathCanvas = document.getElementById('path-canvas');
+    const pCtx = pathCanvas.getContext('2d');
+    const statusEl = document.getElementById('ui-status');
+    const levelEl = document.getElementById('ui-level');
+    const scoreEl = document.getElementById('ui-score');
+    const stepsEl = document.getElementById('ui-steps');
+    const modalEl = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalBtn = document.getElementById('modal-btn');
+
+    function syncPathCanvasSize() {
+      pathCanvas.width = boardEl.clientWidth;
+      pathCanvas.height = boardEl.clientHeight;
+    }
+
+    function startCurrentLevel() {
+      modalEl.classList.add('hidden');
+      CyberAudio.init();
+
+      const conf = LEVELS[currentLevelIdx] || LEVELS[LEVELS.length - 1];
+      gridDim = conf.grid;
+      playerStep = 0;
+      isShowingDemo = true;
+      isGameActive = false;
+
+      boardContainer.style.transform = 'rotate(0deg)';
+      levelEl.textContent = (currentLevelIdx + 1).toLocaleString('fa-IR');
+      scoreEl.textContent = score.toLocaleString('fa-IR');
+      stepsEl.textContent = `۰ / ${conf.pathLength.toLocaleString('fa-IR')}`;
+
+      buildGrid();
+      generatePathAndObstacles(conf.pathLength, conf.obstacles);
+      renderGridDecorations();
+
+      setTimeout(() => {
+        playPathDemonstration(conf.rotate);
+      }, 600);
+    }
+
+    function buildGrid() {
+      boardEl.className = `grid-board grid-${gridDim}`;
+      boardEl.innerHTML = '';
+      for (let r = 0; r < gridDim; r++) {
+        for (let c = 0; c < gridDim; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.r = r;
+          cell.dataset.c = c;
+          cell.addEventListener('click', () => handleCellClick(r, c));
+          boardEl.appendChild(cell);
+        }
+      }
+      syncPathCanvasSize();
+    }
+
+    function generatePathAndObstacles(len, obsCount) {
+      let valid = false;
+      while (!valid) {
+        path = [];
+        obstacles = [];
+        let curr = { r: Math.floor(Math.random() * gridDim), c: Math.floor(Math.random() * gridDim) };
+        path.push(curr);
+
+        while (path.length < len) {
+          const neighbors = getOrthogonalNeighbors(curr.r, curr.c)
+            .filter(n => !path.some(p => p.r === n.r && p.c === n.c));
+
+          if (neighbors.length === 0) break;
+          curr = neighbors[Math.floor(Math.random() * neighbors.length)];
+          path.push(curr);
+        }
+
+        if (path.length === len) {
+          valid = true;
+          const available = [];
+          for (let r = 0; r < gridDim; r++) {
+            for (let c = 0; c < gridDim; c++) {
+              if (!path.some(p => p.r === r && p.c === c)) {
+                available.push({ r, c });
+              }
+            }
+          }
+          obstacles = available.sort(() => Math.random() - 0.5).slice(0, obsCount);
+        }
+      }
+    }
+
+    function getOrthogonalNeighbors(r, c) {
+      const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+      const res = [];
+      dirs.forEach(([dr, dc]) => {
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < gridDim && nc >= 0 && nc < gridDim) res.push({ r: nr, c: nc });
+      });
+      return res;
+    }
+
+    function getCellEl(r, c) {
+      return boardEl.querySelector(`[data-r='${r}'][data-c='${c}']`);
+    }
+
+    function renderGridDecorations() {
+      obstacles.forEach(o => getCellEl(o.r, o.c).classList.add('obstacle'));
+      const start = path[0];
+      const end = path[path.length - 1];
+
+      const startCell = getCellEl(start.r, start.c);
+      startCell.classList.add('start-cell');
+      startCell.innerHTML = '🟢';
+
+      const endCell = getCellEl(end.r, end.c);
+      endCell.classList.add('end-cell');
+      endCell.innerHTML = '🏁';
+    }
+
+    async function playPathDemonstration(targetRotation) {
+      statusEl.textContent = '⚡ مسیر نئونی را به خاطر بسپار!';
+      statusEl.style.color = 'var(--yellow-neon)';
+      syncPathCanvasSize();
+      pCtx.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+
+      for (let i = 0; i < path.length; i++) {
+        const node = path[i];
+        const cell = getCellEl(node.r, node.c);
+        cell.classList.add('lit');
+        CyberAudio.playPathStep(i);
+
+        drawNeonPathUpTo(i);
+        await delay(450);
+        cell.classList.remove('lit');
+      }
+
+      await delay(300);
+      pCtx.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+
+      if (targetRotation > 0) {
+        statusEl.textContent = `🔄 هشدار: چرخش زاویه دید (${targetRotation} درجه)!`;
+        statusEl.style.color = 'var(--pink-neon)';
+        boardContainer.style.transform = `rotate(${targetRotation}deg)`;
+        await delay(900);
+      }
+
+      statusEl.textContent = 'حالا به ترتیب از شروع تا پایان کلیک کن!';
+      statusEl.style.color = 'var(--cyan-neon)';
+      isShowingDemo = false;
+      isGameActive = true;
+    }
+
+    function drawNeonPathUpTo(index) {
+      pCtx.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+      if (index === 0) return;
+
+      pCtx.lineWidth = 6;
+      pCtx.strokeStyle = '#ff0077';
+      pCtx.shadowColor = '#ff0077';
+      pCtx.shadowBlur = 15;
+      pCtx.lineCap = 'round';
+      pCtx.lineJoin = 'round';
+
+      pCtx.beginPath();
+      for (let i = 0; i <= index; i++) {
+        const cell = getCellEl(path[i].r, path[i].c);
+        const x = cell.offsetLeft + cell.clientWidth / 2;
+        const y = cell.offsetTop + cell.clientHeight / 2;
+        if (i === 0) pCtx.moveTo(x, y);
+        else pCtx.lineTo(x, y);
+      }
+      pCtx.stroke();
+    }
+
+    function handleCellClick(r, c) {
+      if (!isGameActive || isShowingDemo) return;
+
+      const targetNode = path[playerStep];
+      const cell = getCellEl(r, c);
+
+      if (r === targetNode.r && c === targetNode.c) {
+        CyberAudio.playCorrectStep(playerStep);
+        cell.classList.add('correct');
+        const rect = cell.getBoundingClientRect();
+        FX.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, '#00f3ff');
+
+        playerStep++;
+        score += 50 * (currentLevelIdx + 1);
+        scoreEl.textContent = score.toLocaleString('fa-IR');
+        stepsEl.textContent = `${playerStep.toLocaleString('fa-IR')} / ${path.length.toLocaleString('fa-IR')}`;
+
+        if (playerStep === path.length) {
+          handleLevelComplete();
+        }
+      } else {
+        CyberAudio.playWrong();
+        cell.classList.add('wrong');
+        setTimeout(() => cell.classList.remove('wrong'), 400);
+        statusEl.textContent = '❌ اشتباه شد! دوباره مسیر نمایش داده می‌شود...';
+        statusEl.style.color = '#ff0033';
+        isGameActive = false;
+
+        setTimeout(() => {
+          resetPlayerProgress();
+          playPathDemonstration(LEVELS[currentLevelIdx].rotate);
+        }, 1200);
+      }
+    }
+
+    function resetPlayerProgress() {
+      playerStep = 0;
+      stepsEl.textContent = `۰ / ${path.length.toLocaleString('fa-IR')}`;
+      boardEl.querySelectorAll('.cell').forEach(c => c.classList.remove('correct'));
+      renderGridDecorations();
+    }
+
+    function handleLevelComplete() {
+      isGameActive = false;
+      CyberAudio.playVictory();
+      statusEl.textContent = '🎉 فوق‌العاده بود! مسیر کامل شد!';
+      statusEl.style.color = 'var(--green-neon)';
+
+      setTimeout(() => {
+        if (currentLevelIdx < LEVELS.length - 1) {
+          currentLevelIdx++;
+          modalTitle.textContent = '⚡ صعود به سطح بعدی!';
+          modalDesc.textContent = LEVELS[currentLevelIdx].desc;
+          modalBtn.textContent = 'شروع مرحله بعد 🚀';
+          modalBtn.onclick = () => {
+            startCurrentLevel();
+          };
+          modalEl.classList.remove('hidden');
+        } else {
+          modalTitle.textContent = '🏆 سلطان مسیرساز نئونی!';
+          modalDesc.textContent = `شاهکار کردی! تمام مراحل سخت را با موفقیت تمام کردی. امتیاز کل: ${score.toLocaleString('fa-IR')}`;
+          modalBtn.textContent = 'بازی مجدد 🔄';
+          modalBtn.onclick = () => {
+            currentLevelIdx = 0;
+            score = 0;
+            startCurrentLevel();
+          };
+          modalEl.classList.remove('hidden');
+        }
+      }, 800);
+    }
+
+    function delay(ms) {
+      return new Promise(res => setTimeout(res, ms));
+    }
+  </script>
+</body>
+</html>

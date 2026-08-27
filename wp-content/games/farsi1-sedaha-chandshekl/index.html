@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>باغچه نشانه‌های چندشکلی</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'IRANSansXFaNum', 'IRANSansX', Tahoma, sans-serif; user-select: none; }
+        body { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 12px; }
+        .game-card { background: #ffffff; border-radius: 24px; box-shadow: 0 15px 35px rgba(124,58,237,0.15); width: 100%; max-width: 480px; padding: 20px; text-align: center; border: 3px solid #ddd6fe; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .badge { background: #f5f3ff; color: #6d28d9; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
+        .score-box { background: #6d28d9; color: #fff; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; }
+        .word-display { background: #faf5ff; border: 3px dashed #c084fc; border-radius: 20px; padding: 20px; margin: 16px 0; font-size: 2rem; font-weight: 900; color: #581c87; letter-spacing: 2px; }
+        .word-meaning { font-size: 1.1rem; color: #7e22ce; font-weight: 700; margin-top: 6px; }
+        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+        .opt-btn { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 16px; padding: 16px; font-size: 1.5rem; font-weight: 900; color: #1e293b; cursor: pointer; transition: all 0.15s; }
+        .opt-btn:active { transform: scale(0.92); }
+        .opt-btn.correct { background: #22c55e !important; color: #fff !important; border-color: #16a34a !important; }
+        .opt-btn.wrong { background: #ef4444 !important; color: #fff !important; border-color: #dc2626 !important; }
+        .modal { display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.96); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; z-index: 10; }
+        .btn-restart { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 14px 32px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-card">
+        <div class="header">
+            <div class="badge">📖 فارسی اول: نشانه‌های چندشکلی</div>
+            <div class="score-box">⭐ امتیاز: <span id="scoreVal">۰</span></div>
+        </div>
+
+        <p style="color:#6d28d9; font-weight:800;">حرف درست برای پر کردن جای خالی را انتخاب کن:</p>
+
+        <div class="word-display">
+            <div id="wordPattern">صـ...ـابون 🧼</div>
+            <div class="word-meaning" id="wordHint">شستشوی دست و صورت</div>
+        </div>
+
+        <div class="options-grid" id="optionsContainer">
+            <!-- Shuffled options -->
+        </div>
+
+        <div class="modal" id="endModal">
+            <div style="font-size:4rem;">🌸✨</div>
+            <h2 style="color:#6d28d9; font-size:1.6rem; font-weight:900;">آفرین باغبان الفبا!</h2>
+            <p style="color:#475569; font-weight:700;">تمام نشانه‌های هم‌صدا را با دقت و درستی انتخاب کردی!</p>
+            <div style="font-size:1.4rem; font-weight:900; color:#059669;">امتیاز نهایی: <span id="finalScoreVal">۱۰۰</span></div>
+            <button class="btn-restart" onclick="restartGame()">🔄 بازی دوباره</button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, dur) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + dur);
+            } catch(e){}
+        }
+        function sndCorrect() { playTone(523, 'sine', 0.12); setTimeout(()=>playTone(659, 'sine', 0.2), 100); }
+        function sndWrong() { playTone(220, 'triangle', 0.25); }
+
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        const pool = [
+            { pattern: '...ـابون 🧼', hint: 'شستشوی دست و تمیزی', answer: 'ص', choices: ['ص', 'س', 'ث'] },
+            { pattern: '...ـوتی 🦜', hint: 'پرنده زیبای سخنگو', answer: 'ط', choices: ['ط', 'ت'] },
+            { pattern: 'قـ...ـل 🔒', hint: 'وسیله بستن در', answer: 'ف', choices: ['ف', 'ق', 'غ'] },
+            { pattern: '...ـوربین 📷', hint: 'عکس گرفتن از خاطرات', answer: 'د', choices: ['د', 'ذ', 'ز'] },
+            { pattern: 'کـ...ـاب 📚', hint: 'دوست دانایی و خواندن', answer: 'ت', choices: ['ت', 'ط'] },
+            { pattern: '...ـوربت 🏖️', hint: 'خاک نرم کنار دریا', answer: 'ت', choices: ['ت', 'ط', 'ث'] },
+            { pattern: 'بـ...ـه 🦆', hint: 'پرنده شناگر در آب', answer: 'ط', choices: ['ط', 'ت'] },
+            { pattern: '...ـتاره ⭐', hint: 'نور درخشان در آسمان شب', answer: 'س', choices: ['س', 'ص', 'ث'] },
+            { pattern: '...ـبز 🥬', hint: 'رنگ برگ درختان و چمن', answer: 'س', choices: ['س', 'ص', 'ث'] }
+        ];
+
+        let gameQuestions = [];
+        let currentIdx = 0;
+        let score = 0;
+        let canClick = true;
+
+        function toPersian(n) { return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+        function loadQuestion() {
+            canClick = true;
+            const q = gameQuestions[currentIdx];
+            document.getElementById('scoreVal').textContent = toPersian(score);
+            document.getElementById('wordPattern').textContent = q.pattern;
+            document.getElementById('wordHint').textContent = q.hint;
+
+            const options = shuffleArray(q.choices);
+            const cont = document.getElementById('optionsContainer');
+            cont.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'opt-btn';
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(opt, q.answer, btn);
+                cont.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(chosen, correct, btn) {
+            if(!canClick) return;
+            canClick = false;
+
+            if(chosen === correct) {
+                sndCorrect();
+                btn.classList.add('correct');
+                score += 12;
+            } else {
+                sndWrong();
+                btn.classList.add('wrong');
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                if(currentIdx < gameQuestions.length) {
+                    loadQuestion();
+                } else {
+                    endGame();
+                }
+            }, 600);
+        }
+
+        function endGame() {
+            document.getElementById('finalScoreVal').textContent = toPersian(score);
+            document.getElementById('endModal').style.display = 'flex';
+            if (window.parent) {
+                window.parent.postMessage({ type: 'GK_SUBMIT_SCORE', score: score }, '*');
+            }
+        }
+
+        function restartGame() {
+            score = 0;
+            currentIdx = 0;
+            gameQuestions = shuffleArray(pool).slice(0, 8);
+            document.getElementById('endModal').style.display = 'none';
+            loadQuestion();
+        }
+
+        restartGame();
+    </script>
+</body>
+</html>

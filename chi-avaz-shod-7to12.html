@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>چی عوض شد؟ | بازی حافظه‌ی دیداری کودکان ۷ تا ۱۲ سال</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF9F0;
+    --ink:#332249;
+    --wall1:#FCE0F0;
+    --wall2:#E7D8FA;
+    --floor1:#C99B6A;
+    --floor2:#B4834F;
+    --pink:#FF5D93;
+    --pink-dark:#DA3E73;
+    --sky:#2FB6E0;
+    --sky-dark:#1A8FB5;
+    --sun:#FFC229;
+    --sun-dark:#E8A300;
+    --mint:#28C79B;
+    --mint-dark:#159D77;
+    --grape:#9B6BF2;
+    --grape-dark:#7B47D9;
+    --white:#FFFFFF;
+    --card-shadow: 0 8px 0 rgba(51,34,73,0.12);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    font-family:'Vazirmatn', Tahoma, sans-serif;
+    background:
+      radial-gradient(circle at 8% 6%, #FFE3F0 0%, transparent 40%),
+      radial-gradient(circle at 92% 10%, #E3F3FF 0%, transparent 40%),
+      radial-gradient(circle at 15% 95%, #EAFBF4 0%, transparent 42%),
+      radial-gradient(circle at 90% 92%, #F1E8FF 0%, transparent 42%),
+      var(--cream);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+
+  .stage{ max-width:800px; margin:0 auto; min-height:100vh; padding:14px 14px 30px; display:flex; flex-direction:column; gap:12px; }
+
+  /* ---------- Header ---------- */
+  .topbar{ display:flex; align-items:center; justify-content:space-between; background:var(--white); border-radius:22px; padding:10px 16px; box-shadow: var(--card-shadow); }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .mascot{ position:relative; width:58px; height:58px; flex:none; display:flex; align-items:center; justify-content:center; }
+  .mascot .face{
+    width:52px; height:52px; border-radius:50%;
+    background: linear-gradient(160deg, #FFD8A8, var(--sun));
+    display:flex; align-items:center; justify-content:center; font-size:26px;
+    box-shadow: inset 0 -4px 0 rgba(0,0,0,0.06);
+    transition: transform .25s; position:relative;
+  }
+  .mascot .hat{ position:absolute; top:-9px; font-size:26px; z-index:2; filter: drop-shadow(0 2px 1px rgba(0,0,0,0.15)); }
+  .mascot .eye{ position:absolute; width:6px; height:8px; background:var(--ink); border-radius:50%; top:23px; z-index:3; transition: transform .35s ease, height .35s ease; }
+  .mascot .eye.l{ right:14px; } .mascot .eye.r{ right:30px; }
+  .mascot.closed .eye{ height:2px; transform:translateY(4px); border-radius:2px; }
+  .mascot.closed .face{ transform: scale(0.96); }
+
+  h1{ font-size:1.15rem; font-weight:900; margin:0; color:var(--pink-dark); }
+  .subtitle{ font-size:0.7rem; color:#7c6f97; font-weight:700; margin-top:1px; }
+  .stats{ display:flex; align-items:center; gap:8px; font-weight:800; }
+  .pill{ background:#FFE3F0; border-radius:999px; padding:6px 12px; font-size:0.8rem; display:flex; align-items:center; gap:5px; color:var(--pink-dark); white-space:nowrap; }
+  .pill.stars{ background:#FFF3D2; color:var(--sun-dark); }
+
+  /* ---------- Banner ---------- */
+  .banner{ background:var(--white); border-radius:20px; padding:12px 18px; text-align:center; font-weight:800; font-size:1rem; box-shadow: var(--card-shadow); transition: background .2s, color .2s; }
+  .banner.good{ background:#DCFBEF; color:var(--mint-dark); }
+  .banner.bad{ background:#FFE6E0; color:#C4552F; }
+  .timerwrap{ height:10px; background:#F1E4CF; border-radius:999px; overflow:hidden; margin-top:8px; }
+  .timerbar{ height:100%; background: linear-gradient(90deg, var(--pink), var(--sun)); width:100%; border-radius:999px; }
+  .progresschips{ display:flex; gap:6px; justify-content:center; margin-top:6px; }
+  .pchip{ width:14px; height:14px; border-radius:50%; background:#F1E4CF; }
+  .pchip.done{ background:var(--mint); }
+
+  /* ---------- Room ---------- */
+  .room-wrap{
+    position:relative; border-radius:28px; overflow:hidden; box-shadow: var(--card-shadow);
+    min-height:520px;
+    background: linear-gradient(180deg, var(--wall1) 0%, var(--wall2) 38%, var(--floor1) 38%, var(--floor2) 100%);
+  }
+  .room-wrap::before{ content:""; position:absolute; inset:0; pointer-events:none; border:9px solid var(--white); border-radius:28px; z-index:6; }
+  .rugpattern{ position:absolute; left:6%; right:6%; bottom:5%; top:44%; background-image: radial-gradient(circle, rgba(255,255,255,0.35) 3px, transparent 3.5px); background-size:24px 24px; border-radius:18px; z-index:0; }
+
+  .room-fog{ position:absolute; inset:0; background:rgba(255,249,240,0.0); backdrop-filter: blur(0px); transition: backdrop-filter .35s ease, background .35s ease; pointer-events:none; z-index:20; display:flex; align-items:center; justify-content:center; }
+  .room-fog.active{ background:rgba(255,249,240,0.45); backdrop-filter: blur(7px); pointer-events:all; }
+  .fog-text{ opacity:0; font-weight:800; font-size:1.1rem; background:var(--white); padding:10px 20px; border-radius:16px; box-shadow: var(--card-shadow); transition: opacity .3s ease; }
+  .room-fog.active .fog-text{ opacity:1; }
+
+  .deco{ position:absolute; pointer-events:none; filter: drop-shadow(0 3px 1px rgba(0,0,0,0.12)); z-index:1; opacity:0.92; }
+
+  .hotspot{ position:absolute; display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; z-index:5; transition: transform .12s; }
+  .hotspot .glyph{ display:block; line-height:1; filter: drop-shadow(0 2px 1px rgba(0,0,0,0.16)); transition: transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s; }
+  .hotspot.empty .glyph{ opacity:0; transform:scale(0); }
+  .hotspot:hover .glyph{ transform:scale(1.08); }
+  .hotspot.correct .glyph{ animation: found-pop .5s ease forwards; }
+  @keyframes found-pop{ 0%{ transform:scale(1) rotate(0deg); opacity:1;} 55%{ transform:scale(1.5) rotate(12deg); opacity:1;} 100%{ transform:scale(0) rotate(25deg); opacity:0;} }
+  .hotspot.wrong{ animation: shake .4s; }
+  @keyframes shake{ 10%,90%{ transform: translateX(-3px);} 20%,80%{ transform: translateX(4px);} 30%,50%,70%{ transform: translateX(-7px);} 40%,60%{ transform: translateX(7px);} }
+  .hotspot.hint .glyph{ animation: hint-glow .8s ease infinite; }
+  @keyframes hint-glow{ 0%,100%{ filter: drop-shadow(0 2px 1px rgba(0,0,0,0.16)) drop-shadow(0 0 0 var(--sun)); } 50%{ filter: drop-shadow(0 2px 1px rgba(0,0,0,0.16)) drop-shadow(0 0 12px var(--sun)); } }
+  .hotspot.correct-empty{ animation: glow-empty .8s ease infinite; }
+  @keyframes glow-empty{ 0%,100%{ box-shadow: 0 0 0 0 rgba(255,194,41,0);} 50%{ box-shadow: 0 0 18px 6px rgba(255,194,41,0.55); border-radius:50%;} }
+
+  /* ---------- Screens ---------- */
+  .screen{ background:var(--white); border-radius:28px; padding:34px 22px; text-align:center; box-shadow: var(--card-shadow); display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .screen .big-emoji{ font-size:60px; filter: drop-shadow(0 4px 2px rgba(0,0,0,0.12)); }
+  .screen h2{ margin:0; font-size:1.35rem; color:var(--pink-dark); }
+  .screen p{ margin:0; color:#7c6f97; font-weight:600; line-height:1.9; max-width:480px; }
+  .starsrow{ font-size:1.8rem; letter-spacing:6px; }
+  .difficulty-row{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .agechip{ background:#F1ECFF; color:var(--grape-dark); font-weight:700; font-size:0.72rem; padding:5px 12px; border-radius:999px; }
+  .btn{ border:none; cursor:pointer; font-family:inherit; font-weight:900; font-size:1.05rem; color:var(--white); background: linear-gradient(180deg, var(--pink), var(--pink-dark)); padding:14px 38px; border-radius:999px; box-shadow: 0 5px 0 #A82C58; transition: transform .08s, box-shadow .08s; }
+  .btn:active{ transform: translateY(4px); box-shadow: 0 1px 0 #A82C58; }
+  .hidden{ display:none !important; }
+
+  .confetti{ position:absolute; top:0; left:0; font-size:22px; pointer-events:none; animation: float-up 1.1s ease-out forwards; z-index:30; }
+  @keyframes float-up{ 0%{ transform: translateY(0) scale(0.6) rotate(0deg); opacity:1;} 100%{ transform: translateY(-90px) scale(1.3) rotate(60deg); opacity:0;} }
+
+  footer{ text-align:center; font-size:0.7rem; color:#b3a6d1; font-weight:600; padding-top:4px; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="mascot" id="mascot">
+        <div class="hat">🕵️</div>
+        <div class="face">🐻</div>
+        <div class="eye l"></div>
+        <div class="eye r"></div>
+      </div>
+      <div>
+        <h1>چی عوض شد؟</h1>
+        <div class="subtitle">بازی کارآگاهیِ حافظه‌ی دیداری</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="pill" id="levelPill">مرحله ۱</div>
+      <div class="pill stars">⭐ <span id="starCount">0</span></div>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <div class="screen" id="startScreen">
+    <div class="big-emoji">🕵️‍♂️🔍🧩</div>
+    <h2>کارآگاه چشم‌تیز شو!</h2>
+    <p>
+      چند وسیله رو وسط یه اتاق خیلی شلوغ بهت نشون می‌دم. خوب نگاهشون کن،
+      چون هیچ جایی از قبل مشخص نیست! بعد یکی-دو تا از وسیله‌ها جابه‌جا
+      یا ناپدید می‌شن... باید با حافظه‌ت پیداشون کنی. هرچی جلوتر بری،
+      اتاق شلوغ‌تر و زمانِ نگاه کردن کمتر می‌شه!
+    </p>
+    <div class="difficulty-row">
+      <span class="agechip">مناسب ۷ تا ۱۲ سال</span>
+      <span class="agechip">۸ مرحله، از آسون تا سخت</span>
+    </div>
+    <button class="btn" id="startBtn">شروع بازی 🎮</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="hidden" style="display:flex; flex-direction:column; gap:12px;">
+    <div class="banner" id="banner">
+      خوب نگاه کن! 👀
+      <div class="timerwrap"><div class="timerbar" id="timerBar"></div></div>
+    </div>
+
+    <div class="room-wrap" id="roomWrap">
+      <div class="room-fog" id="fog"><div class="fog-text" id="fogText">چشماتو ببند... 🙈</div></div>
+      <div class="rugpattern"></div>
+      <div id="decoLayer"></div>
+      <div id="hotspots"></div>
+    </div>
+  </div>
+
+  <!-- LEVEL COMPLETE SCREEN -->
+  <div class="screen hidden" id="levelCompleteScreen">
+    <div class="big-emoji">🎉</div>
+    <h2 id="lcTitle">آفرین! پرونده حل شد</h2>
+    <div class="starsrow" id="lcStars">⭐⭐⭐</div>
+    <button class="btn" id="nextLevelBtn">مرحله بعد ▶</button>
+  </div>
+
+  <!-- GAME COMPLETE SCREEN -->
+  <div class="screen hidden" id="gameCompleteScreen">
+    <div class="big-emoji">🏆</div>
+    <h2>کارآگاه افسانه‌ای!</h2>
+    <p>همه‌ی ۸ پرونده رو حل کردی. حافظه‌ی دیداری‌ت فوق‌العاده‌ست!</p>
+    <button class="btn" id="restartBtn">بازی از اول 🔄</button>
+  </div>
+
+  <footer>مستقیم روی جایی که فکر می‌کنی عوض شده کلیک کن — جایی از قبل مشخص نشده!</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const LEVELS = [
+    { items:5,  memorize:6000, changes:1 },
+    { items:6,  memorize:5500, changes:1 },
+    { items:7,  memorize:5000, changes:1 },
+    { items:8,  memorize:4500, changes:1 },
+    { items:9,  memorize:4200, changes:2 },
+    { items:10, memorize:4000, changes:2 },
+    { items:12, memorize:3600, changes:2 },
+    { items:14, memorize:3200, changes:3 },
+  ];
+  const ROUNDS_PER_LEVEL = 2;
+
+  const EMOJI_POOL = ["🍎","⚽","🚗","🎈","🍌","🥕","🎨","👟","🍪","🥁","🎁","🍇",
+    "🐸","🚀","🎲","🍭","🧃","🐰","🦕","🍓","🥨","🧩","🪀","🍊","🚌","🧦","📚",
+    "🖍️","🪁","🎺","🧢","🍉","🛴","🎻","🐢","🐝","🌟","🍕","🐶","🎧","⌚","📀","🕶️"];
+
+  // decorative-only clutter (never clickable) — makes the room feel genuinely busy
+  const DECO_ITEMS = [
+    {e:"📚", x:4,  y:6,  s:32}, {e:"🖼️", x:88, y:5,  s:30},
+    {e:"🧺", x:2,  y:70, s:38}, {e:"🧳", x:94, y:60, s:32},
+    {e:"🪴", x:12, y:4,  s:28}, {e:"🕰️", x:60, y:2,  s:26}
+  ];
+
+  // irregular hotspot coordinates (percent) — no visual marker will show here
+  const SPOTS = [
+    {x:10, y:20}, {x:22, y:14}, {x:35, y:24}, {x:47, y:15}, {x:59, y:22}, {x:71, y:14}, {x:83, y:24},
+    {x:14, y:40}, {x:27, y:48}, {x:40, y:38}, {x:53, y:46}, {x:66, y:38}, {x:79, y:46}, {x:90, y:34},
+    {x:18, y:64}, {x:32, y:72}, {x:46, y:62}, {x:60, y:70}, {x:74, y:64}, {x:88, y:72}
+  ];
+
+  let levelIndex = 0, stars = 0, wrongTries = 0, roundsWon = 0;
+  let changeGroups = []; // array of arrays of hotspot ids
+  let solvedGroups = [];
+  let hotspots = [];
+  let acceptingClicks = false;
+  let hintTimer = null;
+  let audioCtx = null;
+
+  const $ = (id) => document.getElementById(id);
+  const hotspotsWrap = $('hotspots');
+  const decoLayer = $('decoLayer');
+  const banner = $('banner');
+  const fog = $('fog');
+  const fogText = $('fogText');
+  const mascot = $('mascot');
+  const levelPill = $('levelPill');
+  const starCountEl = $('starCount');
+  const roomWrap = $('roomWrap');
+
+  const FA_DIGITS = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
+  function faNum(n){ return String(n).split('').map(d => FA_DIGITS[d] ?? d).join(''); }
+
+  function beep(freqs, dur){
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      let t = audioCtx.currentTime;
+      freqs.forEach((f,i)=>{
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        gain.gain.setValueAtTime(0.0001, t + i*dur);
+        gain.gain.exponentialRampToValueAtTime(0.18, t + i*dur + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + i*dur + dur);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start(t + i*dur);
+        osc.stop(t + i*dur + dur);
+      });
+    }catch(e){}
+  }
+  const soundCorrect = () => beep([659,880], 0.12);
+  const soundWin = () => beep([523,659,784,988], 0.13);
+  const soundWrong = () => beep([180], 0.14);
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+
+  function buildDeco(){
+    decoLayer.innerHTML = '';
+    DECO_ITEMS.forEach(d=>{
+      const el = document.createElement('div');
+      el.className = 'deco';
+      el.style.left = d.x + '%';
+      el.style.top = d.y + '%';
+      el.style.fontSize = d.s + 'px';
+      el.textContent = d.e;
+      decoLayer.appendChild(el);
+    });
+  }
+
+  function buildHotspots(){
+    hotspotsWrap.innerHTML = '';
+    hotspots = [];
+    SPOTS.forEach((pos, i)=>{
+      const el = document.createElement('div');
+      el.className = 'hotspot';
+      el.style.left = 'calc(' + pos.x + '% - 26px)';
+      el.style.top = 'calc(' + pos.y + '% - 26px)';
+      el.style.width = '52px';
+      el.style.height = '52px';
+      el.setAttribute('role','button');
+      el.setAttribute('tabindex','0');
+      el.setAttribute('aria-label','نقطه‌ای در اتاق');
+      const glyph = document.createElement('span');
+      glyph.className = 'glyph';
+      glyph.style.fontSize = '34px';
+      el.appendChild(glyph);
+      hotspotsWrap.appendChild(el);
+      const rec = { el, glyph, id:i, filled:false, emoji:null };
+      el.addEventListener('click', ()=> onHotspotClick(rec));
+      el.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); onHotspotClick(rec);} });
+      el.style.visibility = 'hidden';
+      hotspots.push(rec);
+    });
+  }
+
+  function setHotspot(rec, emoji, visible){
+    rec.filled = !!emoji;
+    rec.emoji = emoji;
+    rec.glyph.textContent = emoji || '';
+    rec.el.classList.toggle('empty', !emoji);
+    rec.el.style.visibility = visible ? 'visible' : 'hidden';
+    rec.el.classList.remove('correct','wrong','hint','correct-empty');
+  }
+
+  function startLevel(){
+    roundsWon = 0;
+    levelPill.textContent = 'مرحله ' + faNum(levelIndex+1);
+    $('startScreen').classList.add('hidden');
+    $('levelCompleteScreen').classList.add('hidden');
+    $('gameCompleteScreen').classList.add('hidden');
+    $('gameScreen').classList.remove('hidden');
+    buildDeco();
+    startRound();
+  }
+
+  function startRound(){
+    acceptingClicks = false;
+    wrongTries = 0;
+    changeGroups = [];
+    solvedGroups = [];
+    if(hintTimer) clearTimeout(hintTimer);
+    hotspots.forEach(r => setHotspot(r, null, false));
+
+    const level = LEVELS[levelIndex];
+    const chosenIdx = shuffle([...Array(SPOTS.length).keys()]).slice(0, level.items);
+    const chosenEmojis = shuffle(EMOJI_POOL).slice(0, level.items);
+    chosenIdx.forEach((idx, i) => setHotspot(hotspots[idx], chosenEmojis[i], true));
+
+    banner.className = 'banner';
+    banner.innerHTML = 'خوب نگاه کن! 👀 <div class="timerwrap"><div class="timerbar" id="timerBar"></div></div>';
+    const bar = $('timerBar');
+    bar.style.transition = 'none';
+    bar.style.width = '100%';
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        bar.style.transition = 'width linear ' + level.memorize + 'ms';
+        bar.style.width = '0%';
+      });
+    });
+
+    setTimeout(closeEyesPhase, level.memorize);
+  }
+
+  function closeEyesPhase(){
+    mascot.classList.add('closed');
+    fogText.textContent = 'چشماتو ببند... 🙈';
+    fog.classList.add('active');
+    banner.textContent = 'کارآگاه چشماشو بست، صبر کن...';
+
+    setTimeout(()=>{
+      performChange();
+      setTimeout(openEyesPhase, 900);
+    }, 1100);
+  }
+
+  function performChange(){
+    const level = LEVELS[levelIndex];
+    let usedIds = new Set();
+    changeGroups = [];
+
+    for(let c=0; c<level.changes; c++){
+      const filled = hotspots.filter(r => r.filled && !usedIds.has(r.id));
+      if(filled.length === 0) break;
+      const target = filled[Math.floor(Math.random()*filled.length)];
+      const doMove = Math.random() < 0.5;
+      const empties = hotspots.filter(r => !r.filled && !usedIds.has(r.id) && r.el.style.visibility !== 'hidden' ? false : (!r.filled && !usedIds.has(r.id)));
+      // find any empty hotspot in the full 20-spot set not currently used/visible-filled
+      const emptyCandidates = hotspots.filter(r => !r.filled && !usedIds.has(r.id));
+
+      if(doMove && emptyCandidates.length > 0){
+        const dest = emptyCandidates[Math.floor(Math.random()*emptyCandidates.length)];
+        const emoji = target.emoji;
+        setHotspot(target, null, true);
+        setHotspot(dest, emoji, true);
+        usedIds.add(target.id); usedIds.add(dest.id);
+        changeGroups.push([target.id, dest.id]);
+      } else {
+        setHotspot(target, null, true);
+        usedIds.add(target.id);
+        changeGroups.push([target.id]);
+      }
+    }
+  }
+
+  function openEyesPhase(){
+    mascot.classList.remove('closed');
+    fog.classList.remove('active');
+    banner.className = 'banner';
+    const n = changeGroups.length;
+    banner.innerHTML = (n>1 ? faNum(n) + ' تا وسیله عوض شد' : 'یه وسیله عوض شد') +
+      '! پیداش کن 🔎<div class="progresschips" id="pchips"></div>';
+    const pchips = $('pchips');
+    for(let i=0;i<n;i++){
+      const c = document.createElement('div');
+      c.className = 'pchip';
+      pchips.appendChild(c);
+    }
+    acceptingClicks = true;
+    scheduleHint();
+  }
+
+  function scheduleHint(){
+    if(hintTimer) clearTimeout(hintTimer);
+    hintTimer = setTimeout(()=>{
+      const remainingGroups = changeGroups.filter((g,idx)=> !solvedGroups.includes(idx));
+      if(remainingGroups.length === 0) return;
+      const group = remainingGroups[0];
+      group.forEach(id=>{
+        const r = hotspots[id];
+        r.el.classList.add(r.filled ? 'hint' : 'correct-empty');
+        setTimeout(()=>{ r.el.classList.remove('hint','correct-empty'); }, 1800);
+      });
+      scheduleHint();
+    }, 16000);
+  }
+
+  function spawnConfetti(x, y){
+    const icons = ['✨','⭐','🎉','💫'];
+    for(let i=0;i<7;i++){
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.textContent = icons[Math.floor(Math.random()*icons.length)];
+      c.style.left = (x + (Math.random()*70-35)) + 'px';
+      c.style.top = (y + (Math.random()*20-10)) + 'px';
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(), 1200);
+    }
+  }
+
+  function onHotspotClick(rec){
+    if(!acceptingClicks) return;
+    const rect = rec.el.getBoundingClientRect();
+
+    // find which change-group (if any, unsolved) this hotspot belongs to
+    let hitGroupIdx = -1;
+    changeGroups.forEach((g, idx)=>{
+      if(!solvedGroups.includes(idx) && g.includes(rec.id)) hitGroupIdx = idx;
+    });
+
+    if(hitGroupIdx !== -1){
+      solvedGroups.push(hitGroupIdx);
+      soundCorrect();
+      changeGroups[hitGroupIdx].forEach(id=>{
+        const r = hotspots[id];
+        r.el.classList.add('correct');
+        r.el.classList.remove('hint','correct-empty');
+      });
+      spawnConfetti(rect.left + rect.width/2, rect.top + window.scrollY);
+      const pchips = document.querySelectorAll('.pchip');
+      if(pchips[solvedGroups.length-1]) pchips[solvedGroups.length-1].classList.add('done');
+      banner.className = 'banner good';
+
+      if(solvedGroups.length >= changeGroups.length){
+        acceptingClicks = false;
+        if(hintTimer) clearTimeout(hintTimer);
+        banner.textContent = 'آفرین! پیدا کردی! 🎉';
+        roundsWon++; stars++;
+        starCountEl.textContent = faNum(stars);
+        setTimeout(()=>{
+          if(roundsWon >= ROUNDS_PER_LEVEL) showLevelComplete();
+          else startRound();
+        }, 1300);
+      } else {
+        banner.textContent = 'آفرین! ادامه بده 👏 (' + faNum(solvedGroups.length) + '/' + faNum(changeGroups.length) + ')';
+      }
+    } else {
+      wrongTries++;
+      soundWrong();
+      rec.el.classList.add('wrong');
+      setTimeout(()=>rec.el.classList.remove('wrong'), 350);
+      banner.className = 'banner bad';
+      banner.textContent = rec.filled ? 'این که همون‌جاست که بود! 🙂' : 'اینجا که چیزی نبود، دوباره فکر کن 🤔';
+      setTimeout(()=>{
+        if(acceptingClicks){ banner.className='banner'; banner.textContent = (changeGroups.length>1?faNum(changeGroups.length)+' تا وسیله عوض شد':'یه وسیله عوض شد') + '! پیداش کن 🔎'; }
+      }, 1100);
+    }
+  }
+
+  function showLevelComplete(){
+    $('gameScreen').classList.add('hidden');
+    const screen = $('levelCompleteScreen');
+    screen.classList.remove('hidden');
+    $('lcTitle').textContent = 'آفرین! مرحله ' + faNum(levelIndex+1) + ' تموم شد';
+    const starsEarned = wrongTries <= 1 ? 3 : (wrongTries <= 4 ? 2 : 1);
+    $('lcStars').textContent = '⭐'.repeat(starsEarned) + '☆'.repeat(3-starsEarned);
+    const nextBtn = $('nextLevelBtn');
+    if(levelIndex + 1 >= LEVELS.length){
+      screen.classList.add('hidden');
+      $('gameCompleteScreen').classList.remove('hidden');
+      soundWin();
+    } else {
+      nextBtn.classList.remove('hidden');
+    }
+  }
+
+  $('startBtn').addEventListener('click', ()=>{
+    levelIndex = 0; stars = 0; starCountEl.textContent = '۰';
+    buildHotspots();
+    startLevel();
+  });
+
+  $('nextLevelBtn').addEventListener('click', ()=>{
+    levelIndex++;
+    $('levelCompleteScreen').classList.add('hidden');
+    $('gameScreen').classList.remove('hidden');
+    buildDeco();
+    startLevel();
+  });
+
+  $('restartBtn').addEventListener('click', ()=>{
+    levelIndex = 0; stars = 0; starCountEl.textContent = '۰';
+    $('gameCompleteScreen').classList.add('hidden');
+    $('startScreen').classList.remove('hidden');
+  });
+})();
+</script>
+</body>
+</html>

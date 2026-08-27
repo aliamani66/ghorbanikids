@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>توالی جهت‌گیری عقربه‌ها | Clock Hands Sequence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 50% 10%, #1e1b4b, #0f172a, #020617);
+      --primary: #38bdf8;
+      --accent: #ec4899;
+      --gold: #fbbf24;
+      --success: #10b981;
+      --danger: #f43f5e;
+      --panel-bg: rgba(30, 41, 59, 0.65);
+      --glow-blue: rgba(56, 189, 248, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: var(--bg);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* کانتینر اصلی با دید ۳ بعدی */
+    .game-container {
+      width: min(94vw, 420px);
+      height: min(92vh, 760px);
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 32px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--glow-blue);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      perspective: 1000px;
+    }
+
+    /* نوار وضعیت و امتیازات */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 10px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+    }
+
+    .hud-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hud-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .hud-val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    /* راهنما و تایمر */
+    .status-area {
+      text-align: center;
+      margin: 8px 0;
+    }
+
+    .status-text {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      min-height: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .timer-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      transform-origin: right;
+      transition: transform 0.1s linear;
+    }
+
+    /* چیدمان ۴ ساعت (Grid 2x2 با ظاهر ۳ بعدی) */
+    .clocks-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: auto 0;
+      perspective: 600px;
+    }
+
+    .clock-slot {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(145deg, #1e293b, #090d16);
+      border-radius: 50%;
+      box-shadow: 8px 8px 16px #060911, -8px -8px 16px #24334a, inset 0 0 12px rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid rgba(255, 255, 255, 0.05);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    .clock-slot.active-focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 25px var(--glow-blue), inset 0 0 15px rgba(56, 189, 248, 0.3);
+      transform: translateZ(20px) scale(1.05);
+    }
+
+    .clock-badge {
+      position: absolute;
+      top: 6px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* صفحه ساعت و عقربه ۳ بعدی */
+    .clock-face {
+      width: 82%;
+      height: 82%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #334155, #0f172a);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.05);
+    }
+
+    .clock-ticks {
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    .hand-wrapper {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .clock-hand {
+      position: absolute;
+      bottom: 50%;
+      width: 6px;
+      height: 38%;
+      background: linear-gradient(to top, var(--accent), #f43f5e);
+      border-radius: 99px;
+      box-shadow: 0 4px 10px rgba(236, 72, 153, 0.6);
+      transform-origin: bottom center;
+    }
+
+    .clock-hand::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 8px solid #f43f5e;
+    }
+
+    .clock-center-pin {
+      width: 12px;
+      height: 12px;
+      background: #f8fafc;
+      border-radius: 50%;
+      z-index: 5;
+      box-shadow: 0 0 8px rgba(255,255,255,0.8);
+    }
+
+    /* پد کنترلی تعاملی (جهت‌ها) */
+    .controls-panel {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 12px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .dir-btn {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 12px 0;
+      color: #f8fafc;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .dir-btn span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .dir-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(56, 189, 248, 0.3);
+    }
+
+    .dir-btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .dir-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+    }
+
+    /* انیمیشن و فیدبک خطا/درست */
+    .correct-anim {
+      border-color: var(--success) !important;
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.6) !important;
+      animation: pulseSuccess 0.4s ease;
+    }
+
+    .wrong-anim {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 30px rgba(244, 63, 94, 0.6) !important;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px) rotate(-4deg); }
+      40%, 80% { transform: translateX(8px) rotate(4deg); }
+    }
+
+    @keyframes pulseSuccess {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* لایه ورودی و پایان بازی */
+    .modal-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 15, 30, 0.94);
+      backdrop-filter: blur(25px);
+      border-radius: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 100;
+      transition: opacity 0.4s ease, visibility 0.4s;
+    }
+
+    .modal-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .modal-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .modal-desc {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      color: white;
+      border: none;
+      padding: 14px 44px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      font-family: inherit;
+      border-radius: 99px;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 36px rgba(99, 102, 241, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <!-- نوار HUD -->
+    <div class="hud">
+      <div class="hud-box">
+        <span class="hud-label">مرحله</span>
+        <span class="hud-val" id="level-txt">۱</span>
+      </div>
+      <div class="hud-box">
+        <span class="hud-label">امتیاز</span>
+        <span class="hud-val" id="score-txt">۰</span>
+      </div>
+      <div class="hud-box">
+        <span class="hud-label">فرصت‌ها</span>
+        <span class="hud-val" id="lives-txt">❤️❤️❤️</span>
+      </div>
+    </div>
+
+    <!-- وضعیت بازی و تایمر -->
+    <div class="status-area">
+      <div class="status-text" id="status-txt">جهت‌ها را به خاطر بسپارید...</div>
+      <div class="timer-track">
+        <div class="timer-fill" id="timer-fill"></div>
+      </div>
+    </div>
+
+    <!-- ماتریس ۴ ساعته ۲x۲ -->
+    <div class="clocks-grid" id="clocks-grid">
+      <!-- تولید با جاوااسکریپت -->
+    </div>
+
+    <!-- دکمه‌های انتخاب جهت -->
+    <div class="controls-panel">
+      <button class="dir-btn" data-dir="UP" disabled>
+        ⬆️<span>بالا</span>
+      </button>
+      <button class="dir-btn" data-dir="RIGHT" disabled>
+        ➡️<span>راست</span>
+      </button>
+      <button class="dir-btn" data-dir="DOWN" disabled>
+        ⬇️<span>پایین</span>
+      </button>
+      <button class="dir-btn" data-dir="LEFT" disabled>
+        ⬅️<span>چپ</span>
+      </button>
+    </div>
+
+    <!-- صفحه شروع / باخت -->
+    <div class="modal-screen" id="modal-screen">
+      <h1 class="modal-title" id="modal-title">توالی جهت عقربه‌ها</h1>
+      <p class="modal-desc" id="modal-desc">
+        جهت عقربه هر ۴ ساعت را در زمان مشخص‌شده به خاطر بسپارید.<br>
+        سپس به ترتیب از ساعت ۱ تا ۴ جهت‌های صحیح را وارد نمایید. تا مرحله ۶ زمان حفظ کردن راحت است؛ از مرحله ۶ به بعد کم‌کم کمتر و چالش‌برانگیزتر می‌شود!
+      </p>
+      <button class="start-btn" id="start-btn">شروع بازی</button>
+    </div>
+  </div>
+
+  <script>
+    // --- موتور صوتی Realtime Synth با Web Audio API ---
+    const Sound = {
+      ctx: null,
+      init() {
+        if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      },
+      playTick() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.05);
+      },
+      playStep() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(580, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
+      },
+      playSuccess() {
+        if (!this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C, E, G, C (آکورد ماژور پیروزی)
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = freq;
+          const t = this.ctx.currentTime + idx * 0.07;
+          gain.gain.setValueAtTime(0.25, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.25);
+        });
+      },
+      playFail() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(250, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(90, this.ctx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.35);
+      }
+    };
+
+    // --- تنظیمات جهت‌ها ---
+    const DIRECTIONS = {
+      UP: { deg: 0, label: 'بالا' },
+      RIGHT: { deg: 90, label: 'راست' },
+      DOWN: { deg: 180, label: 'پایین' },
+      LEFT: { deg: 270, label: 'چپ' }
+    };
+    const DIR_KEYS = Object.keys(DIRECTIONS);
+
+    // تا مرحله ۵: زمان حفظ کردن ثابت و راحت. از مرحله ۶ به بعد: کم‌کم سخت‌تر (زمان کمتر) می‌شود
+    function getMemorizeTime(level) {
+      if (level < 6) return 3600;
+      const hardLevel = level - 5;
+      return Math.max(1000, 3600 - hardLevel * 280);
+    }
+
+    // --- وضعیت بازی ---
+    const STATE = {
+      level: 1,
+      score: 0,
+      lives: 3,
+      currentStep: 0,
+      sequence: [],
+      phase: 'IDLE' // MEMORIZE, INPUT, RESULT
+    };
+
+    // المان‌های صفحه
+    const gridEl = document.getElementById('clocks-grid');
+    const levelTxt = document.getElementById('level-txt');
+    const scoreTxt = document.getElementById('score-txt');
+    const livesTxt = document.getElementById('lives-txt');
+    const statusTxt = document.getElementById('status-txt');
+    const timerFill = document.getElementById('timer-fill');
+    const modalScreen = document.getElementById('modal-screen');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const startBtn = document.getElementById('start-btn');
+    const dirButtons = document.querySelectorAll('.dir-btn');
+
+    // ایجاد ۴ ساعت
+    function buildClocks() {
+      gridEl.innerHTML = '';
+      for (let i = 0; i < 4; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'clock-slot';
+        slot.id = `clock-${i}`;
+        slot.innerHTML = `
+          <div class="clock-badge">#${i + 1}</div>
+          <div class="clock-face">
+            <div class="clock-ticks"></div>
+            <div class="hand-wrapper" id="hand-${i}">
+              <div class="clock-hand"></div>
+            </div>
+            <div class="clock-center-pin"></div>
+          </div>
+        `;
+        gridEl.appendChild(slot);
+      }
+    }
+
+    // شروع مرحله جدید با محاسبه سختی پویا
+    function startRound() {
+      STATE.phase = 'MEMORIZE';
+      STATE.currentStep = 0;
+      setInputsEnabled(false);
+      clearFocus();
+
+      // ساخت توالی تصادفی ۴ جهته
+      STATE.sequence = Array.from({ length: 4 }, () => {
+        return DIR_KEYS[Math.floor(Math.random() * DIR_KEYS.length)];
+      });
+
+      // تنظیم زاویه عقربه‌ها و نمایش به کاربر
+      STATE.sequence.forEach((dir, i) => {
+        const hand = document.getElementById(`hand-${i}`);
+        hand.style.opacity = '1';
+        hand.style.transform = `rotate(${DIRECTIONS[dir].deg}deg)`;
+      });
+
+      Sound.playTick();
+      statusTxt.textContent = 'جهت عقربه‌ها را به خاطر بسپارید...';
+      statusTxt.style.color = '#38bdf8';
+
+      // محاسبه زمان حفظ کردن (مرحله ۱: ۳.۵ ثانیه -> مراحل بالاتر تا ۱.۲ ثانیه)
+      const memorizeTime = getMemorizeTime(STATE.level);
+
+      // اجرای انیمیشن نوار زمان
+      timerFill.style.transition = 'none';
+      timerFill.style.transform = 'scaleX(1)';
+      setTimeout(() => {
+        timerFill.style.transition = `transform ${memorizeTime}ms linear`;
+        timerFill.style.transform = 'scaleX(0)';
+      }, 50);
+
+      // اتمام زمان حفظ و پنهان کردن عقربه‌ها
+      setTimeout(() => {
+        // مخفی‌سازی زاویه با برگرداندن به حالت مبهم/چرخش خنثی
+        for (let i = 0; i < 4; i++) {
+          const hand = document.getElementById(`hand-${i}`);
+          hand.style.opacity = '0.05';
+          hand.style.transform = 'rotate(0deg)';
+        }
+
+        STATE.phase = 'INPUT';
+        setInputsEnabled(true);
+        highlightFocus(0);
+        statusTxt.textContent = `جهت ساعت شماره ۱ را وارد کنید:`;
+        statusTxt.style.color = '#fbbf24';
+      }, memorizeTime);
+    }
+
+    // بررسی ورودی کاربر
+    function handleDirectionInput(selectedDir) {
+      if (STATE.phase !== 'INPUT') return;
+
+      const expectedDir = STATE.sequence[STATE.currentStep];
+      const activeSlot = document.getElementById(`clock-${STATE.currentStep}`);
+      const activeHand = document.getElementById(`hand-${STATE.currentStep}`);
+
+      // نمایش عقربه ثبت‌شده توسط بازیکن
+      activeHand.style.opacity = '1';
+      activeHand.style.transform = `rotate(${DIRECTIONS[selectedDir].deg}deg)`;
+
+      if (selectedDir === expectedDir) {
+        // صحیح
+        Sound.playStep();
+        activeSlot.classList.add('correct-anim');
+        STATE.currentStep++;
+
+        if (STATE.currentStep < 4) {
+          highlightFocus(STATE.currentStep);
+          statusTxt.textContent = `جهت ساعت شماره ${STATE.currentStep + 1} را وارد کنید:`;
+        } else {
+          // تکمیل مرحله
+          STATE.phase = 'RESULT';
+          setInputsEnabled(false);
+          Sound.playSuccess();
+          STATE.score += 150 * STATE.level;
+          STATE.level += 1;
+          statusTxt.textContent = 'آفرین! توالی کاملاً درست بود ✨';
+          statusTxt.style.color = '#10b981';
+          updateHUD();
+
+          setTimeout(() => {
+            clearStyles();
+            startRound();
+          }, 1400);
+        }
+      } else {
+        // اشتباه
+        STATE.phase = 'RESULT';
+        setInputsEnabled(false);
+        Sound.playFail();
+        activeSlot.classList.add('wrong-anim');
+        STATE.lives -= 1;
+        updateHUD();
+
+        // نمایش جهت صحیح واقعی
+        setTimeout(() => {
+          activeHand.style.transform = `rotate(${DIRECTIONS[expectedDir].deg}deg)`;
+          activeHand.querySelector('.clock-hand').style.background = '#10b981';
+        }, 300);
+
+        statusTxt.textContent = `اشتباه بود! جهت درست مشخص شد.`;
+        statusTxt.style.color = '#f43f5e';
+
+        setTimeout(() => {
+          clearStyles();
+          if (STATE.lives > 0) {
+            startRound();
+          } else {
+            gameOver();
+          }
+        }, 1800);
+      }
+    }
+
+    function highlightFocus(index) {
+      clearFocus();
+      const slot = document.getElementById(`clock-${index}`);
+      if (slot) slot.classList.add('active-focus');
+    }
+
+    function clearFocus() {
+      document.querySelectorAll('.clock-slot').forEach(s => s.classList.remove('active-focus'));
+    }
+
+    function clearStyles() {
+      document.querySelectorAll('.clock-slot').forEach(s => {
+        s.classList.remove('correct-anim', 'wrong-anim', 'active-focus');
+      });
+      document.querySelectorAll('.clock-hand').forEach(h => {
+        h.style.background = 'linear-gradient(to top, var(--accent), #f43f5e)';
+      });
+    }
+
+    function setInputsEnabled(enabled) {
+      dirButtons.forEach(btn => btn.disabled = !enabled);
+    }
+
+    function updateHUD() {
+      levelTxt.textContent = STATE.level;
+      scoreTxt.textContent = STATE.score;
+      livesTxt.textContent = '❤️'.repeat(Math.max(0, STATE.lives));
+    }
+
+    function gameOver() {
+      modalTitle.textContent = 'پایان بازی!';
+      modalDesc.innerHTML = `
+        امتیاز نهایی: <b>${STATE.score}</b><br>
+        بیشترین مرحله ثبت شده: <b>${STATE.level}</b>
+      `;
+      startBtn.textContent = 'تلاش مجدد';
+      modalScreen.classList.remove('hidden');
+    }
+
+    // هندلرهای رویداد
+    dirButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dir = btn.getAttribute('data-dir');
+        handleDirectionInput(dir);
+      });
+    });
+
+    startBtn.addEventListener('click', () => {
+      Sound.init();
+      STATE.level = 1;
+      STATE.score = 0;
+      STATE.lives = 3;
+      updateHUD();
+      modalScreen.classList.add('hidden');
+      startRound();
+    });
+
+    // راه‌اندازی اولیه
+    buildClocks();
+  </script>
+</body>
+</html>

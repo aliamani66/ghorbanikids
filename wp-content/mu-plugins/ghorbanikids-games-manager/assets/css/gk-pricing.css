@@ -1,0 +1,164 @@
+/* =========================================================
+   GhorbaniKids Pricing & Subscription Plans Table
+   ========================================================= */
+
+.gk-pricing-container {
+    max-width: 1200px !important;
+    margin: 30px auto !important;
+    padding: 0 16px !important;
+    direction: rtl !important;
+}
+
+.gk-pricing-header {
+    text-align: center !important;
+    margin-bottom: 40px !important;
+}
+
+.gk-pricing-header h2 {
+    font-size: 2.2rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin-bottom: 12px !important;
+}
+
+.gk-pricing-header p {
+    font-size: 1.1rem !important;
+    color: #64748b !important;
+    max-width: 650px !important;
+    margin: 0 auto !important;
+}
+
+.gk-pricing-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+    gap: 24px !important;
+    align-items: stretch !important;
+}
+
+.gk-pricing-card {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 32px 24px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    position: relative !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+.gk-pricing-card:hover {
+    transform: translateY(-8px) !important;
+    border-color: #0284c7 !important;
+    box-shadow: 0 20px 25px -5px rgba(2, 132, 199, 0.15) !important;
+}
+
+.gk-pricing-card.featured {
+    border-color: #f59e0b !important;
+    background: linear-gradient(180deg, #ffffff 0%, #fffbeb 100%) !important;
+    box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2) !important;
+}
+
+.gk-ribbon {
+    position: absolute !important;
+    top: -14px !important;
+    right: 24px !important;
+    background: #f59e0b !important;
+    color: #ffffff !important;
+    font-size: 0.85rem !important;
+    font-weight: 900 !important;
+    padding: 4px 14px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4) !important;
+}
+
+.gk-plan-icon {
+    font-size: 2.5rem !important;
+    margin-bottom: 16px !important;
+}
+
+.gk-plan-name {
+    font-size: 1.4rem !important;
+    font-weight: 900 !important;
+    color: #1e293b !important;
+    margin-bottom: 8px !important;
+}
+
+.gk-plan-duration {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: #0284c7 !important;
+    margin-bottom: 16px !important;
+}
+
+.gk-plan-price {
+    font-size: 2.2rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin-bottom: 24px !important;
+}
+
+.gk-plan-price span {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+}
+
+.gk-plan-features {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 0 28px 0 !important;
+    border-top: 1px dashed #e2e8f0 !important;
+    padding-top: 20px !important;
+}
+
+.gk-plan-features li {
+    font-size: 0.95rem !important;
+    color: #475569 !important;
+    margin-bottom: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.gk-plan-features li::before {
+    content: "✓" !important;
+    color: #16a34a !important;
+    font-weight: 900 !important;
+    font-size: 1.1rem !important;
+}
+
+.gk-btn-buy {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    padding: 14px 20px !important;
+    border-radius: 16px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3) !important;
+    transition: all 0.2s ease !important;
+}
+
+.gk-btn-buy:hover {
+    background: #0369a1 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4) !important;
+}
+
+.gk-pricing-card.featured .gk-btn-buy {
+    background: #f59e0b !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35) !important;
+}
+
+.gk-pricing-card.featured .gk-btn-buy:hover {
+    background: #d97706 !important;
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45) !important;
+}

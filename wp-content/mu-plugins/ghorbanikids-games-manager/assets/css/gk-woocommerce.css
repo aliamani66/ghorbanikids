@@ -1,0 +1,512 @@
+/* =========================================================
+   GhorbaniKids WooCommerce Master Stylesheet
+   (Cart, Checkout, Order Received, My Account)
+   ========================================================= */
+
+/* استایل عمومی کانتینر صفحات ووکامرس */
+.woocommerce,
+.woocommerce-page .gk-container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 20px 16px 60px 16px !important;
+    direction: rtl !important;
+    box-sizing: border-box !important;
+}
+
+/* =========================================================
+   ۱. صفحه سبد خرید (Cart Page)
+   ========================================================= */
+
+/* حالت سبد خرید خالی (Empty Cart) */
+.woocommerce .cart-empty,
+p.cart-empty {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 50px 30px !important;
+    text-align: center !important;
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    color: #1e293b !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+    margin: 30px auto 25px auto !important;
+    max-width: 700px !important;
+}
+
+.woocommerce .cart-empty::before {
+    content: "🛒" !important;
+    display: block !important;
+    font-size: 4rem !important;
+    margin-bottom: 16px !important;
+}
+
+p.return-to-shop {
+    text-align: center !important;
+    margin-bottom: 40px !important;
+}
+
+p.return-to-shop .button,
+p.return-to-shop .button.wc-backward {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    padding: 14px 28px !important;
+    border-radius: 16px !important;
+    text-decoration: none !important;
+    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3) !important;
+    transition: all 0.2s ease !important;
+}
+
+p.return-to-shop .button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 25px rgba(2, 132, 199, 0.4) !important;
+}
+
+/* جدول سبد خرید در حالت پر (Filled Cart) */
+.woocommerce-cart-form {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 24px !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
+    margin-bottom: 30px !important;
+    overflow-x: auto !important;
+}
+
+table.shop_table.cart {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border: none !important;
+}
+
+table.shop_table.cart th {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 800 !important;
+    font-size: 0.9rem !important;
+    padding: 14px 16px !important;
+    border: none !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+}
+
+table.shop_table.cart td {
+    padding: 16px !important;
+    border: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    vertical-align: middle !important;
+}
+
+table.shop_table.cart td.product-remove a.remove {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: #fee2e2 !important;
+    color: #ef4444 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+table.shop_table.cart td.product-remove a.remove:hover {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+table.shop_table.cart td.product-name a {
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    font-size: 1.05rem !important;
+    text-decoration: none !important;
+}
+
+table.shop_table.cart td.product-price,
+table.shop_table.cart td.product-subtotal {
+    font-weight: 800 !important;
+    color: #0284c7 !important;
+    font-size: 1.05rem !important;
+}
+
+table.shop_table.cart td.actions {
+    padding-top: 20px !important;
+}
+
+table.shop_table.cart td.actions .coupon {
+    display: inline-flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+table.shop_table.cart td.actions .coupon input.input-text {
+    height: 44px !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    padding: 0 14px !important;
+    font-size: 0.95rem !important;
+}
+
+table.shop_table.cart td.actions button.button {
+    height: 44px !important;
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0 18px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+/* کادر مجموع سبد خرید (Cart Totals) */
+.cart-collaterals {
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+.cart_totals {
+    width: 100% !important;
+    max-width: 480px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 28px !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+    box-sizing: border-box !important;
+}
+
+.cart_totals h2 {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+    font-size: 1.45rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin: 0 0 16px 0 !important;
+    padding-bottom: 12px !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+}
+
+.cart_totals table.shop_table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    margin-bottom: 20px !important;
+    border: none !important;
+}
+
+.cart_totals table.shop_table th,
+.cart_totals table.shop_table td {
+    padding: 12px 0 !important;
+    border: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    font-size: 1rem !important;
+}
+
+.cart_totals table.shop_table tr.order-total th,
+.cart_totals table.shop_table tr.order-total td {
+    border-top: 2px solid #e2e8f0 !important;
+    font-size: 1.2rem !important;
+    font-weight: 900 !important;
+    padding-top: 16px !important;
+}
+
+.cart_totals table.shop_table tr.order-total td {
+    color: #16a34a !important;
+    text-align: left !important;
+}
+
+.wc-proceed-to-checkout a.checkout-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    color: #ffffff !important;
+    border-radius: 16px !important;
+    padding: 16px 24px !important;
+    font-size: 1.15rem !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.35) !important;
+    transition: all 0.25s ease !important;
+}
+
+.wc-proceed-to-checkout a.checkout-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 30px rgba(22, 163, 74, 0.45) !important;
+}
+
+/* =========================================================
+   ۲. صفحه تشکر و سفارش ثبت شده (Order Received)
+   ========================================================= */
+
+.woocommerce-order {
+    max-width: 800px !important;
+    margin: 0 auto !important;
+}
+
+p.woocommerce-notice.woocommerce-notice--success.woocommerce-thankyou-order-received {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+    border: 2px solid #86efac !important;
+    border-radius: 24px !important;
+    padding: 30px 20px !important;
+    text-align: center !important;
+    font-size: 1.35rem !important;
+    font-weight: 900 !important;
+    color: #166534 !important;
+    box-shadow: 0 10px 25px rgba(22, 163, 74, 0.1) !important;
+    margin-bottom: 25px !important;
+    line-height: 1.5 !important;
+}
+
+p.woocommerce-notice--success::before {
+    content: "🎉" !important;
+    display: block !important;
+    font-size: 3.5rem !important;
+    margin-bottom: 12px !important;
+}
+
+ul.woocommerce-order-overview.woocommerce-thankyou-order-details {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 20px !important;
+    padding: 20px 24px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-around !important;
+    gap: 16px !important;
+    list-style: none !important;
+    margin-bottom: 30px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+ul.woocommerce-order-overview li {
+    text-align: center !important;
+    font-size: 0.9rem !important;
+    color: #64748b !important;
+    font-weight: 700 !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+ul.woocommerce-order-overview li strong {
+    display: block !important;
+    font-size: 1.05rem !important;
+    color: #0f172a !important;
+    font-weight: 900 !important;
+    margin-top: 4px !important;
+}
+
+.woocommerce-order-details,
+.woocommerce-customer-details {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 28px !important;
+    margin-bottom: 25px !important;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04) !important;
+}
+
+.woocommerce-order-details__title,
+.woocommerce-customer-details h2 {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+    font-size: 1.45rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin: 0 0 16px 0 !important;
+    padding-bottom: 10px !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+}
+
+/* =========================================================
+   ۳. صفحه حساب کاربری (My Account)
+   ========================================================= */
+
+/* حالت ورود / ثبت‌نام (Logged Out) */
+.woocommerce-account .woocommerce > form.login,
+.woocommerce-account .woocommerce > form.register,
+.woocommerce-account #customer_login {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 32px 28px !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+    max-width: 520px !important;
+    margin: 20px auto !important;
+    box-sizing: border-box !important;
+}
+
+.woocommerce-account #customer_login h2 {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+    font-size: 1.6rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin-bottom: 20px !important;
+    text-align: center !important;
+}
+
+.woocommerce-account form .form-row {
+    margin-bottom: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.woocommerce-account form label {
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+    margin-bottom: 6px !important;
+}
+
+.woocommerce-account form input.input-text {
+    width: 100% !important;
+    height: 48px !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 14px !important;
+    padding: 0 16px !important;
+    font-size: 1rem !important;
+    background: #f8fafc !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+}
+
+.woocommerce-account form input.input-text:focus {
+    background: #ffffff !important;
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12) !important;
+    outline: none !important;
+}
+
+.woocommerce-account form button.button {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 14px !important;
+    font-size: 1.05rem !important;
+    font-weight: 900 !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 18px rgba(2, 132, 199, 0.3) !important;
+    transition: all 0.2s ease !important;
+    margin-top: 10px !important;
+}
+
+.woocommerce-account form button.button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 22px rgba(2, 132, 199, 0.4) !important;
+}
+
+/* حالت لاگین شده (Dashboard & Navigation) */
+.woocommerce-MyAccount-navigation {
+    width: 250px !important;
+    float: right !important;
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 20px !important;
+    padding: 16px !important;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04) !important;
+    margin-left: 25px !important;
+    box-sizing: border-box !important;
+}
+
+.woocommerce-MyAccount-navigation ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.woocommerce-MyAccount-navigation li {
+    margin-bottom: 6px !important;
+}
+
+.woocommerce-MyAccount-navigation li a {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 14px !important;
+    border-radius: 12px !important;
+    color: #334155 !important;
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.woocommerce-MyAccount-navigation li a:hover,
+.woocommerce-MyAccount-navigation li.is-active a {
+    background: #f0f9ff !important;
+    color: #0284c7 !important;
+    transform: translateX(-4px) !important;
+}
+
+.woocommerce-MyAccount-content {
+    width: calc(100% - 275px) !important;
+    float: left !important;
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 28px !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
+    box-sizing: border-box !important;
+}
+
+.woocommerce-MyAccount-content p {
+    font-size: 1rem !important;
+    line-height: 1.8 !important;
+    color: #334155 !important;
+}
+
+/* جدول سفارش‌ها در پنل کاربری */
+table.my_account_orders {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    margin-top: 15px !important;
+    border: none !important;
+}
+
+table.my_account_orders th {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 800 !important;
+    padding: 12px 14px !important;
+    border: none !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+}
+
+table.my_account_orders td {
+    padding: 14px !important;
+    border: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+table.my_account_orders .woocommerce-button {
+    background: #f1f5f9 !important;
+    color: #0284c7 !important;
+    padding: 6px 14px !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    transition: all 0.2s ease !important;
+}
+
+table.my_account_orders .woocommerce-button:hover {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+}
+
+/* ریسپانسیو در تبلت و موبایل */
+@media (max-width: 860px) {
+    .woocommerce-MyAccount-navigation,
+    .woocommerce-MyAccount-content {
+        width: 100% !important;
+        float: none !important;
+        margin: 0 0 20px 0 !important;
+    }
+}

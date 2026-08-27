@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>آب‌نبات‌چوبی‌های چرخشی | Lollipop Match</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #2e0854, #120224);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 850px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: bold;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 6px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+    }
+
+    .badge span {
+      color: #ffd700;
+    }
+
+    .timer-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #ff007f, #00f0ff);
+      transition: width 0.1s linear;
+    }
+
+    .game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 16px;
+      position: relative;
+    }
+
+    .target-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+      padding: 8px;
+      border-radius: 20px;
+      position: relative;
+    }
+
+    .target-title {
+      font-size: 0.9rem;
+      color: #ff99f0;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 8px rgba(255, 153, 240, 0.5);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .choice-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .choice-card:active {
+      transform: scale(0.93);
+    }
+
+    .choice-card.correct {
+      border-color: #00ff66;
+      background: rgba(0, 255, 102, 0.2);
+      box-shadow: 0 0 25px rgba(0, 255, 102, 0.6);
+      transform: scale(1.05);
+    }
+
+    .choice-card.wrong {
+      border-color: #ff3344;
+      background: rgba(255, 51, 68, 0.2);
+      box-shadow: 0 0 25px rgba(255, 51, 68, 0.6);
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(30, 5, 55, 0.95), rgba(10, 0, 20, 0.98));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 24px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay-screen.hidden {
+      display: none;
+      opacity: 0;
+    }
+
+    .game-logo {
+      font-size: 2.2rem;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff007f, #ffaa00, #00f0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 4px 10px rgba(255, 0, 127, 0.4));
+    }
+
+    .game-desc {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #e0d0f5;
+      margin-bottom: 28px;
+      max-width: 320px;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, #ff007f, #9b00e8);
+      color: white;
+      border: none;
+      outline: none;
+      padding: 14px 44px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(255, 0, 127, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.2s;
+    }
+
+    .btn-main:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 12px rgba(255, 0, 127, 0.4);
+    }
+
+    #particle-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+    <canvas id="particle-canvas"></canvas>
+
+    <div id="start-screen" class="overlay-screen">
+      <div class="game-logo">آب‌نبات‌چوبی‌های چرخشی</div>
+      <p class="game-desc">
+        تمام آب‌نبات‌ها در حال چرخش هستند! با دقت به چرخش خطوط مارپیچ، گزینه‌ای که دقیقاً هم‌رنگ آب‌نبات هدف است را پیدا کن.
+      </p>
+      <button id="start-btn" class="btn-main">شروع بازی 🍭</button>
+    </div>
+
+    <div id="gameover-screen" class="overlay-screen hidden">
+      <div class="game-logo" style="font-size: 1.8rem;">پایان بازی!</div>
+      <p class="game-desc" id="final-stats">امتیاز شما: ۰</p>
+      <button id="retry-btn" class="btn-main">تلاش مجدد 🔄</button>
+    </div>
+
+    <div class="top-bar">
+      <div class="badge">مرحله: <span id="level-txt">۱</span></div>
+      <div class="badge">امتیاز: <span id="score-txt">۰</span></div>
+      <div class="badge">❤️ <span id="lives-txt">۳</span></div>
+    </div>
+    
+    <div class="timer-container">
+      <div id="timer-bar" class="timer-fill"></div>
+    </div>
+
+    <div class="game-area">
+      <div class="target-wrapper">
+        <div class="target-title">🎯 آب‌نبات هدف (در حال چرخش)</div>
+        <canvas id="target-canvas" width="130" height="150"></canvas>
+      </div>
+
+      <div class="options-grid">
+        <div class="choice-card" data-index="0">
+          <canvas id="choice-0" width="110" height="130"></canvas>
+        </div>
+        <div class="choice-card" data-index="1">
+          <canvas id="choice-1" width="110" height="130"></canvas>
+        </div>
+        <div class="choice-card" data-index="2">
+          <canvas id="choice-2" width="110" height="130"></canvas>
+        </div>
+        <div class="choice-card" data-index="3">
+          <canvas id="choice-3" width="110" height="130"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // GhorbaniKids Score Submission Protocol
+    function gkSendScore(finalScore) {
+        try {
+            var sc = parseInt(finalScore) || 0;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'GK_SUBMIT_SCORE',
+                    score: sc
+                }, '*');
+            }
+        } catch(e) { console.error('GK postMessage error:', e); }
+    }
+    
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+      playSuccess() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.25);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      },
+      playWrong() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.linearRampToValueAtTime(90, now + 0.25);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      },
+      playGameOver() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [300, 260, 220, 180];
+        notes.forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.2, now + i * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + (i + 1) * 0.12);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.12);
+          osc.stop(now + (i + 1) * 0.12);
+        });
+      }
+    };
+
+    const COLOR_PALETTES = [
+      ['#FF0055', '#00F0FF'],
+      ['#FFCC00', '#FF007F'],
+      ['#00FF88', '#7928CA'],
+      ['#FF5500', '#00D4FF'],
+      ['#FF007F', '#00FFCC', '#FFE600'],
+      ['#9B51E0', '#FF3366', '#33CCFF'],
+      ['#FF1493', '#00FA9A', '#1E90FF', '#FFD700']
+    ];
+
+    let state = {
+      level: 1,
+      score: 0,
+      lives: 3,
+      correctIdx: 0,
+      targetData: null,
+      optionsData: [],
+      timer: 100,
+      timerMax: 10,
+      timerId: null,
+      isActive: false,
+      globalAngle: 0
+    };
+
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('gameover-screen');
+    const startBtn = document.getElementById('start-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    const scoreTxt = document.getElementById('score-txt');
+    const levelTxt = document.getElementById('level-txt');
+    const livesTxt = document.getElementById('lives-txt');
+    const timerBar = document.getElementById('timer-bar');
+    const finalStats = document.getElementById('final-stats');
+    const choiceCards = document.querySelectorAll('.choice-card');
+
+    const targetCanvas = document.getElementById('target-canvas');
+    const optionCanvases = [
+      document.getElementById('choice-0'),
+      document.getElementById('choice-1'),
+      document.getElementById('choice-2'),
+      document.getElementById('choice-3')
+    ];
+
+    const particleCanvas = document.getElementById('particle-canvas');
+    const pCtx = particleCanvas.getContext('2d');
+    let particles = [];
+
+    function resizeParticleCanvas() {
+      particleCanvas.width = particleCanvas.parentElement.clientWidth;
+      particleCanvas.height = particleCanvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeParticleCanvas);
+    resizeParticleCanvas();
+
+    function spawnConfetti(x, y) {
+      const colors = ['#FF007F', '#00F0FF', '#FFE600', '#00FF66', '#FFFFFF'];
+      for (let i = 0; i < 35; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8 - 2,
+          radius: Math.random() * 4 + 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          decay: Math.random() * 0.03 + 0.015
+        });
+      }
+    }
+
+    function draw3DLollipop(canvas, data, globalRotation) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const headRadius = (Math.min(w, h) / 2) * 0.72;
+      const cx = w / 2;
+      const cy = headRadius + 12;
+
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.strokeStyle = '#d6cbbe';
+      ctx.lineWidth = headRadius * 0.16;
+      ctx.lineCap = 'round';
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx, h - 8);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = headRadius * 0.05;
+      ctx.moveTo(cx - 2, cy + 6);
+      ctx.lineTo(cx - 2, h - 10);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx + 4, cy + 6, headRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+      ctx.filter = 'blur(6px)';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.beginPath();
+      ctx.arc(0, 0, headRadius, 0, Math.PI * 2);
+      ctx.clip();
+
+      const currentAngle = (globalRotation * data.speedMultiplier) + (data.phase || 0);
+
+      const numArms = data.colors.length;
+      const totalTurns = 2.8; 
+      const step = 0.04;
+
+      for (let arm = 0; arm < numArms; arm++) {
+        ctx.fillStyle = data.colors[arm];
+        ctx.beginPath();
+        const baseOffset = (arm * (Math.PI * 2)) / numArms;
+
+        ctx.moveTo(0, 0);
+        for (let theta = 0; theta < Math.PI * 2 * totalTurns; theta += step) {
+          const r = (headRadius / (Math.PI * 2 * totalTurns)) * theta;
+          const a = theta + baseOffset + currentAngle;
+          ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        }
+
+        for (let theta = Math.PI * 2 * totalTurns; theta >= 0; theta -= step) {
+          const r = (headRadius / (Math.PI * 2 * totalTurns)) * theta;
+          const a = theta + baseOffset + (Math.PI * 2 / numArms) + currentAngle;
+          ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      const glossGrad = ctx.createRadialGradient(
+        -headRadius * 0.35, -headRadius * 0.35, headRadius * 0.1,
+        0, 0, headRadius
+      );
+      glossGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+      glossGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.2)');
+      glossGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.05)');
+      glossGrad.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
+
+      ctx.fillStyle = glossGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, headRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(-headRadius * 0.32, -headRadius * 0.35, headRadius * 0.25, headRadius * 0.14, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function generateLevel() {
+      const paletteIndex = Math.min(state.level - 1, COLOR_PALETTES.length - 1);
+      const activePalette = COLOR_PALETTES[paletteIndex];
+
+      const baseSpeed = 1.0 + (state.level * 0.12);
+
+      state.targetData = {
+        colors: [...activePalette],
+        speedMultiplier: baseSpeed,
+        phase: 0
+      };
+
+      state.correctIdx = Math.floor(Math.random() * 4);
+      state.optionsData = [];
+
+      for (let i = 0; i < 4; i++) {
+        if (i === state.correctIdx) {
+          state.optionsData.push({
+            colors: [...activePalette],
+            speedMultiplier: baseSpeed * (Math.random() > 0.5 ? 1 : -1),
+            phase: Math.random() * Math.PI * 2
+          });
+        } else {
+          let distractorColors = [...activePalette];
+          if (distractorColors.length > 2) {
+            const a = Math.floor(Math.random() * distractorColors.length);
+            let b = (a + 1) % distractorColors.length;
+            [distractorColors[a], distractorColors[b]] = [distractorColors[b], distractorColors[a]];
+          } else {
+            distractorColors = [activePalette[1], activePalette[0]];
+          }
+
+          state.optionsData.push({
+            colors: distractorColors,
+            speedMultiplier: baseSpeed * (Math.random() > 0.5 ? 1.15 : -0.9),
+            phase: Math.random() * Math.PI * 2
+          });
+        }
+      }
+
+      state.timerMax = Math.max(4.5, 9.5 - (state.level * 0.45));
+      state.timer = state.timerMax;
+
+      choiceCards.forEach(c => {
+        c.className = 'choice-card';
+      });
+    }
+
+    function startTimer() {
+      if (state.timerId) clearInterval(state.timerId);
+      const step = 50;
+      state.timerId = setInterval(() => {
+        if (!state.isActive) return;
+        state.timer -= (step / 1000);
+        const percent = Math.max(0, (state.timer / state.timerMax) * 100);
+        timerBar.style.width = percent + '%';
+
+        if (state.timer <= 0) {
+          handleWrongChoice(null, true);
+        }
+      }, step);
+    }
+
+    function handleChoice(index) {
+      if (!state.isActive) return;
+
+      const card = choiceCards[index];
+      if (index === state.correctIdx) {
+        state.isActive = false;
+        AudioEngine.playSuccess();
+        card.classList.add('correct');
+
+        const rect = card.getBoundingClientRect();
+        const containerRect = document.getElementById('game-container').getBoundingClientRect();
+        spawnConfetti(
+          rect.left - containerRect.left + rect.width / 2,
+          rect.top - containerRect.top + rect.height / 2
+        );
+
+        state.score += 100 + Math.floor(state.timer * 15);
+        state.level += 1;
+        updateUI();
+
+        setTimeout(() => {
+          generateLevel();
+          state.isActive = true;
+        }, 700);
+
+      } else {
+        handleWrongChoice(card, false);
+      }
+    }
+
+    function handleWrongChoice(cardElement, isTimeout) {
+      state.isActive = false;
+      AudioEngine.playWrong();
+
+      if (cardElement) {
+        cardElement.classList.add('wrong');
+      }
+
+      state.lives -= 1;
+      updateUI();
+
+      if (state.lives <= 0) {
+        setTimeout(gameOver, 600);
+      } else {
+        setTimeout(() => {
+          generateLevel();
+          state.isActive = true;
+        }, 800);
+      }
+    }
+
+    function updateUI() {
+      scoreTxt.innerText = state.score;
+      levelTxt.innerText = state.level;
+      livesTxt.innerText = state.lives;
+    }
+
+    function startGame() {
+      AudioEngine.init();
+      state.score = 0;
+      state.level = 1;
+      state.lives = 3;
+      updateUI();
+      startScreen.classList.add('hidden');
+      gameOverScreen.classList.add('hidden');
+      generateLevel();
+      state.isActive = true;
+      startTimer();
+    }
+
+    function gameOver() { 
+      try { gkSendScore(state.score); } catch(e){} 
+      state.isActive = false;
+      clearInterval(state.timerId);
+      AudioEngine.playGameOver();
+      finalStats.innerHTML = `امتیاز نهایی شما: <b>${state.score}</b><br>رسیدن به مرحله: <b>${state.level}</b>`;
+      gameOverScreen.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    retryBtn.addEventListener('click', startGame);
+
+    choiceCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const idx = parseInt(card.getAttribute('data-index'), 10);
+        handleChoice(idx);
+      });
+    });
+
+    function gameLoop() {
+      state.globalAngle += 0.04;
+
+      if (state.targetData) {
+        draw3DLollipop(targetCanvas, state.targetData, state.globalAngle);
+      }
+
+      if (state.optionsData && state.optionsData.length === 4) {
+        for (let i = 0; i < 4; i++) {
+          draw3DLollipop(optionCanvases[i], state.optionsData[i], state.globalAngle);
+        }
+      }
+
+      pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15;
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        } else {
+          pCtx.save();
+          pCtx.globalAlpha = p.alpha;
+          pCtx.fillStyle = p.color;
+          pCtx.beginPath();
+          pCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          pCtx.fill();
+          pCtx.restore();
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

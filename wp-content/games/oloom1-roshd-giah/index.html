@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مراحل رشد گیاه - علوم اول دبستان</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; font-family: system-ui, -apple-system, 'Vazirmatn', sans-serif; }
+        body { background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 12px; }
+        .game-card { width: 100%; max-width: 500px; background: #ffffff; border-radius: 28px; box-shadow: 0 20px 40px -10px rgba(22,163,74,0.25); border: 4px solid #86efac; padding: 20px; display: flex; flex-direction: column; gap: 16px; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .badge { background: #dcfce7; color: #166534; font-weight: 800; font-size: 0.85rem; padding: 6px 14px; border-radius: 20px; }
+        .score-box { background: #fef08a; color: #854d0e; font-weight: 900; font-size: 1.1rem; padding: 6px 16px; border-radius: 20px; border: 2px solid #facc15; }
+        .plant-box { background: #f0fdf4; border: 3px solid #4ade80; border-radius: 22px; padding: 20px; text-align: center; }
+        .plant-icon { font-size: 4.5rem; }
+        .plant-question { font-size: 1.25rem; font-weight: 900; color: #14532d; }
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
+        .opt-btn { background: #ffffff; border: 3px solid #86efac; border-radius: 20px; padding: 14px; font-size: 1.2rem; font-weight: 900; color: #14532d; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .opt-btn:active { transform: scale(0.92); }
+        .opt-btn.correct { background: #dcfce7; border-color: #22c55e; }
+        .opt-btn.wrong { background: #fee2e2; border-color: #ef4444; }
+        .modal { position: absolute; inset: 0; background: rgba(255,255,255,0.96); border-radius: 24px; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; z-index: 10; }
+        .modal.active { display: flex; }
+        .btn-restart { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; padding: 14px 32px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-card">
+        <div class="header">
+            <div class="badge">🔬 علوم اول: دنیای گیاهان</div>
+            <div class="score-box">⭐ امتیاز: <span id="scoreVal">۰</span></div>
+        </div>
+
+        <p style="text-align:center; color:#166534; font-weight:800; font-size:1.05rem;">گیاه برای رشد به چه چیزی نیاز دارد؟</p>
+
+        <div class="plant-box">
+            <div class="plant-icon" id="plantIcon">🌱</div>
+            <div class="plant-question" id="plantQuestion">مرحله اول: کاشت ... در خاک است!</div>
+        </div>
+
+        <div class="options-grid" id="optionsGrid"></div>
+
+        <div class="modal" id="endModal">
+            <div style="font-size:4rem;">🌱🌻🌳</div>
+            <h2 style="color:#14532d; font-size:1.6rem; font-weight:900;">آفرین باغبان دانا!</h2>
+            <p style="color:#475569; font-weight:700;">تمام مراحل رشد گیاهان و اجزای آن را عالی یاد گرفتی!</p>
+            <div style="font-size:1.4rem; font-weight:900; color:#059669;">امتیاز نهایی: <span id="finalScoreVal">۱۰۰</span></div>
+            <button class="btn-restart" onclick="restartGame()">🔄 بازی دوباره</button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, dur) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + dur);
+            } catch(e){}
+        }
+        function sndCorrect() { playTone(523, 'sine', 0.12); setTimeout(()=>playTone(659, 'sine', 0.2), 100); }
+        function sndWrong() { playTone(180, 'sawtooth', 0.2); }
+        function sndWin() { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'triangle', 0.25), i * 120)); }
+
+        const questions = [
+            { icon: '🌰', text: 'گیاه از رشد چه چیزی شروع می‌شود؟', ans: '🌰 دانه', pool: ['🌰 دانه', '🍎 میوه', '🍂 برگ خشک', '🪵 شاخه'] },
+            { icon: '💧', text: 'گیاه برای رشد به چه چیزی نیاز دارد؟', ans: '💧 آب و نور خورشید', pool: ['💧 آب و نور خورشید', '🍬 شکلات', '🥤 نوشابه', '🪙 سکه'] },
+            { icon: '🪴', text: 'کدام قسمت گیاه در زیر خاک آب جذب می‌کند؟', ans: '🌿 ریشه', pool: ['🌿 ریشه', '🌸 گلبرگ', '🍁 برگ', '🍎 میوه'] },
+            { icon: '🌿', text: 'آب از ریشه توسط چه عضوی بالا می‌رود؟', ans: '🪵 ساقه', pool: ['🪵 ساقه', '🌸 گل', '🌰 دانه', '🍂 برگ'] },
+            { icon: '🌻', text: 'کدام بخش گیاه معمولاً بوی خوش و رنگ زیبا دارد؟', ans: '🌸 گل', pool: ['🌸 گل', '🌿 ریشه', '🪵 ساقه', '🌰 دانه'] }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let canClick = true;
+
+        function toPersian(n) { return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+        function loadQuestion() {
+            canClick = true;
+            const q = questions[currentIdx];
+            document.getElementById('scoreVal').textContent = toPersian(score);
+            document.getElementById('plantIcon').textContent = q.icon;
+            document.getElementById('plantQuestion').textContent = q.text;
+
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+            q.pool.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'opt-btn';
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(opt, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(chosen, btn) {
+            if(!canClick) return;
+            canClick = false;
+            const q = questions[currentIdx];
+
+            if(chosen === q.ans) {
+                sndCorrect();
+                btn.classList.add('correct');
+                score += 20;
+                document.getElementById('scoreVal').textContent = toPersian(score);
+                setTimeout(() => {
+                    currentIdx++;
+                    if(currentIdx < questions.length) {
+                        loadQuestion();
+                    } else {
+                        endGame();
+                    }
+                }, 800);
+            } else {
+                sndWrong();
+                btn.classList.add('wrong');
+                setTimeout(() => {
+                    btn.classList.remove('wrong');
+                    canClick = true;
+                }, 600);
+            }
+        }
+
+        function endGame() {
+            sndWin();
+            document.getElementById('finalScoreVal').textContent = toPersian(score);
+            document.getElementById('endModal').classList.add('active');
+            if (window.parent) {
+                window.parent.postMessage({ type: 'GK_SUBMIT_SCORE', score: score }, '*');
+            }
+        }
+
+        function restartGame() {
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('endModal').classList.remove('active');
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

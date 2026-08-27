@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تطبیق آیتم با سایه | Shadow Match</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, #6c5ce7 0%, #2d3436 100%);
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 780px;
+      max-width: 96vw;
+      height: 610px;
+      max-height: 96vh;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(16px);
+      border-radius: 28px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: 1rem;
+      z-index: 5;
+    }
+
+    .badge {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 6px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .timer-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      width: 100%;
+      height: 100%;
+      background: #00cec9;
+      transition: width 0.1s linear;
+    }
+    .timer-fill.danger { background: #ff7675; }
+
+    .diff-tag {
+      margin-top: 8px;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #fff;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    /* صحنه‌ی سایه */
+    .target-stage {
+      position: relative;
+      width: 100%;
+      height: 190px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spotlight {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.28) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      z-index: 0;
+      animation: spotlightPulse 2.2s ease-in-out infinite;
+    }
+    .target-stage.active-spotlight .spotlight { opacity: 1; }
+    @keyframes spotlightPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    /* صفحه‌نمایش سایه — هم برای تک‌سایه، هم سایه‌های روی‌هم‌افتاده */
+    .shadow-screen {
+      position: relative;
+      height: 150px;
+      background: linear-gradient(160deg, #dfe6e9, #b2bec3);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.25);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .shadow-item {
+      font-size: 3.4rem;
+      filter: brightness(0);
+      opacity: 0.8;
+      mix-blend-mode: multiply;
+      animation: shadowDrop 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .shadow-item.idle-sway {
+      animation: idleSway 2.4s ease-in-out infinite;
+    }
+
+    @keyframes shadowDrop {
+      0% { opacity: 0; transform: translateY(-90px) scale(0.35) rotate(var(--rot, 0deg)) skew(var(--skx, 0deg), var(--sky, 0deg)); }
+      55% { opacity: 0.9; transform: translateY(10px) scale(1.18) rotate(var(--rot, 0deg)) skew(var(--skx, 0deg), var(--sky, 0deg)); }
+      100% { opacity: 0.8; transform: translateY(0) scale(1) rotate(var(--rot, 0deg)) skew(var(--skx, 0deg), var(--sky, 0deg)); }
+    }
+
+    @keyframes idleSway {
+      0%, 100% { transform: rotate(calc(var(--rot, 0deg) - 4deg)) skew(var(--skx, 0deg), var(--sky, 0deg)); }
+      50% { transform: rotate(calc(var(--rot, 0deg) + 4deg)) skew(var(--skx, 0deg), var(--sky, 0deg)); }
+    }
+
+    .prompt-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      min-height: 28px;
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    .rack-section {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 20px;
+      padding: 12px 14px;
+      border-top: 4px solid #fdcb6e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rack-title {
+      color: #ffeaa7;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .options-grid {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+      min-height: 90px;
+    }
+
+    .rack-item {
+      width: 68px;
+      height: 78px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 16px;
+      border: 3px solid #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.1rem;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    .rack-item:hover {
+      transform: translateY(-6px) scale(1.08);
+      border-color: #00cec9;
+      box-shadow: 0 12px 20px rgba(0, 206, 201, 0.4);
+    }
+
+    .rack-item:active { transform: scale(0.95); }
+
+    .rack-item.selected {
+      border-color: #00cec9;
+      box-shadow: 0 0 0 3px rgba(0, 206, 201, 0.55);
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    .rack-item.correct-pick { background: #55efc4 !important; border-color: #00b894 !important; }
+    .rack-item.wrong-pick { background: #ff7675 !important; border-color: #d63031 !important; }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 24, 38, 0.92);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 20;
+      border-radius: 28px;
+      color: white;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      color: #0c241d;
+      font-size: 1.25rem;
+      font-weight: 900;
+      border: none;
+      padding: 14px 44px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0, 206, 201, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-start:hover {
+      transform: scale(1.06);
+      box-shadow: 0 14px 30px rgba(0, 206, 201, 0.6);
+    }
+
+    #confetti-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+    <canvas id="confetti-canvas"></canvas>
+
+    <div style="width: 100%;">
+      <div class="top-bar">
+        <div class="badge">مرحله: <span id="level-num">۱</span></div>
+        <div class="badge">امتیاز: <span id="score-num">۰</span></div>
+        <div class="badge">فرصت: <span id="lives-num">❤️❤️❤️</span></div>
+      </div>
+      <div class="timer-bar-wrap">
+        <div class="timer-fill" id="timer-bar"></div>
+      </div>
+    </div>
+
+    <div class="diff-tag" id="diff-tag">آسان 🟢</div>
+
+    <div class="target-stage" id="target-stage">
+      <div class="spotlight" id="spotlight"></div>
+      <div class="shadow-screen" id="shadow-screen"></div>
+    </div>
+
+    <div class="prompt-text" id="prompt-msg">سایه رو خوب نگاه کن...</div>
+
+    <div class="rack-section">
+      <div class="rack-title">📦 رگال انتخاب آیتم</div>
+      <div class="options-grid" id="options-grid"></div>
+    </div>
+
+    <div class="overlay" id="menu-overlay">
+      <h1 style="font-size: 2.2rem; color: #ffeaa7;">👗 تطبیق سایه با آیتم</h1>
+      <p style="max-width: 460px; line-height: 1.7; color: #dfe6e9; font-size: 0.95rem;">
+        فقط سایه‌ی یک آیتم رو می‌بینی، نه خودش رو! باید حدس بزنی سایه مال چیه و آیتم درست
+        رو از رگال پیدا کنی. هرچه جلوتر بری سخت‌تر می‌شه: گزینه‌ها بیشتر، زمان کمتر، و در
+        مراحل آخر چند سایه با هم روی هم می‌افتن که باید همه‌شون رو پیدا کنی.
+      </p>
+      <button class="btn-start" id="start-btn">شروع بازی</button>
+    </div>
+  </div>
+
+  <script>
+    const ITEMS_DATA = [
+      { id: 'tshirt', icon: '👕', name: 'تی‌شرت', cat: 'clothes' },
+      { id: 'dress', icon: '👗', name: 'پیراهن', cat: 'clothes' },
+      { id: 'shoe', icon: '👟', name: 'کتانی', cat: 'clothes' },
+      { id: 'hat', icon: '🧢', name: 'کلاه', cat: 'clothes' },
+      { id: 'sock', icon: '🧦', name: 'جوراب', cat: 'clothes' },
+      { id: 'apple', icon: '🍎', name: 'سیب', cat: 'fruits' },
+      { id: 'banana', icon: '🍌', name: 'موز', cat: 'fruits' },
+      { id: 'strawberry', icon: '🍓', name: 'توت‌فرنگی', cat: 'fruits' },
+      { id: 'watermelon', icon: '🍉', name: 'هندوانه', cat: 'fruits' },
+      { id: 'grapes', icon: '🍇', name: 'انگور', cat: 'fruits' },
+      { id: 'cat', icon: '🐱', name: 'گربه', cat: 'animals' },
+      { id: 'dog', icon: '🐶', name: 'سگ', cat: 'animals' },
+      { id: 'lion', icon: '🦁', name: 'شیر', cat: 'animals' },
+      { id: 'fox', icon: '🦊', name: 'روباه', cat: 'animals' },
+      { id: 'rabbit', icon: '🐰', name: 'خرگوش', cat: 'animals' },
+      { id: 'car', icon: '🚗', name: 'ماشین', cat: 'objects' },
+      { id: 'rocket', icon: '🚀', name: 'موشک', cat: 'objects' },
+      { id: 'ball', icon: '⚽', name: 'توپ', cat: 'objects' },
+      { id: 'guitar', icon: '🎸', name: 'گیتار', cat: 'objects' },
+      { id: 'clock', icon: '⏰', name: 'ساعت', cat: 'objects' }
+    ];
+
+    // سختی بیشتر: زمان کمتر، گزینه‌های بیشتر، و گزینه‌های مزاحم از همون دسته‌ی هدف (مثلاً چند میوه با هم) تا فرق‌گذاشتن سخت‌تر بشه
+    function getTier(level) {
+      if (level <= 2) return { name: 'آسان 🟢', color: 'rgba(0,184,148,0.55)', optionCount: 5, answerTime: 5200, shadowCount: 1, distortion: false, sameCatBias: 0, skewMax: 0, blurMax: 0 };
+      if (level <= 4) return { name: 'متوسط 🟡', color: 'rgba(253,203,110,0.45)', optionCount: 6, answerTime: 4200, shadowCount: 1, distortion: true, sameCatBias: 0.5, skewMax: 6, blurMax: 0.4 };
+      if (level <= 6) return { name: 'سخت 🟠', color: 'rgba(225,112,85,0.5)', optionCount: 7, answerTime: 3600, shadowCount: 1, distortion: true, sameCatBias: 0.85, skewMax: 12, blurMax: 0.9 };
+      if (level <= 8) return { name: 'خیلی سخت 🔴', color: 'rgba(214,48,49,0.55)', optionCount: 7, answerTime: 5600, shadowCount: 2, distortion: true, sameCatBias: 0.7, skewMax: 10, blurMax: 0.8 };
+      return { name: 'استاد سایه‌ها 🟣', color: 'rgba(108,92,231,0.6)', optionCount: 8, answerTime: 7200, shadowCount: 3, distortion: true, sameCatBias: 0.7, skewMax: 12, blurMax: 1.1 };
+    }
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(freq, type = 'sine', duration = 0.2, gainVal = 0.15) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function soundFlip() { playTone(320, 'triangle', 0.15, 0.2); }
+    function soundTick() { playTone(500, 'sine', 0.08, 0.12); }
+    function soundCorrect() {
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => setTimeout(() => playTone(freq, 'triangle', 0.2, 0.12), idx * 80));
+    }
+    function soundWrong() {
+      playTone(220, 'sawtooth', 0.2, 0.2);
+      setTimeout(() => playTone(150, 'sawtooth', 0.3, 0.25), 120);
+    }
+
+    let level = 1;
+    let score = 0;
+    let lives = 3;
+    let currentTargets = [];
+    let selectedAnswers = new Set();
+    let isAcceptingInput = false;
+    let roundEnded = false;
+    let timerInterval = null;
+
+    const targetStage = document.getElementById('target-stage');
+    const shadowScreen = document.getElementById('shadow-screen');
+    const optionsGrid = document.getElementById('options-grid');
+    const promptMsg = document.getElementById('prompt-msg');
+    const timerBar = document.getElementById('timer-bar');
+    const diffTag = document.getElementById('diff-tag');
+    const overlay = document.getElementById('menu-overlay');
+    const startBtn = document.getElementById('start-btn');
+
+    startBtn.onclick = () => { overlay.style.display = 'none'; initGame(); };
+
+    function initGame() {
+      level = 1; score = 0; lives = 3;
+      updateHeader();
+      startRound();
+    }
+
+    function updateHeader() {
+      document.getElementById('level-num').innerText = level;
+      document.getElementById('score-num').innerText = score;
+      document.getElementById('lives-num').innerText = '❤️'.repeat(lives);
+    }
+
+    function toFa(n) {
+      const map = { 0:'۰',1:'۱',2:'۲',3:'۳',4:'۴',5:'۵',6:'۶',7:'۷',8:'۸',9:'۹' };
+      return String(n).split('').map(d => map[d] ?? d).join('');
+    }
+
+    function startRound() {
+      isAcceptingInput = false;
+      roundEnded = false;
+      optionsGrid.innerHTML = '';
+      selectedAnswers.clear();
+      targetStage.classList.remove('active-spotlight');
+
+      const tier = getTier(level);
+      diffTag.innerText = tier.name;
+      diffTag.style.background = tier.color;
+      timerBar.classList.remove('danger');
+
+      const pool = [...ITEMS_DATA];
+      currentTargets = [];
+      while (currentTargets.length < tier.shadowCount) {
+        const idx = Math.floor(Math.random() * pool.length);
+        currentTargets.push(pool.splice(idx, 1)[0]);
+      }
+
+      revealShadow(tier);
+    }
+
+    function revealShadow(tier) {
+      shadowScreen.innerHTML = '';
+      shadowScreen.style.width = tier.shadowCount === 1 ? '170px' : (tier.shadowCount === 2 ? '270px' : '340px');
+      targetStage.classList.add('active-spotlight');
+
+      const positions1 = [{ pos: false, rot: 0 }];
+      // فاصله‌ی کافی بین سایه‌ها تا فقط لبه‌هاشون کمی روی هم بیفته، نه کل شکل
+      const positions2 = [
+        { left: '20px', top: '30px', rot: -8 },
+        { left: '148px', top: '38px', rot: 9 }
+      ];
+      const positions3 = [
+        { left: '8px', top: '32px', rot: -9 },
+        { left: '112px', top: '20px', rot: 5 },
+        { left: '212px', top: '34px', rot: 10 }
+      ];
+      const positions = tier.shadowCount === 3 ? positions3 : (tier.shadowCount === 2 ? positions2 : positions1);
+
+      currentTargets.forEach((t, i) => {
+        const div = document.createElement('div');
+        div.className = 'shadow-item';
+        if (tier.shadowCount > 1) {
+          div.style.position = 'absolute';
+          div.style.left = positions[i].left;
+          div.style.top = positions[i].top;
+          div.style.fontSize = '2.8rem';
+        }
+        const rot = tier.distortion ? (tier.shadowCount === 1 ? (Math.random() * 26 - 13) : positions[i].rot) : 0;
+        div.style.setProperty('--rot', rot + 'deg');
+
+        if (tier.skewMax) {
+          const skx = (Math.random() * tier.skewMax * 2 - tier.skewMax).toFixed(1);
+          const sky = (Math.random() * tier.skewMax - tier.skewMax / 2).toFixed(1);
+          div.style.setProperty('--skx', skx + 'deg');
+          div.style.setProperty('--sky', sky + 'deg');
+        }
+        if (tier.blurMax) {
+          const blurPx = (Math.random() * tier.blurMax + tier.blurMax * 0.3).toFixed(2);
+          div.style.filter = `brightness(0) blur(${blurPx}px)`;
+        }
+        div.style.animationDelay = (i * 0.2) + 's';
+        div.innerText = t.icon;
+        shadowScreen.appendChild(div);
+        setTimeout(soundTick, i * 200 + 100);
+
+        // بعد از فرود، اگر سایه‌ی تکی و بدون اعوجاجه، کمی تاب بخورد تا زنده‌تر به‌نظر برسد
+        if (tier.shadowCount === 1 && !tier.distortion) {
+          setTimeout(() => div.classList.add('idle-sway'), 750);
+        }
+      });
+      soundFlip();
+
+      const revealDelay = tier.shadowCount === 1 ? 650 : 950;
+      setTimeout(() => {
+        if (tier.shadowCount === 1) {
+          promptMsg.innerText = '🔍 این سایه متعلق به کدام آیتم روی رگال است؟';
+        } else {
+          promptMsg.innerText = `🔍 ${toFa(tier.shadowCount)} سایه روی هم افتادن! آیتم‌های داخلشون رو از رگال پیدا کن`;
+        }
+        renderOptions(tier);
+        startAnswerTimer(tier);
+      }, revealDelay);
+    }
+
+    function renderOptions(tier) {
+      const options = [...currentTargets];
+      const targetCats = new Set(currentTargets.map(t => t.cat));
+      const rest = ITEMS_DATA.filter(item => !currentTargets.some(t => t.id === item.id));
+
+      const sameCat = rest.filter(item => targetCats.has(item.cat)).sort(() => 0.5 - Math.random());
+      const otherCat = rest.filter(item => !targetCats.has(item.cat)).sort(() => 0.5 - Math.random());
+
+      while (options.length < tier.optionCount && (sameCat.length || otherCat.length)) {
+        const pickSameCat = sameCat.length && (Math.random() < tier.sameCatBias || !otherCat.length);
+        const pool = pickSameCat ? sameCat : otherCat;
+        options.push(pool.pop());
+      }
+      options.sort(() => 0.5 - Math.random());
+
+      optionsGrid.innerHTML = '';
+      options.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'rack-item';
+        div.dataset.id = item.id;
+        div.innerText = item.icon;
+        if (tier.shadowCount === 1) div.onclick = () => handleSelectionSingle(item, tier);
+        else div.onclick = () => handleToggleSelect(item, div, tier);
+        optionsGrid.appendChild(div);
+      });
+
+      isAcceptingInput = true;
+    }
+
+    function startAnswerTimer(tier) {
+      animateTimer(tier.answerTime, () => {
+        if (roundEnded) return;
+        if (tier.shadowCount === 1) handleSelectionSingle(null, tier, true);
+        else evaluateMulti(tier, true);
+      });
+    }
+
+    function animateTimer(duration, onExpire) {
+      clearInterval(timerInterval);
+      const start = Date.now();
+      timerBar.style.width = '100%';
+      timerBar.classList.remove('danger');
+
+      timerInterval = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const remaining = Math.max(0, 1 - (elapsed / duration));
+        timerBar.style.width = `${remaining * 100}%`;
+        if (remaining < 0.25) timerBar.classList.add('danger');
+        if (remaining <= 0) {
+          clearInterval(timerInterval);
+          onExpire();
+        }
+      }, 50);
+    }
+
+    function endStage() {
+      clearInterval(timerInterval);
+      targetStage.classList.remove('active-spotlight');
+    }
+
+    function handleSelectionSingle(selected, tier, timedOut) {
+      if (roundEnded) return;
+      roundEnded = true;
+      isAcceptingInput = false;
+      endStage();
+
+      const target = currentTargets[0];
+      if (selected && selected.id === target.id) {
+        soundCorrect();
+        score += 100 + (level * 20);
+        promptMsg.innerText = `✨ آفرین! درست حدس زدی (${target.name} ${target.icon}).`;
+        triggerConfetti();
+        level++;
+        updateHeader();
+        setTimeout(startRound, 2000);
+      } else {
+        soundWrong();
+        lives--;
+        promptMsg.innerText = timedOut
+          ? `⏰ وقت تموم شد! این سایه برای ${target.name} ${target.icon} بود.`
+          : `❌ اشتباه بود! این سایه برای ${target.name} ${target.icon} بود.`;
+        updateHeader();
+        if (lives <= 0) setTimeout(showGameOver, 1500);
+        else setTimeout(startRound, 2200);
+      }
+    }
+
+    function handleToggleSelect(item, div, tier) {
+      if (!isAcceptingInput) return;
+      if (div.classList.contains('selected')) {
+        div.classList.remove('selected');
+        selectedAnswers.delete(item.id);
+        return;
+      }
+      if (selectedAnswers.size >= tier.shadowCount) return;
+
+      div.classList.add('selected');
+      selectedAnswers.add(item.id);
+      soundTick();
+
+      if (selectedAnswers.size === tier.shadowCount) {
+        isAcceptingInput = false;
+        setTimeout(() => evaluateMulti(tier), 400);
+      }
+    }
+
+    function evaluateMulti(tier, timedOut) {
+      if (roundEnded) return;
+      roundEnded = true;
+      isAcceptingInput = false;
+      endStage();
+
+      const targetIds = new Set(currentTargets.map(t => t.id));
+      let allCorrect = selectedAnswers.size === targetIds.size;
+
+      optionsGrid.querySelectorAll('.rack-item').forEach(div => {
+        const id = div.dataset.id;
+        if (selectedAnswers.has(id)) {
+          if (targetIds.has(id)) div.classList.add('correct-pick');
+          else { div.classList.add('wrong-pick'); allCorrect = false; }
+        }
+      });
+      if (!allCorrect) {
+        optionsGrid.querySelectorAll('.rack-item').forEach(div => {
+          if (targetIds.has(div.dataset.id) && !selectedAnswers.has(div.dataset.id)) {
+            div.classList.add('correct-pick');
+          }
+        });
+      }
+
+      if (allCorrect) {
+        soundCorrect();
+        score += 150 + (level * 25);
+        promptMsg.innerText = '✨ عالی بود! همه‌ی آیتم‌های داخل سایه‌ها رو درست پیدا کردی.';
+        triggerConfetti();
+        level++;
+        updateHeader();
+        setTimeout(startRound, 2200);
+      } else {
+        soundWrong();
+        lives--;
+        const names = currentTargets.map(t => `${t.name} ${t.icon}`).join('، ');
+        promptMsg.innerText = timedOut
+          ? `⏰ وقت تموم شد! آیتم‌های درست: ${names}`
+          : `❌ اشتباه بود! آیتم‌های درست: ${names}`;
+        updateHeader();
+        if (lives <= 0) setTimeout(showGameOver, 1800);
+        else setTimeout(startRound, 2600);
+      }
+    }
+
+    function showGameOver() {
+      overlay.style.display = 'flex';
+      overlay.querySelector('h1').innerText = 'پایان بازی!';
+      overlay.querySelector('p').innerText = `امتیاز نهایی: ${score} | به مرحله ${level} رسیدی.`;
+      startBtn.innerText = 'تلاش مجدد';
+
+      // ارسال امتیاز بازی به سیستم قربانی کیدز
+      if (window.parent) {
+        window.parent.postMessage({
+          type: 'GK_SUBMIT_SCORE',
+          score: score
+        }, '*');
+      }
+    }
+
+    function triggerConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+
+      const particles = Array.from({ length: 45 }, () => ({
+        x: canvas.width / 2, y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.7) * 11,
+        size: Math.random() * 8 + 4,
+        color: ['#00cec9', '#ff7675', '#ffeaa7', '#a29bfe', '#55efc4'][Math.floor(Math.random() * 5)]
+      }));
+
+      let frame = 0;
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.vy += 0.25;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.size, p.size);
+        });
+        if (++frame < 50) requestAnimationFrame(render);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      render();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>خانواده صدای «ز» - کلاس ریاضی رضا</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+      background: radial-gradient(circle, #e8f5e9 0%, #c8e6c9 60%, #a5d6a7 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      background: #ffffff;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #1b5e20;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 3px solid #81c784;
+      white-space: nowrap;
+    }
+
+    .lives-badge {
+      border-color: #ef9a9a;
+      color: #c62828;
+      letter-spacing: 2px;
+    }
+
+    .banner {
+      background: #2e7d32;
+      color: #fffde7;
+      border: 3px solid #1b5e20;
+      border-radius: 20px;
+      padding: 8px 24px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      text-align: center;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      margin-bottom: 12px;
+    }
+
+    .progress-track {
+      width: 100%;
+      max-width: 620px;
+      height: 12px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      border: 2px solid #66bb6a;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #66bb6a, #2e7d32);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .blackboard-frame {
+      width: 100%;
+      max-width: 620px;
+      background: #5d4037;
+      border: 12px solid #3e2723;
+      border-radius: 24px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+      padding: 8px;
+      position: relative;
+    }
+
+    .blackboard-screen {
+      background: #263238;
+      border-radius: 12px;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #ffffff;
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    .scene-illustration {
+      font-size: 3.5rem;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+      animation: floatSlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatSlow {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-6px); }
+    }
+
+    .scene-hint {
+      color: #b0bec5;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .chalk-word {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #fff9c4;
+      text-shadow: 0 0 8px rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      letter-spacing: 2px;
+      direction: rtl;
+    }
+
+    .chalk-slot {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 58px;
+      height: 58px;
+      border: 3px dashed #ffca28;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #ffca28;
+      font-size: 2.2rem;
+      animation: blinkSlot 1.2s infinite;
+    }
+
+    @keyframes blinkSlot {
+      0%, 100% { background: rgba(255, 255, 255, 0.1); }
+      50% { background: rgba(255, 202, 40, 0.25); }
+    }
+
+    .letters-shelf {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      width: 100%;
+      max-width: 620px;
+      margin: 16px 0;
+      z-index: 10;
+      min-height: 100px;
+    }
+
+    .chalk-btn {
+      --ty: 0px;
+      --rot: 0deg;
+      flex: 1 1 90px;
+      max-width: 90px;
+      height: 85px;
+      background: #ffffff;
+      border: 4px solid #43a047;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #1b5e20;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #2e7d32, 0 10px 18px rgba(0,0,0,0.12);
+      transform: translateY(var(--ty)) rotate(var(--rot));
+      transition: box-shadow 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  border-color 0.15s ease;
+      animation: btnPopIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+    }
+
+    @keyframes btnPopIn {
+      0% { opacity: 0; transform: translateY(calc(var(--ty) + 16px)) rotate(var(--rot)) scale(0.5); }
+      100% { opacity: 1; transform: translateY(var(--ty)) rotate(var(--rot)) scale(1); }
+    }
+
+    /* روی صفحه‌های خیلی کوچک، دکمه‌ها جمع‌وجورتر می‌شوند اما هنوز کنار هم می‌مانند */
+    @media (max-width: 420px) {
+      .letters-shelf {
+        gap: 8px;
+      }
+      .chalk-btn {
+        height: 70px;
+        font-size: 1.9rem;
+        border-width: 3px;
+        border-radius: 14px;
+      }
+    }
+
+    .chalk-btn:hover:not(:disabled) {
+      transform: translateY(calc(var(--ty) - 4px)) rotate(var(--rot));
+      box-shadow: 0 10px 0 #2e7d32, 0 14px 22px rgba(0,0,0,0.18);
+      border-color: #2e7d32;
+    }
+
+    .chalk-btn:active:not(:disabled) {
+      transform: translateY(calc(var(--ty) + 4px)) rotate(var(--rot));
+      box-shadow: 0 2px 0 #2e7d32;
+    }
+
+    .chalk-btn:disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+
+    .chalk-success {
+      animation: popGreen 0.4s ease-out;
+    }
+
+    @keyframes popGreen {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .shake-screen {
+      animation: shakeBoard 0.35s ease-in-out;
+    }
+
+    @keyframes shakeBoard {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* صفحه پایان بازی */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(27, 60, 33, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .overlay.visible {
+      display: flex;
+    }
+
+    .end-card {
+      background: #fffde7;
+      border-radius: 24px;
+      border: 6px solid #2e7d32;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    .end-icon {
+      font-size: 4rem;
+      margin-bottom: 8px;
+    }
+
+    .end-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #1b5e20;
+      margin-bottom: 10px;
+    }
+
+    .end-desc {
+      font-size: 1.1rem;
+      color: #33691e;
+      margin-bottom: 20px;
+      line-height: 1.9;
+    }
+
+    .end-btn {
+      background: #43a047;
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #2e7d32;
+    }
+
+    .end-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #2e7d32;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">⭐ کلمات درست: <span id="score-val">۰</span></div>
+    <div class="badge lives-badge" id="lives-badge">❤️❤️❤️</div>
+    <div class="badge">🎯 معما: <span id="round-val">۱</span> از <span id="total-val">۶۰</span></div>
+  </header>
+
+  <div class="banner">
+    خانواده صدای «ز»: شکل املایی درست را انتخاب کن!
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+
+  <div class="blackboard-frame">
+    <div class="blackboard-screen" id="board-screen">
+      <div class="scene-illustration" id="scene-icon">📐</div>
+      <div class="scene-hint" id="scene-hint">رضا در کلاس ریاضی است</div>
+      <div class="chalk-word" id="chalk-word">
+        <!-- کلمه روی تخته ساخته می‌شود -->
+      </div>
+    </div>
+  </div>
+
+  <div class="letters-shelf" id="letters-shelf">
+    <!-- دکمه‌های گچی به صورت پویا اضافه می‌شوند -->
+  </div>
+
+  <div class="overlay" id="end-overlay">
+    <div class="end-card">
+      <div class="end-icon" id="end-icon">🏆</div>
+      <div class="end-title" id="end-title">آفرین!</div>
+      <div class="end-desc" id="end-desc"></div>
+      <button class="end-btn" id="restart-btn">شروع دوباره</button>
+    </div>
+  </div>
+
+  <script>
+    // بانک ۶۰ کلمه‌ای برای چهار شکل املایی صدای «ز» (ز / ض / ذ / ظ) - سطح پایه اول دبستان
+    const Z_FAMILY_QUESTIONS = [
+      // --- ز ---
+      { prefix: '', correctLetter: 'ز', suffix: 'رد', fullWord: 'زرد', icon: '🎨', hint: 'رنگ آفتاب و لیمو' },
+      { prefix: '', correctLetter: 'ز', suffix: 'نگ', fullWord: 'زنگ', icon: '🔔', hint: 'صدای شروع و پایان کلاس' },
+      { prefix: '', correctLetter: 'ز', suffix: 'نبور', fullWord: 'زنبور', icon: '🐝', hint: 'حشره‌ای که عسل می‌سازد' },
+      { prefix: '', correctLetter: 'ز', suffix: 'مستان', fullWord: 'زمستان', icon: '⛄', hint: 'فصل برف و سرما' },
+      { prefix: 'رو', correctLetter: 'ز', suffix: '', fullWord: 'روز', icon: '☀️', hint: 'وقتی هوا روشن است' },
+      { prefix: 'سب', correctLetter: 'ز', suffix: '', fullWord: 'سبز', icon: '🌿', hint: 'رنگ برگ درخت' },
+      { prefix: 'درا', correctLetter: 'ز', suffix: '', fullWord: 'دراز', icon: '📏', hint: 'بلند و کشیده' },
+      { prefix: 'پایی', correctLetter: 'ز', suffix: '', fullWord: 'پاییز', icon: '🍂', hint: 'فصل ریختن برگ‌ها' },
+      { prefix: '', correctLetter: 'ز', suffix: 'انو', fullWord: 'زانو', icon: '🦵', hint: 'قسمتی وسط پا' },
+      { prefix: 'آوا', correctLetter: 'ز', suffix: '', fullWord: 'آواز', icon: '🎤', hint: 'خواندن با صدای خوش' },
+      { prefix: 'مغ', correctLetter: 'ز', suffix: '', fullWord: 'مغز', icon: '🧠', hint: 'با آن فکر می‌کنیم' },
+      { prefix: 'نا', correctLetter: 'ز', suffix: '', fullWord: 'ناز', icon: '🎀', hint: 'ظریف و دوست‌داشتنی' },
+      { prefix: 'گا', correctLetter: 'ز', suffix: '', fullWord: 'گاز', icon: '🔥', hint: 'برای پختن غذا استفاده می‌شود' },
+      { prefix: 'تا', correctLetter: 'ز', suffix: 'ه', fullWord: 'تازه', icon: '🍞', hint: 'نو و جدید' },
+      { prefix: 'با', correctLetter: 'ز', suffix: 'ی', fullWord: 'بازی', icon: '⚽', hint: 'کاری که بچه‌ها دوست دارند' },
+
+      // --- ض ---
+      { prefix: 'ر', correctLetter: 'ض', suffix: 'ا', fullWord: 'رضا', icon: '👦', hint: 'نام پسری پرتلاش در کلاس' },
+      { prefix: 'ریا', correctLetter: 'ض', suffix: 'ی', fullWord: 'ریاضی', icon: '📐', hint: 'درس عددها و شکل‌های هندسی' },
+      { prefix: 'حا', correctLetter: 'ض', suffix: 'ر', fullWord: 'حاضر', icon: '✋', hint: 'آماده و در کلاس' },
+      { prefix: 'مری', correctLetter: 'ض', suffix: '', fullWord: 'مریض', icon: '🤒', hint: 'وقتی حالمان خوب نیست' },
+      { prefix: 'و', correctLetter: 'ض', suffix: 'و', fullWord: 'وضو', icon: '💧', hint: 'شست‌وشو پیش از نماز' },
+      { prefix: 'بی', correctLetter: 'ض', suffix: 'ی', fullWord: 'بیضی', icon: '🥚', hint: 'شکلی مثل تخم‌مرغ' },
+      { prefix: 'عو', correctLetter: 'ض', suffix: '', fullWord: 'عوض', icon: '🔄', hint: 'تغییر دادن چیزی' },
+      { prefix: 'حو', correctLetter: 'ض', suffix: '', fullWord: 'حوض', icon: '🏊', hint: 'استخر کوچک در حیاط' },
+      { prefix: 'قا', correctLetter: 'ض', suffix: 'ی', fullWord: 'قاضی', icon: '⚖️', hint: 'کسی که در دادگاه داوری می‌کند' },
+      { prefix: '', correctLetter: 'ض', suffix: 'رب', fullWord: 'ضرب', icon: '✖️', hint: 'یکی از عمل‌های ریاضی' },
+      { prefix: '', correctLetter: 'ض', suffix: 'عیف', fullWord: 'ضعیف', icon: '🐭', hint: 'ناتوان و کم‌توان' },
+      { prefix: 'ح', correctLetter: 'ض', suffix: 'ور', fullWord: 'حضور', icon: '🙋', hint: 'در جایی بودن' },
+      { prefix: 'ر', correctLetter: 'ض', suffix: 'ایت', fullWord: 'رضایت', icon: '😊', hint: 'خشنودی و خوشحالی' },
+      { prefix: 'ا', correctLetter: 'ض', suffix: 'افه', fullWord: 'اضافه', icon: '➕', hint: 'زیاد کردن چیزی' },
+      { prefix: '', correctLetter: 'ض', suffix: 'امن', fullWord: 'ضامن', icon: '🤝', hint: 'کسی که ضمانت می‌دهد' },
+
+      // --- ذ ---
+      { prefix: '', correctLetter: 'ذ', suffix: 'رّت', fullWord: 'ذرّت', icon: '🌽', hint: 'دانه‌های زرد و خوشمزه' },
+      { prefix: 'ل', correctLetter: 'ذ', suffix: 'ت', fullWord: 'لذت', icon: '😋', hint: 'احساس خوشی' },
+      { prefix: 'غ', correctLetter: 'ذ', suffix: 'ا', fullWord: 'غذا', icon: '🍽️', hint: 'چیزی که می‌خوریم' },
+      { prefix: 'کاغ', correctLetter: 'ذ', suffix: '', fullWord: 'کاغذ', icon: '📄', hint: 'برای نوشتن و نقاشی' },
+      { prefix: 'آ', correctLetter: 'ذ', suffix: 'ر', fullWord: 'آذر', icon: '🍁', hint: 'نام یکی از ماه‌های پاییز' },
+      { prefix: 'گ', correctLetter: 'ذ', suffix: 'ر', fullWord: 'گذر', icon: '🚶', hint: 'رد شدن از یک جا' },
+      { prefix: 'ب', correctLetter: 'ذ', suffix: 'ر', fullWord: 'بذر', icon: '🌱', hint: 'دانه‌ای که می‌کاریم' },
+      { prefix: 'ح', correctLetter: 'ذ', suffix: 'ف', fullWord: 'حذف', icon: '❌', hint: 'پاک کردن چیزی' },
+      { prefix: 'گ', correctLetter: 'ذ', suffix: 'شته', fullWord: 'گذشته', icon: '⏳', hint: 'زمانی که تمام شده است' },
+      { prefix: '', correctLetter: 'ذ', suffix: 'وق', fullWord: 'ذوق', icon: '😄', hint: 'علاقه و اشتیاق' },
+      { prefix: 'ا', correctLetter: 'ذ', suffix: 'ان', fullWord: 'اذان', icon: '🕌', hint: 'ندای وقت نماز' },
+      { prefix: 'ن', correctLetter: 'ذ', suffix: 'ر', fullWord: 'نذر', icon: '🙏', hint: 'قولی که به خدا می‌دهیم' },
+      { prefix: 'ا', correctLetter: 'ذ', suffix: 'یت', fullWord: 'اذیت', icon: '😣', hint: 'آزار رساندن' },
+      { prefix: '', correctLetter: 'ذ', suffix: 'خیره', fullWord: 'ذخیره', icon: '💾', hint: 'نگه‌داری کردن چیزی' },
+      { prefix: 'جا', correctLetter: 'ذ', suffix: 'به', fullWord: 'جاذبه', icon: '🍎', hint: 'نیرویی که چیزها را به زمین می‌کشد' },
+
+      // --- ظ ---
+      { prefix: '', correctLetter: 'ظ', suffix: 'رف', fullWord: 'ظرف', icon: '🥣', hint: 'کاسه و بشقاب روی سفره' },
+      { prefix: 'نا', correctLetter: 'ظ', suffix: 'م', fullWord: 'ناظم', icon: '🏫', hint: 'مسئول نظم مدرسه' },
+      { prefix: 'حف', correctLetter: 'ظ', suffix: '', fullWord: 'حفظ', icon: '🧠', hint: 'به خاطر سپردن درس' },
+      { prefix: 'ن', correctLetter: 'ظ', suffix: 'م', fullWord: 'نظم', icon: '📏', hint: 'مرتب و منظم بودن' },
+      { prefix: 'من', correctLetter: 'ظ', suffix: 'م', fullWord: 'منظم', icon: '✅', hint: 'کسی که همه‌چیز را مرتب دارد' },
+      { prefix: 'لح', correctLetter: 'ظ', suffix: 'ه', fullWord: 'لحظه', icon: '⏱️', hint: 'یک آن کوتاه از زمان' },
+      { prefix: 'ن', correctLetter: 'ظ', suffix: 'ر', fullWord: 'نظر', icon: '👀', hint: 'عقیده و دیدگاه' },
+      { prefix: '', correctLetter: 'ظ', suffix: 'هر', fullWord: 'ظهر', icon: '🌞', hint: 'وسط روز که آفتاب بالای سر است' },
+      { prefix: 'غلی', correctLetter: 'ظ', suffix: '', fullWord: 'غلیظ', icon: '🍲', hint: 'سفت و پرمایه، مثل سوپ غلیظ' },
+      { prefix: '', correctLetter: 'ظ', suffix: 'الم', fullWord: 'ظالم', icon: '😠', hint: 'کسی که به دیگران ظلم می‌کند' },
+      { prefix: 'ن', correctLetter: 'ظ', suffix: 'افت', fullWord: 'نظافت', icon: '🧹', hint: 'تمیز کردن جایی' },
+      { prefix: 'ع', correctLetter: 'ظ', suffix: 'یم', fullWord: 'عظیم', icon: '🏔️', hint: 'خیلی بزرگ' },
+      { prefix: 'انت', correctLetter: 'ظ', suffix: 'ار', fullWord: 'انتظار', icon: '⏳', hint: 'منتظر چیزی ماندن' },
+      { prefix: '', correctLetter: 'ظ', suffix: 'روف', fullWord: 'ظروف', icon: '🍽️', hint: 'جمع کلمه ظرف' },
+      { prefix: 'ن', correctLetter: 'ظ', suffix: 'ارت', fullWord: 'نظارت', icon: '👁️', hint: 'مراقب کاری بودن' }
+    ];
+
+    const ALL_LETTERS = ['ز', 'ض', 'ذ', 'ظ'];
+    const TOTAL_WORDS = Z_FAMILY_QUESTIONS.length;
+    const MAX_LIVES = 3;
+
+    let order = [];
+    let currentPos = 0;
+    let score = 0;
+    let lives = MAX_LIVES;
+    let isLocked = false;
+
+    const scoreVal = document.getElementById('score-val');
+    const roundVal = document.getElementById('round-val');
+    const totalVal = document.getElementById('total-val');
+    const livesBadge = document.getElementById('lives-badge');
+    const sceneIcon = document.getElementById('scene-icon');
+    const sceneHint = document.getElementById('scene-hint');
+    const chalkWord = document.getElementById('chalk-word');
+    const shelf = document.getElementById('letters-shelf');
+    const boardScreen = document.getElementById('board-screen');
+    const progressFill = document.getElementById('progress-fill');
+    const endOverlay = document.getElementById('end-overlay');
+    const endIcon = document.getElementById('end-icon');
+    const endTitle = document.getElementById('end-title');
+    const endDesc = document.getElementById('end-desc');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // سیستم صوتی Web Audio API (با ساخت تنبل تا از خطای مرورگرها جلوگیری شود)
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playAudio(type) {
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      if (type === 'chalk') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(130, now + 0.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'gameover') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(330, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.6);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      } else if (type === 'win') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = 'sine';
+          const start = now + i * 0.12;
+          o.frequency.setValueAtTime(freq, start);
+          g.gain.setValueAtTime(0.25, start);
+          g.gain.exponentialRampToValueAtTime(0.01, start + 0.3);
+          o.start(start);
+          o.stop(start + 0.3);
+        });
+      }
+    }
+
+    function toPersianDigits(num) {
+      const digits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return num.toString().replace(/\d/g, d => digits[d]);
+    }
+
+    // درهم‌ریختن آرایه (Fisher-Yates) - هم برای ترتیب کلمات و هم چیدمان گزینه‌ها
+    function shuffle(array) {
+      const arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function updateLivesDisplay() {
+      let hearts = '';
+      for (let i = 0; i < MAX_LIVES; i++) {
+        hearts += i < lives ? '❤️' : '🖤';
+      }
+      livesBadge.textContent = hearts;
+    }
+
+    function updateProgress() {
+      const pct = (currentPos / TOTAL_WORDS) * 100;
+      progressFill.style.width = pct + '%';
+      roundVal.textContent = toPersianDigits(currentPos + 1);
+      totalVal.textContent = toPersianDigits(TOTAL_WORDS);
+    }
+
+    function startGame() {
+      order = shuffle(Z_FAMILY_QUESTIONS);
+      currentPos = 0;
+      score = 0;
+      lives = MAX_LIVES;
+      scoreVal.textContent = toPersianDigits(score);
+      updateLivesDisplay();
+      endOverlay.classList.remove('visible');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      isLocked = false;
+      shelf.innerHTML = '';
+      const current = order[currentPos];
+
+      sceneIcon.textContent = current.icon;
+      sceneHint.textContent = current.hint;
+      updateProgress();
+
+      chalkWord.innerHTML = `
+        <span>${current.prefix}</span>
+        <span class="chalk-slot">؟</span>
+        <span>${current.suffix}</span>
+      `;
+
+      // هر ۴ عضو خانواده صدا را با ترتیب تصادفی و جای‌گیری متفاوت نشان می‌دهیم
+      // تا بچه هر بار مجبور شود به‌جای حفظ محل دکمه، خود حرف را با دقت بخواند
+      const shuffledLetters = shuffle(ALL_LETTERS);
+      shuffledLetters.forEach((letter, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'chalk-btn';
+        btn.textContent = letter;
+
+        // جابه‌جایی عمودی و چرخش کوچک تصادفی برای هر دکمه در هر دور
+        const ty = (Math.random() * 26 - 13).toFixed(1); // بین ۱۳- تا ۱۳ پیکسل
+        const rot = (Math.random() * 10 - 5).toFixed(1); // بین ۵- تا ۵ درجه
+        btn.style.setProperty('--ty', ty + 'px');
+        btn.style.setProperty('--rot', rot + 'deg');
+        btn.style.animationDelay = (i * 0.07) + 's';
+
+        btn.onclick = () => handleChoice(letter, current, btn);
+        shelf.appendChild(btn);
+      });
+    }
+
+    function setButtonsDisabled(disabled) {
+      shelf.querySelectorAll('.chalk-btn').forEach(b => { b.disabled = disabled; });
+    }
+
+    function handleChoice(selectedLetter, current, buttonEl) {
+      if (isLocked) return;
+
+      if (selectedLetter === current.correctLetter) {
+        isLocked = true;
+        setButtonsDisabled(true);
+        playAudio('chalk');
+        score += 10;
+        scoreVal.textContent = toPersianDigits(score);
+
+        chalkWord.innerHTML = `
+          <span style="color: #69f0ae; animation: popGreen 0.3s ease;">${current.fullWord}</span>
+        `;
+        boardScreen.classList.add('chalk-success');
+
+        setTimeout(() => {
+          boardScreen.classList.remove('chalk-success');
+          currentPos++;
+          if (currentPos >= TOTAL_WORDS) {
+            showWin();
+          } else {
+            loadQuestion();
+          }
+        }, 1100);
+
+      } else {
+        playAudio('wrong');
+        boardScreen.classList.add('shake-screen');
+        buttonEl.style.borderColor = '#e53935';
+        buttonEl.style.color = '#e53935';
+        buttonEl.disabled = true;
+
+        lives--;
+        updateLivesDisplay();
+
+        setTimeout(() => {
+          boardScreen.classList.remove('shake-screen');
+        }, 400);
+
+        if (lives <= 0) {
+          isLocked = true;
+          setButtonsDisabled(true);
+          setTimeout(() => showGameOver(), 500);
+        }
+      }
+    }
+
+    function showGameOver() {
+      playAudio('gameover');
+      endIcon.textContent = '😢';
+      endTitle.textContent = 'فرصت‌ها تمام شد!';
+      endDesc.textContent = `تعداد کلمات درست: ${toPersianDigits(score / 10)} از ${toPersianDigits(TOTAL_WORDS)}. اشکالی ندارد، دوباره تلاش کن!`;
+      endOverlay.classList.add('visible');
+    }
+
+    function showWin() {
+      playAudio('win');
+      endIcon.textContent = '🏆';
+      endTitle.textContent = 'آفرین! بازی تمام شد';
+      endDesc.textContent = `تو همه‌ی ${toPersianDigits(TOTAL_WORDS)} کلمه را درست حدس زدی و ${toPersianDigits(score)} امتیاز گرفتی! خانواده صدای «ز» را عالی یاد گرفتی.`;
+      endOverlay.classList.add('visible');
+    }
+
+    restartBtn.addEventListener('click', startGame);
+
+    // شروع بازی
+    startGame();
+  </script>
+</body>
+</html>

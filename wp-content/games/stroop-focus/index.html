@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>موشک تمرکز | بازی استروپ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#171735;
+    --panel:#22224a;
+    --panel-2:#2b2b5c;
+    --ink:#f2f0ff;
+    --ink-soft:#b2aede;
+    --line:#3a3a72;
+    --good:#3ddc84;
+    --bad:#ff5c6c;
+    --gold:#ffd54a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Vazirmatn',sans-serif;
+    background: radial-gradient(ellipse 120% 100% at 50% -10%, #24245a 0%, var(--bg) 55%);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 12px;
+  }
+  .stars{
+    position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none;
+  }
+  .star{
+    position:absolute; width:3px; height:3px; background:#fff; border-radius:50%; opacity:.5;
+  }
+  .wrap{
+    position:relative; z-index:1;
+    width:100%; max-width:480px;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:22px 20px 26px;
+    box-shadow:0 20px 50px -20px rgba(0,0,0,.6);
+  }
+  h1{
+    font-size:22px; font-weight:900; margin:0 0 6px; text-align:center;
+  }
+  .sub{
+    color:var(--ink-soft); font-size:14px; text-align:center; margin:0 0 20px; line-height:1.9;
+  }
+  .btn{
+    display:block; width:100%; text-align:center;
+    background:var(--gold); color:#3a2900; font-weight:700; font-size:17px;
+    border:none; border-radius:14px; padding:14px; cursor:pointer;
+    transition:transform .12s ease;
+  }
+  .btn:active{ transform:scale(.97); }
+  .btn.secondary{ background:transparent; color:var(--ink); border:1px solid var(--line); margin-top:10px; }
+
+  .rules{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
+  .rule{ display:flex; align-items:flex-start; gap:10px; background:var(--panel-2); border-radius:14px; padding:10px 12px; font-size:13.5px; color:var(--ink-soft); }
+  .rule b{ color:var(--ink); }
+  .badge{ flex:none; width:26px; height:26px; border-radius:50%; background:var(--gold); color:#3a2900; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; }
+
+  .hud{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
+  .hud-block{ display:flex; align-items:center; gap:6px; background:var(--panel-2); border-radius:12px; padding:6px 10px; font-size:13px; color:var(--ink-soft); }
+  .hud-block b{ color:var(--ink); font-size:15px; }
+  .hearts{ display:flex; gap:4px; }
+  .heart{ font-size:14px; }
+
+  .timerbar{ height:8px; border-radius:5px; background:var(--panel-2); overflow:hidden; margin-bottom:20px; }
+  .timerfill{ height:100%; background:var(--gold); border-radius:5px; width:100%; transition:width .1s linear, background .2s; }
+
+  .stage{ display:flex; align-items:center; justify-content:center; margin-bottom:22px; min-height:120px; }
+  .word{ font-size:44px; font-weight:900; letter-spacing:1px; }
+
+  .options{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .opt{
+    aspect-ratio:1; border-radius:18px; border:3px solid rgba(255,255,255,.12);
+    cursor:pointer; transition:transform .12s ease, border-color .15s ease;
+  }
+  .opt:active{ transform:scale(.93); }
+  .opt.correct{ border-color:var(--good); box-shadow:0 0 0 4px rgba(61,220,132,.25); }
+  .opt.wrong{ border-color:var(--bad); box-shadow:0 0 0 4px rgba(255,92,108,.25); }
+
+  .rocket-row{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .rocket-track{ flex:1; height:14px; background:var(--panel-2); border-radius:8px; position:relative; overflow:hidden; }
+  .rocket-fill{ position:absolute; inset:0 0 0 auto; height:100%; width:0%; background:linear-gradient(90deg,#7f77dd,#ffd54a); border-radius:8px; transition:width .4s ease; }
+  .rocket-label{ font-size:12px; color:var(--ink-soft); flex:none; }
+
+  .feedback{ text-align:center; font-size:15px; font-weight:700; min-height:22px; margin-bottom:6px; }
+  .feedback.good{ color:var(--good); }
+  .feedback.bad{ color:var(--bad); }
+
+  .result{ text-align:center; }
+  .result h2{ font-size:24px; margin:6px 0 2px; font-weight:900; }
+  .result .score{ font-size:42px; font-weight:900; color:var(--gold); margin:10px 0 4px; }
+  .stats{ display:flex; justify-content:center; gap:18px; margin:14px 0 22px; }
+  .stat{ background:var(--panel-2); border-radius:14px; padding:10px 16px; }
+  .stat b{ display:block; font-size:18px; }
+  .stat span{ font-size:12px; color:var(--ink-soft); }
+
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  @media (prefers-reduced-motion: reduce){
+    .btn, .opt, .rocket-fill, .timerfill{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="wrap">
+  <div class="card">
+
+    <div class="screen active" id="screen-start">
+      <h1>موشک تمرکز 🚀</h1>
+      <p class="sub">این بازی به مغزت کمک می‌کنه که بهتر تمرکز کنی و حواس‌پرتی رو نادیده بگیری.</p>
+      <div class="rules">
+        <div class="rule"><span class="badge">۱</span><div>یک <b>کلمه‌ی رنگ</b> روی صفحه میاد، اما رنگش با معنی‌ش فرق دارد!</div></div>
+        <div class="rule"><span class="badge">۲</span><div>باید دایره‌ای رو بزنی که <b>هم‌رنگ نوشته‌ی روی صفحه</b> باشه، نه هم‌معنی با کلمه.</div></div>
+        <div class="rule"><span class="badge">۳</span><div>هرچی سریع‌تر و درست‌تر جواب بدی، موشک تمرکزت بالاتر می‌پرد!</div></div>
+      </div>
+      <button class="btn" id="btn-start">شروع بازی</button>
+    </div>
+
+    <div class="screen" id="screen-game">
+      <div class="hud">
+        <div class="hud-block">امتیاز: <b id="score">0</b></div>
+        <div class="hud-block">تراز <b id="level">1</b></div>
+        <div class="hud-block hearts" id="hearts"></div>
+      </div>
+
+      <div class="rocket-row">
+        <span class="rocket-label">تمرکز</span>
+        <div class="rocket-track"><div class="rocket-fill" id="rocketFill"></div></div>
+      </div>
+
+      <div class="timerbar"><div class="timerfill" id="timerFill"></div></div>
+
+      <div class="stage"><div class="word" id="word">قرمز</div></div>
+
+      <div class="feedback" id="feedback">&nbsp;</div>
+
+      <div class="options" id="options"></div>
+    </div>
+
+    <div class="screen" id="screen-over">
+      <div class="result">
+        <h2>بازی تموم شد!</h2>
+        <div class="score" id="finalScore">0</div>
+        <div class="stats">
+          <div class="stat"><b id="finalLevel">1</b><span>تراز رسیده</span></div>
+          <div class="stat"><b id="finalStreak">0</b><span>بهترین رشته</span></div>
+        </div>
+      </div>
+      <button class="btn" id="btn-submit-gk" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; margin-bottom: 10px;" onclick="try{ if(window.parent){ window.parent.postMessage({type:'GK_SUBMIT_SCORE', score:state.score}, '*'); } }catch(e){}">✨ ثبت امتیاز من در جدول</button>
+      <button class="btn" id="btn-retry">دوباره بازی کن</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var starsEl = document.getElementById('stars');
+  for(var i=0;i<40;i++){
+    var s = document.createElement('div');
+    s.className='star';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.opacity = (0.2+Math.random()*0.5).toFixed(2);
+    starsEl.appendChild(s);
+  }
+
+  var COLORS = [
+    {name:'قرمز', hex:'#FF5C6C'},
+    {name:'زرد',  hex:'#FFD54A'},
+    {name:'آبی',  hex:'#4DA6FF'},
+    {name:'سبز',  hex:'#3DDC84'},
+    {name:'بنفش', hex:'#B388FF'},
+    {name:'نارنجی', hex:'#FF9142'}
+  ];
+
+  var LEVELS = [
+    { colors:3, time:5000, target:5 },
+    { colors:4, time:4200, target:10 },
+    { colors:4, time:3400, target:16 },
+    { colors:5, time:2900, target:24 },
+    { colors:5, time:2400, target:34 },
+    { colors:6, time:2000, target:9999 }
+  ];
+
+  var screenStart = document.getElementById('screen-start');
+  var screenGame  = document.getElementById('screen-game');
+  var screenOver  = document.getElementById('screen-over');
+
+  var scoreEl   = document.getElementById('score');
+  var levelEl   = document.getElementById('level');
+  var heartsEl  = document.getElementById('hearts');
+  var wordEl    = document.getElementById('word');
+  var optionsEl = document.getElementById('options');
+  var timerFill = document.getElementById('timerFill');
+  var rocketFill= document.getElementById('rocketFill');
+  var feedbackEl= document.getElementById('feedback');
+
+  var state;
+  var timerHandle = null;
+  var lockInput = false;
+
+  function showScreen(el){
+    [screenStart, screenGame, screenOver].forEach(function(s){ s.classList.remove('active'); });
+    el.classList.add('active');
+  }
+
+  function resetState(){
+    state = { score:0, lives:3, streak:0, bestStreak:0, levelIndex:0 };
+  }
+
+  function currentLevel(){ return LEVELS[state.levelIndex]; }
+
+  function renderHud(){
+    scoreEl.textContent = state.score;
+    levelEl.textContent = state.levelIndex + 1;
+    heartsEl.innerHTML = '';
+    for(var i=0;i<3;i++){
+      var h = document.createElement('span');
+      h.className='heart';
+      h.textContent = i < state.lives ? '❤' : '·';
+      heartsEl.appendChild(h);
+    }
+    var lvl = currentLevel();
+    var pct = Math.min(100, Math.round((state.score / lvl.target) * 100));
+    if(state.levelIndex === LEVELS.length-1) pct = Math.min(100, state.streak * 4);
+    rocketFill.style.width = pct + '%';
+  }
+
+  function pickRound(){
+    var lvl = currentLevel();
+    var pool = COLORS.slice(0, lvl.colors);
+    var meaning = pool[Math.floor(Math.random()*pool.length)];
+    var inkOptions = pool.filter(function(c){ return c.name !== meaning.name; });
+    var ink = inkOptions[Math.floor(Math.random()*inkOptions.length)];
+    var shuffled = pool.slice().sort(function(){ return Math.random()-0.5; });
+    return { meaning: meaning, ink: ink, options: shuffled, timeLimit: lvl.time };
+  }
+
+  function renderRound(round){
+    lockInput = false;
+    wordEl.textContent = round.meaning.name;
+    wordEl.style.color = round.ink.hex;
+    feedbackEl.textContent = '\u00A0';
+    feedbackEl.className = 'feedback';
+
+    optionsEl.innerHTML = '';
+    round.options.forEach(function(c){
+      var b = document.createElement('button');
+      b.className = 'opt';
+      b.style.background = c.hex;
+      b.setAttribute('aria-label', c.name);
+      b.addEventListener('click', function(){ handleAnswer(c, round, b); });
+      optionsEl.appendChild(b);
+    });
+
+    startTimer(round.timeLimit);
+  }
+
+  function startTimer(ms){
+    clearTimer();
+    var start = Date.now();
+    timerFill.style.background = 'var(--gold)';
+    timerHandle = setInterval(function(){
+      var elapsed = Date.now() - start;
+      var pct = Math.max(0, 100 - (elapsed/ms)*100);
+      timerFill.style.width = pct + '%';
+      if(pct < 25) timerFill.style.background = 'var(--bad)';
+      if(elapsed >= ms){
+        clearTimer();
+        if(!lockInput) handleTimeout();
+      }
+    }, 50);
+  }
+
+  function clearTimer(){
+    if(timerHandle){ clearInterval(timerHandle); timerHandle = null; }
+  }
+
+  function handleTimeout(){
+    lockInput = true;
+    state.lives -= 1;
+    state.streak = 0;
+    feedbackEl.textContent = 'وقت تموم شد! دفعه‌ی بعد سریع‌تر باش.';
+    feedbackEl.className = 'feedback bad';
+    renderHud();
+    afterAnswer();
+  }
+
+  function handleAnswer(chosen, round, buttonEl){
+    if(lockInput) return;
+    lockInput = true;
+    clearTimer();
+
+    var correct = chosen.name === round.ink.name;
+    var allBtns = optionsEl.querySelectorAll('.opt');
+    allBtns.forEach(function(b, idx){
+      if(round.options[idx].name === round.ink.name){
+        b.classList.add(correct ? 'correct' : 'correct');
+      }
+    });
+
+    if(correct){
+      state.score += 10;
+      state.streak += 1;
+      if(state.streak > state.bestStreak) state.bestStreak = state.streak;
+      feedbackEl.textContent = 'درسته! آفرین 🎯';
+      feedbackEl.className = 'feedback good';
+      maybeLevelUp();
+    } else {
+      state.lives -= 1;
+      state.streak = 0;
+      buttonEl.classList.add('wrong');
+      feedbackEl.textContent = 'اشتباه بود، رنگ نوشته رو نگاه کن نه معنی‌ش.';
+      feedbackEl.className = 'feedback bad';
+    }
+
+    renderHud();
+    afterAnswer();
+  }
+
+  function maybeLevelUp(){
+    var lvl = currentLevel();
+    if(state.score >= lvl.target && state.levelIndex < LEVELS.length - 1){
+      state.levelIndex += 1;
+    }
+  }
+
+  function afterAnswer(){
+    setTimeout(function(){
+      if(state.lives <= 0){
+        endGame();
+      } else {
+        renderRound(pickRound());
+      }
+    }, 650);
+  }
+
+  function endGame(){
+    clearTimer();
+    document.getElementById('finalScore').textContent = state.score;
+    document.getElementById('finalLevel').textContent = state.levelIndex + 1;
+    document.getElementById('finalStreak').textContent = state.bestStreak;
+    showScreen(screenOver);
+    try { if (window.parent) { window.parent.postMessage({ type: 'GK_SUBMIT_SCORE', score: state.score }, '*'); } } catch(e){}
+  }
+
+  function startGame(){
+    resetState();
+    renderHud();
+    showScreen(screenGame);
+    renderRound(pickRound());
+  }
+
+  document.getElementById('btn-start').addEventListener('click', startGame);
+  document.getElementById('btn-retry').addEventListener('click', startGame);
+})();
+</script>
+
+</body>
+</html>

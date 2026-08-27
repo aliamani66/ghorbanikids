@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>کارآگاه حباب</title>
+<style>
+*{box-sizing:border-box;user-select:none;margin:0;padding:0}
+body{font-family:Tahoma,Arial,sans-serif;min-height:100vh;background:radial-gradient(circle at center,#0f3854,#051329);display:flex;justify-content:center;align-items:center;overflow:hidden;color:#fff}
+.bg{position:fixed;inset:0;pointer-events:none}.bg i{position:absolute;border-radius:50%;background:rgba(0,242,254,.15);box-shadow:inset 0 0 12px #fff;animation:up 7s linear infinite}
+@keyframes up{from{transform:translateY(110vh);opacity:0}20%{opacity:.7}to{transform:translateY(-20vh);opacity:0}}
+.game{width:900px;max-width:94vw;background:rgba(10,30,60,.82);border:3px solid rgba(0,242,254,.5);border-radius:30px;box-shadow:0 0 40px rgba(0,242,254,.3);padding:25px;position:relative}
+.header{display:flex;justify-content:space-between;background:rgba(255,255,255,.08);border-radius:18px;padding:13px 20px;margin-bottom:18px;font-weight:bold}
+.header b{color:#00f2fe;font-size:1.3rem}.msg{text-align:center;color:#ffe600;font-size:1.25rem;font-weight:bold;min-height:42px}
+.tank{min-height:290px;border:2px dashed rgba(0,242,254,.45);border-radius:24px;background:rgba(0,242,254,.06);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:18px;padding:25px;position:relative}
+.bubble{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3.2rem;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.9),rgba(0,242,254,.3) 45%,rgba(255,0,127,.35));box-shadow:0 8px 25px rgba(0,242,254,.4),inset 0 0 15px #fff;animation:float 1.8s ease-in-out infinite alternate}
+@keyframes float{to{transform:translateY(-8px) rotate(4deg)}}
+.missing{border:2px dashed rgba(255,255,255,.35);background:rgba(255,255,255,.06);box-shadow:none}
+.cover{position:absolute;inset:0;border-radius:22px;background:linear-gradient(135deg,rgba(255,0,127,.92),rgba(0,242,254,.9));display:flex;align-items:center;justify-content:center;font-size:4rem;font-weight:bold;z-index:5}
+.options{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:22px 0;min-height:76px}
+.option{width:72px;height:72px;border-radius:18px;border:2px solid rgba(0,242,254,.5);background:rgba(255,255,255,.1);font-size:2.4rem;cursor:pointer;color:white}.option:hover{transform:scale(1.1);background:rgba(0,242,254,.25)}
+.action{display:block;margin:auto;background:linear-gradient(45deg,#ff007f,#7928ca);border:0;color:#fff;padding:12px 35px;font-size:1.2rem;font-weight:bold;border-radius:40px;cursor:pointer}
+</style></head>
+<body>
+<div class="bg" id="bg"></div>
+<div class="game">
+<div class="header"><div>مرحله: <b id="level">1</b>/5</div><div>امتیاز: <b id="score">0</b></div><div>زمان دیدن: <b id="timer">4</b> ثانیه</div></div>
+<div class="msg" id="msg">آماده‌ای برای کشف حباب گمشده؟ 🕵️‍♀️</div>
+<div class="tank" id="tank"></div>
+<div class="options" id="options"></div>
+<button class="action" id="start" onclick="startGame()">شروع بازی</button>
+</div>
+<script>
+const EMOJIS=['🐠','🐙','🦀','🐬','🐢','🐡','🪼','🦐','🦈','🐚','🦭','🐳'];
+const LEVELS=[{n:3,t:4,p:100,o:3},{n:4,t:4,p:150,o:4},{n:5,t:3,p:200,o:4},{n:6,t:3,p:250,o:5},{n:8,t:2,p:300,o:6}];
+let li=0,score=0,icons=[],missing='',locked=false;
+for(let i=0;i<15;i++){let x=document.createElement('i'),s=15+Math.random()*40;x.style.width=x.style.height=s+'px';x.style.left=Math.random()*100+'%';x.style.animationDelay=Math.random()*6+'s';document.getElementById('bg').appendChild(x)}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function startGame(){li=0;score=0;document.getElementById('score').textContent=0;document.getElementById('start').style.display='none';level()}
+function level(){
+ locked=false;let c=LEVELS[li];document.getElementById('level').textContent=li+1;document.getElementById('timer').textContent=c.t;document.getElementById('msg').textContent='دقت کن و حیوانات را خوب به خاطر بسپار! 👀';document.getElementById('options').innerHTML='';
+ icons=shuffle(EMOJIS).slice(0,c.n);let tank=document.getElementById('tank');tank.innerHTML='';let cover=document.createElement('div');cover.className='cover';cover.textContent='👀';tank.appendChild(cover);
+ icons.forEach((e,i)=>{let b=document.createElement('div');b.className='bubble';b.textContent=e;b.style.animationDelay=i*.1+'s';tank.appendChild(b)});
+ let t=c.t,iv=setInterval(()=>{t--;document.getElementById('timer').textContent=t;if(t<=0){clearInterval(iv);hide()}},1000)
+}
+function hide(){
+ let c=LEVELS[li];missing=icons[Math.floor(Math.random()*icons.length)];let tank=document.getElementById('tank');tank.innerHTML='';
+ icons.forEach(e=>{let b=document.createElement('div');b.className='bubble '+(e===missing?'missing':'');b.textContent=e===missing?'❓':e;tank.appendChild(b)});
+ document.getElementById('msg').textContent='کدام حیوان غیب شده است؟ 🤔';let wrong=shuffle(EMOJIS.filter(e=>!icons.includes(e))).slice(0,c.o-1);shuffle([missing,...wrong]).forEach(e=>{let b=document.createElement('button');b.className='option';b.textContent=e;b.onclick=()=>answer(e);document.getElementById('options').appendChild(b)})
+}
+function answer(e){
+ if(locked)return;
+ if(e===missing){locked=true;let c=LEVELS[li];score+=c.p;document.getElementById('score').textContent=score;document.getElementById('msg').textContent='آفرین! درست پیدا کردی! 🎉👏';document.querySelectorAll('.missing').forEach(x=>{x.className='bubble';x.textContent=missing});document.getElementById('options').innerHTML='';setTimeout(()=>{li++;if(li<LEVELS.length)level();else{document.getElementById('msg').textContent='🏆 تبریک! کارآگاه نابغه شدی! امتیاز: '+score;let b=document.getElementById('start');b.textContent='بازی مجدد';b.style.display='block'}},1200)}
+ else document.getElementById('msg').textContent='اشتباه بود؛ دوباره با دقت نگاه کن! 🔍'
+}
+</script></body></html>

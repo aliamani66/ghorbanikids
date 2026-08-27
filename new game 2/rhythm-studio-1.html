@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>استودیوی ریتمیک | Rhythm Studio</title>
+  <style>
+    :root { --bg: #0f172a; --panel: #1e293b; --accent: #f59e0b; --success: #22c55e; }
+    body { background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; margin: 0; }
+    
+    #game-container { 
+      width: 90vw; max-width: 500px; height: 80vh; background: var(--panel); 
+      border-radius: 40px; display: flex; flex-direction: column; align-items: center; 
+      position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .hud { width: 100%; padding: 25px; display: flex; justify-content: space-between; font-weight: bold; }
+    .combo-text { color: var(--accent); font-size: 1.5rem; }
+
+    .rhythm-lane { display: flex; gap: 10px; margin: 15px 0; perspective: 1000px; flex-wrap: wrap; justify-content: center; align-content: center; flex: 1; min-height: 0; overflow-y: auto; padding: 0 15px; }
+    .slot { width: var(--slot-size, 65px); height: var(--slot-size, 65px); background: #334155; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: calc(var(--slot-size, 65px) * 0.45); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 8px 0 #1e293b; flex-shrink: 0; }
+    .slot.active { transform: translateY(8px) scale(1.1); box-shadow: none; background: var(--accent); }
+    .slot.question { border: 2px dashed var(--accent); background: rgba(245, 158, 11, 0.1); }
+
+    .controls { display: flex; gap: 30px; margin-top: 20px; }
+    .btn { width: 90px; height: 90px; border-radius: 50%; border: none; cursor: pointer; font-size: 2rem; box-shadow: 0 10px 0 rgba(0,0,0,0.3); transition: 0.1s; }
+    .btn:active { transform: translateY(10px); box-shadow: none; }
+
+    canvas { position: absolute; pointer-events: none; top: 0; left: 0; }
+    .overlay { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.98); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; border-radius: 40px; }
+
+    #replay-btn {
+      margin-top: 15px; background: #334155; color: white; border: none; border-radius: 12px;
+      padding: 8px 18px; font-size: 0.95rem; cursor: pointer;
+    }
+
+    #level-toast {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white; font-weight: bold; text-align: center;
+      padding: 25px 35px; border-radius: 24px; z-index: 200;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #level-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    #level-toast .big { font-size: 2.2rem; display: block; margin-bottom: 6px; }
+    #level-toast .small { font-size: 1.05rem; opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="game-container">
+  <div class="hud">
+    <div>مرحله: <span id="level">1</span></div>
+    <div class="combo-text" id="combo">x1</div>
+    <div>امتیاز: <span id="score">0</span></div>
+  </div>
+
+  <div id="start-screen" class="overlay">
+    <h1 style="font-size: 3rem;">🥁 استودیوی ریتم</h1>
+    <p style="max-width: 320px; text-align: center; opacity: 0.85; line-height: 1.8; padding: 0 10px;">
+      یه ریتم چند بار تکرار می‌شه 🔁<br>
+      خوب گوش کن و ببین جای خالی ❓ باید ضربه‌ی درام 🥁 باشه یا سکوت Ø
+    </p>
+    <button style="padding: 20px 60px; font-size: 1.5rem; background: var(--accent); border: none; border-radius: 30px; color: white; cursor: pointer;" onclick="startGame()">شروع</button>
+  </div>
+
+  <div id="level-toast">
+    <span class="big">🎉 آفرین!</span>
+    <span class="small" id="level-toast-text">مرحله ۱ تموم شد</span>
+  </div>
+
+  <div id="gameover-screen" class="overlay" style="display:none">
+    <h1 style="font-size: 2.5rem;">😅 اشتباه بود!</h1>
+    <p style="font-size: 1.3rem; margin: 15px 0;">امتیاز نهایی: <span id="final-score">0</span></p>
+    <button style="padding: 18px 50px; font-size: 1.3rem; background: var(--accent); border: none; border-radius: 30px; color: white; cursor: pointer;" onclick="restartGame()">شروع دوباره</button>
+  </div>
+
+  <div class="rhythm-lane" id="grid"></div>
+  <button id="replay-btn" onclick="playSequence()">🔁 دوباره بشنو</button>
+
+  <div class="controls">
+    <button class="btn" style="background:#22c55e" onclick="checkChoice(1)">🥁</button>
+    <button class="btn" style="background:#ef4444" onclick="checkChoice(0)">Ø</button>
+  </div>
+</div>
+
+<script>
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let state = { level: 1, score: 0, combo: 1, pattern: [], missingIdx: -1, isPlaying: false };
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  // سیستم ذرات (Particles)
+  function createParticles(x, y) {
+    for (let i = 0; i < 20; i++) particles.push({ x, y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 1, color: '#f59e0b' });
+  }
+
+  // ===== صدای واقعی‌تر ساز کوبه‌ای با Web Audio API =====
+
+  // یه باس اصلی با کمپرسور، تا وقتی چند صدا هم‌زمان پخش می‌شن صدا خش‌دار/کلیپ نشه
+  const masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.9;
+  const compressor = audioCtx.createDynamicsCompressor();
+  compressor.threshold.value = -12;
+  compressor.knee.value = 20;
+  compressor.ratio.value = 6;
+  compressor.attack.value = 0.002;
+  compressor.release.value = 0.15;
+  masterGain.connect(compressor);
+  compressor.connect(audioCtx.destination);
+
+  // بافر نویز سفید، برای شبیه‌سازی صدای ضربه و هشیهات
+  let noiseBuffer = null;
+  function getNoiseBuffer() {
+    if (noiseBuffer) return noiseBuffer;
+    const bufferSize = audioCtx.sampleRate * 0.3;
+    noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    return noiseBuffer;
+  }
+
+  // 🥁 ضربه‌ی درام (کیک): بدنه‌ی بم با افت فرکانسی نرم + هد کلیک واضح + کمی گرمای هارمونیک
+  function playDrumHit() {
+    const t = audioCtx.currentTime;
+
+    // بدنه‌ی صدا (ساب-بیس): افت فرکانسی نرم از ۱۲۰ به ۴۰ هرتز با منحنی طبیعی‌تر
+    const osc = audioCtx.createOscillator();
+    const oscGain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(120, t);
+    osc.frequency.exponentialRampToValueAtTime(40, t + 0.18);
+    oscGain.gain.setValueAtTime(0.0001, t);
+    oscGain.gain.exponentialRampToValueAtTime(0.85, t + 0.008); // اتک سریع بدون کلیک ناگهانی
+    oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    osc.connect(oscGain); oscGain.connect(masterGain);
+    osc.start(t); osc.stop(t + 0.36);
+
+    // هارمونیک میانی: کمی گرما و بدنه به صدا اضافه می‌کنه (شبیه پوست درام)
+    const body = audioCtx.createOscillator();
+    const bodyGain = audioCtx.createGain();
+    body.type = 'triangle';
+    body.frequency.setValueAtTime(200, t);
+    body.frequency.exponentialRampToValueAtTime(80, t + 0.1);
+    bodyGain.gain.setValueAtTime(0.0001, t);
+    bodyGain.gain.exponentialRampToValueAtTime(0.25, t + 0.005);
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    body.connect(bodyGain); bodyGain.connect(masterGain);
+    body.start(t); body.stop(t + 0.16);
+
+    // کلیک برخورد: نویز کوتاه فیلترشده برای وضوح لحظه‌ی ضربه
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = getNoiseBuffer();
+    const noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.value = 1800;
+    noiseFilter.Q.value = 0.7;
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.setValueAtTime(0.0001, t);
+    noiseGain.gain.exponentialRampToValueAtTime(0.35, t + 0.003);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+    noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(masterGain);
+    noise.start(t); noise.stop(t + 0.05);
+  }
+
+  // Ø سکوت ریتمیک: یه تیک نرم و کوتاه (شبیه هشیهات بسته) تا فرق سکوت با ضربه واضح باشه
+  function playRestTick() {
+    const t = audioCtx.currentTime;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = getNoiseBuffer();
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 7000;
+    filter.Q.value = 0.9;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.22, t + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    noise.connect(filter); filter.connect(gain); gain.connect(masterGain);
+    noise.start(t); noise.stop(t + 0.04);
+  }
+
+  function playSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (type === 1) playDrumHit();
+    else playRestTick();
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+
+    // اندازه‌ی خونه‌ها رو طوری حساب می‌کنیم که همه‌ی خونه‌ها در یک ردیف جا بشن (اگه ممکن باشه)
+    const count = state.pattern.length;
+    const containerWidth = document.getElementById('game-container').clientWidth - 30;
+    const gap = 10;
+    const rawSize = Math.floor((containerWidth - (count - 1) * gap) / count);
+    const size = Math.max(38, Math.min(65, rawSize));
+    document.documentElement.style.setProperty('--slot-size', size + 'px');
+
+    state.pattern.forEach((val, i) => {
+      const div = document.createElement('div');
+      div.className = 'slot' + (i === state.missingIdx ? ' question' : '');
+      div.id = `slot-${i}`;
+      // مهم: اول باید چک کنیم جای خالیه یا نه، تا جواب لو نره
+      div.innerText = (i === state.missingIdx) ? '❓' : (val === 1 ? '🥁' : '—');
+      grid.appendChild(div);
+    });
+  }
+
+  async function playSequence() {
+    state.isPlaying = false;
+    for (let i = 0; i < state.pattern.length; i++) {
+      if (i === state.missingIdx) { await new Promise(r => setTimeout(r, 600)); continue; }
+      const el = document.getElementById(`slot-${i}`);
+      el.classList.add('active');
+      playSound(state.pattern[i]);
+      await new Promise(r => setTimeout(r, 600));
+      el.classList.remove('active');
+    }
+    state.isPlaying = true;
+  }
+
+  function checkChoice(choice) {
+    if (!state.isPlaying) return;
+    if (choice === state.pattern[state.missingIdx]) {
+      state.score += (20 * state.combo);
+      state.combo++;
+      document.getElementById('score').innerText = state.score;
+      document.getElementById('combo').innerText = 'x' + state.combo;
+      const rect = document.getElementById(`slot-${state.missingIdx}`).getBoundingClientRect();
+      createParticles(rect.left + 30, rect.top + 30);
+
+      document.getElementById(`slot-${state.missingIdx}`).innerText = choice ? '🥁' : '—';
+      playSound(choice);
+      state.isPlaying = false;
+      showLevelToast();
+      setTimeout(() => { state.level++; document.getElementById('level').innerText = state.level; generateLevel(); }, 1600);
+    } else {
+      state.isPlaying = false;
+      playRestTick(); // یه صدای کوتاه برای بازخورد اشتباه
+      gameOver();
+    }
+  }
+
+  function gameOver() {
+    document.getElementById('final-score').innerText = state.score;
+    document.getElementById('gameover-screen').style.display = 'flex';
+  }
+
+  function restartGame() {
+    state = { level: 1, score: 0, combo: 1, pattern: [], missingIdx: -1, isPlaying: false };
+    document.getElementById('score').innerText = 0;
+    document.getElementById('level').innerText = 1;
+    document.getElementById('combo').innerText = 'x1';
+    document.getElementById('gameover-screen').style.display = 'none';
+    generateLevel();
+  }
+
+  function showLevelToast() {
+    const toast = document.getElementById('level-toast');
+    document.getElementById('level-toast-text').innerText = `مرحله ${state.level} تموم شد`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1300);
+  }
+
+  function generateLevel() {
+    // به‌جای الگوی کاملاً تصادفی، یه «موتیف» کوتاه می‌سازیم و چند بار تکرارش می‌کنیم
+    // تا بچه با شنیدن تکرارها بتونه ریتم رو یاد بگیره و جای خالی رو منطقی حدس بزنه
+    const motifLen = 2 + (Math.floor(state.level / 3) % 3); // طول موتیف: ۲ تا ۴ ضربه
+    let motif = Array.from({ length: motifLen }, () => Math.random() > 0.45 ? 1 : 0);
+    if (motif.every(v => v === 0)) motif[0] = 1; // موتیف کاملاً ساکت نباشه
+
+    // تعداد تکرار رو طوری تنظیم می‌کنیم که کل تعداد خونه‌ها از ۸ بیشتر نشه (تا چیدمان به‌هم نریزه)
+    const repeats = motifLen <= 2 ? 3 : (motifLen === 3 ? 2 : 2);
+    state.pattern = [];
+    for (let r = 0; r < repeats; r++) state.pattern.push(...motif);
+
+    // جای خالی رو از تکرار دوم به بعد انتخاب می‌کنیم تا بچه حداقل یه بار کامل موتیف رو شنیده باشه
+    state.missingIdx = motifLen + Math.floor(Math.random() * (state.pattern.length - motifLen));
+
+    renderGrid();
+    setTimeout(playSequence, 500);
+  }
+
+  function startGame() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    document.getElementById('start-screen').style.display = 'none';
+    generateLevel();
+  }
+
+  // حلقه انیمیشن ذرات
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p, i) => {
+      p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+      if (p.life <= 0) particles.splice(i, 1);
+    });
+    requestAnimationFrame(animate);
+  }
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  animate();
+</script>
+</body>
+</html>

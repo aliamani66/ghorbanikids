@@ -1,0 +1,4036 @@
+<?php
+/**
+ * Plugin Name: GhorbaniKids Games Manager & Subscriptions
+ * Description: مدیریت بازی‌های HTML5، قفل‌گذاری هوشمند، سیستم اشتراک ووکامرس، استایل اختصاصی حساب کاربری و هدر بار کاربر و سبد خرید.
+ * Version: 5.7.0
+ * Author: GhorbaniKids
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class GhorbaniKids_Games {
+
+    private static $instance = null;
+
+    public static function get_instance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    public function __construct() {
+        add_action('init', [$this, 'register_cpt_and_taxonomies'], 0);
+        add_action('add_meta_boxes', [$this, 'add_meta_boxes']);
+        add_action('save_post_gk_game', [$this, 'save_meta_box_data']);
+        add_filter('the_content', [$this, 'render_game_content']);
+        add_shortcode('ghorbanikids_games', [$this, 'render_games_archive_shortcode']);
+        add_shortcode('ghorbanikids_pricing', [$this, 'render_pricing_table_shortcode']);
+        
+        // پری‌لود پرسرعت فونت‌ها و تصاویر صفحه اول در هد
+        add_action('wp_head', [$this, 'inject_resource_preloads'], 1);
+        add_action('wp_head', [$this, 'inject_frontend_styles'], 10);
+        add_action('avada_before_body_content', [$this, 'inject_top_navbar'], 1);
+        add_action('wp_body_open', [$this, 'inject_top_navbar'], 1);
+        add_action('wp_footer', [$this, 'inject_top_navbar'], 1);
+        add_action('wp_footer', [$this, 'replace_avada_social_icons_script']);
+        add_action('wp_footer', [$this, 'inject_auth_tabs_script']);
+        
+        add_filter('template_include', [$this, 'override_archive_template']);
+        add_action('template_redirect', [$this, 'redirect_shop_to_pricing']);
+        add_action('template_redirect', [$this, 'disable_cache_for_game_players']);
+        add_filter('body_class', [$this, 'enforce_right_side_header_body_class'], 999);
+        add_filter('woocommerce_return_to_shop_redirect', [$this, 'custom_return_to_shop_url']);
+        add_filter('woocommerce_endpoint_dashboard_title', [$this, 'custom_dashboard_title']);
+        add_filter('gettext', [$this, 'translate_dashboard_text'], 20, 3);
+
+        // جایگزینی قطعی متن کپی‌رایت فوتر به همراه آیکون شبکه‌های اجتماعی
+        add_action('avada_footer_copyright_content', [$this, 'render_custom_footer_copyright'], 1);
+
+        // جلوگیری از کرش ثبت سفارش هنگام غیرفعال بودن تابع mail در هاست
+        add_filter('pre_wp_mail', [$this, 'safe_pre_wp_mail'], 10, 2);
+
+        // جلوگیری از توقف و کندی ناشی از اجرای درون‌برنامه‌ای کرون در هاست اشتراکی
+        add_filter('cron_request', [$this, 'prevent_hanging_cron_loopback']);
+
+        // حذف کامل باگ چشمک‌زدن و بسته شدن کمبوباکس‌ها (Select2/SelectWoo Conflict)
+        add_action('wp_enqueue_scripts', [$this, 'disable_select2_bug'], 999);
+
+        // مدیریت اشتراک و ووکامرس (فعال‌سازی در وضعیت تکمیل‌شده و درحال‌انجام)
+        add_action('woocommerce_order_status_completed', [$this, 'handle_subscription_order']);
+        add_action('woocommerce_order_status_processing', [$this, 'handle_subscription_order']);
+        add_action('woocommerce_order_status_changed', [$this, 'handle_subscription_order_on_change'], 10, 3);
+        add_action('show_user_profile', [$this, 'render_user_subscription_fields']);
+        add_action('edit_user_profile', [$this, 'render_user_subscription_fields']);
+        add_action('personal_options_update', [$this, 'save_user_subscription_fields']);
+        add_action('edit_user_profile_update', [$this, 'save_user_subscription_fields']);
+
+        // پیام پیشخوان حساب کاربری
+        add_action('woocommerce_account_dashboard', [$this, 'render_dashboard_subscription_box'], 5);
+
+        // بهینه‌سازی فرم تسویه‌حساب ووکامرس
+        add_filter('woocommerce_checkout_fields', [$this, 'simplify_checkout_fields']);
+
+        // تسهیل و رفع خطای ثبت‌نام در ووکامرس
+        add_filter('woocommerce_min_password_strength', [$this, 'custom_min_password_strength']);
+        add_action('woocommerce_created_customer', [$this, 'auto_login_new_user']);
+
+        // بهینه‌سازی سرعت و لود اسکریپت‌ها
+        add_action('wp_enqueue_scripts', [$this, 'optimize_woocommerce_assets'], 99);
+        add_action('wp_print_scripts', [$this, 'disable_cart_fragments'], 100);
+    }
+
+    public function custom_dashboard_title() {
+        return 'داشبورد';
+    }
+
+    public function translate_dashboard_text($translation, $text, $domain) {
+        if (trim($text) === 'Dashboard') {
+            return 'داشبورد';
+        }
+        return $translation;
+    }
+
+    public function custom_return_to_shop_url() {
+        return home_url('/pricing/');
+    }
+
+    /**
+     * پیش‌بارگذاری سریع (Preload) فونت‌های فارسی و تصویر شاخص صفحه اصلی برای لود صدم ثانیه‌ای
+     */
+    public function inject_resource_preloads() {
+        if (is_front_page() || is_home()) {
+            echo '<link rel="preload" as="image" href="https://ghorbanikids.ir/wp-content/uploads/2016/06/kids_conner_4.webp" fetchpriority="high">' . "\n";
+            echo '<link rel="preload" as="image" href="https://ghorbanikids.ir/wp-content/uploads/2016/06/background.webp">' . "\n";
+        }
+        echo '<link rel="preload" href="https://ghorbanikids.ir/wp-content/uploads/2021/10/aviny-web.woff2" as="font" type="font/woff2" crossorigin>' . "\n";
+        echo '<link rel="preload" href="https://ghorbanikids.ir/wp-content/uploads/2021/10/IRANSansXFaNum-Regular.woff2" as="font" type="font/woff2" crossorigin>' . "\n";
+    }
+
+    /**
+     * سیستم تب‌های فعال و هوشمند ورود و عضویت در دسکتاپ و موبایل
+     */
+    public function inject_auth_tabs_script() {
+        if (is_account_page() && !is_user_logged_in()) {
+            ?>
+            <script data-no-optimize="1">
+                document.addEventListener("DOMContentLoaded", function() {
+                    var customerLogin = document.getElementById("customer_login");
+                    if (!customerLogin) return;
+
+                    var col1 = customerLogin.querySelector(".col-1") || customerLogin.querySelector(".u-column1");
+                    var col2 = customerLogin.querySelector(".col-2") || customerLogin.querySelector(".u-column2");
+
+                    if (col1 && col2) {
+                        if (!document.getElementById("gkAuthTabsHeader")) {
+                            var tabsHeader = document.createElement("div");
+                            tabsHeader.id = "gkAuthTabsHeader";
+                            tabsHeader.className = "gk-auth-tabs-header";
+                            tabsHeader.innerHTML = `
+                                <button type="button" class="gk-auth-tab-btn active" data-target="login">🔑 ورود به حساب</button>
+                                <button type="button" class="gk-auth-tab-btn" data-target="register">✨ عضویت و ثبت‌نام</button>
+                            `;
+                            customerLogin.parentNode.insertBefore(tabsHeader, customerLogin);
+
+                            var tabBtns = tabsHeader.querySelectorAll(".gk-auth-tab-btn");
+                            tabBtns.forEach(function(btn) {
+                                btn.addEventListener("click", function(e) {
+                                    e.preventDefault();
+                                    tabBtns.forEach(function(b) { b.classList.remove("active"); });
+                                    btn.classList.add("active");
+
+                                    var target = btn.getAttribute("data-target");
+                                    if (target === "login") {
+                                        customerLogin.classList.remove("show-register");
+                                        customerLogin.classList.add("show-login");
+                                    } else {
+                                        customerLogin.classList.remove("show-login");
+                                        customerLogin.classList.add("show-register");
+                                    }
+                                });
+                            });
+                        }
+
+                        // پیش‌فرض نمایش ورود
+                        customerLogin.classList.remove("show-register");
+                        customerLogin.classList.add("show-login");
+                    }
+                });
+            </script>
+            <?php
+        }
+    }
+
+    /**
+     * جایگزینی دقیق و شیک آیکون‌های قدیمی سایدبار و منوی موبایل با آیکون‌های اینستاگرام، تلگرام، بله و شماره تماس موبایل
+     */
+    public function replace_avada_social_icons_script() {
+        ?>
+        <script data-no-optimize="1">
+            document.addEventListener("DOMContentLoaded", function() {
+                var socialHtml = `
+                    <div class="gk-social-replacement-box">
+                        <div class="gk-social-links-row">
+                            <a href="https://instagram.com/ghorbanikids" target="_blank" rel="noopener" class="gk-s-btn gk-s-instagram" title="اینستاگرام: @ghorbanikids">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                </svg>
+                            </a>
+                            <a href="https://t.me/ghorbanikids" target="_blank" rel="noopener" class="gk-s-btn gk-s-telegram" title="تلگرام: @ghorbanikids">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.61 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.05-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.98-1.73 6.64-2.88 7.97-3.44 3.8-1.58 4.59-1.86 5.1-1.87.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.04.38z"/>
+                                </svg>
+                            </a>
+                            <a href="https://ble.ir/ghorbanikids" target="_blank" rel="noopener" class="gk-s-btn gk-s-bale" title="پیام‌رسان بله: @ghorbanikids">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <rect width="24" height="24" rx="6" fill="#14b8a6"/>
+                                    <path d="M7 6h10a1 1 0 0 1 1 1v6a5 5 0 0 1-5 5H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zm3 8h4a2 2 0 0 0 2-2V9H10v5z" fill="#ffffff"/>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="gk-social-phone-row">
+                            <a href="tel:09306197877" class="gk-s-phone-box" title="تماس مستقیم و پشتیبانی">
+                                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                                <span>۰۹۳۰ ۶۱۹ ۷۸۷۷</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                // جایگزینی در سایدبار دسکتاپ
+                var target = document.querySelector("#side-header .fusion-social-links-header") || 
+                             document.querySelector("#side-header .fusion-social-networks") ||
+                             document.querySelector("#side-header .fusion-social-networks-wrapper") ||
+                             document.querySelector("#side-header .fusion-builder-column:last-child .fusion-column-wrapper");
+                if (target) {
+                    target.innerHTML = socialHtml;
+                }
+
+                // درج در منوی موبایل
+                var mobileNav = document.querySelector(".fusion-mobile-nav-holder") || document.querySelector(".awb-menu__mobile-container");
+                if (mobileNav && !document.getElementById("gkMobileSocialInjected")) {
+                    var mobileDiv = document.createElement("div");
+                    mobileDiv.id = "gkMobileSocialInjected";
+                    mobileDiv.style.padding = "15px 0";
+                    mobileDiv.innerHTML = socialHtml;
+                    mobileNav.appendChild(mobileDiv);
+                }
+
+                // حذف باکس‌های اشتراک‌گذاری قدیمی
+                var shareBoxes = document.querySelectorAll(".fusion-sharing-box, .fusion-social-sharing, .sharing-box");
+                shareBoxes.forEach(function(box) {
+                    box.remove();
+                });
+            });
+        </script>
+        <?php
+    }
+
+    /**
+     * چاپ آیکون‌های شبکه‌های اجتماعی و متن کپی‌رایت اختصاصی قربانی کیدز در فوتر
+     */
+    public function render_custom_footer_copyright() {
+        remove_action('avada_footer_copyright_content', 'avada_render_footer_copyright_notice', 10);
+        ?>
+        <div class="gk-footer-content-box" style="text-align: center; padding: 20px 10px; direction: rtl;">
+            <div class="gk-footer-social-row" style="display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 14px;">
+                <a href="https://instagram.com/ghorbanikids" target="_blank" rel="noopener" class="gk-s-btn gk-s-instagram" title="اینستاگرام: @ghorbanikids">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                </a>
+                <a href="https://t.me/ghorbanikids" target="_blank" rel="noopener" class="gk-s-btn gk-s-telegram" title="تلگرام: @ghorbanikids">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.61 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.05-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.98-1.73 6.64-2.88 7.97-3.44 3.8-1.58 4.59-1.86 5.1-1.87.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.04.38z"/>
+                    </svg>
+                </a>
+                <a href="https://ble.ir/ghorbanikids" target="_blank" rel="noopener" class="gk-s-btn gk-s-bale" title="پیام‌رسان بله: @ghorbanikids">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <rect width="24" height="24" rx="6" fill="#14b8a6"/>
+                        <path d="M7 6h10a1 1 0 0 1 1 1v6a5 5 0 0 1-5 5H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zm3 8h4a2 2 0 0 0 2-2V9H10v5z" fill="#ffffff"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="gk-footer-copyright-text" style="color: #cbd5e1; font-size: 0.95rem; font-weight: 700; text-align: center; width: 100%; margin: 0 auto; display: block;">
+                © کلیه حقوق مادی و معنوی این سایت متعلق به قربانی کیدز (GhorbaniKids) می‌باشد.
+            </div>
+        </div>
+        <style>
+            .fusion-copyright-content a[href*="theme-fusion"],
+            .fusion-copyright-content a[href*="wordpress.org"],
+            .fusion-copyright-content a[href*="themeforest"] {
+                display: none !important;
+            }
+                    /* استایل دراپ‌داون زیرمنوها در دسکتاپ */
+            .gk-nav-item.has-dropdown {
+                position: relative !important;
+            }
+
+            .gk-dropdown-arrow {
+                transition: transform 0.25s ease !important;
+                margin-right: 2px !important;
+                opacity: 0.75 !important;
+            }
+
+            .gk-nav-item.has-dropdown:hover .gk-dropdown-arrow {
+                transform: rotate(180deg) !important;
+                opacity: 1 !important;
+            }
+
+            .gk-dropdown-menu {
+                position: absolute !important;
+                top: 100% !important;
+                right: 0 !important;
+                min-width: 220px !important;
+                background: #ffffff !important;
+                border: 1.5px solid #e2e8f0 !important;
+                border-radius: 18px !important;
+                box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12) !important;
+                padding: 10px !important;
+                margin: 8px 0 0 0 !important;
+                list-style: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                transform: translateY(10px) !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                pointer-events: none !important;
+                z-index: 1000000 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 4px !important;
+            }
+
+            .gk-nav-item.has-dropdown:hover .gk-dropdown-menu {
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: translateY(0) !important;
+                pointer-events: auto !important;
+            }
+
+            .gk-dropdown-item {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .gk-dropdown-link {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                padding: 10px 14px !important;
+                border-radius: 12px !important;
+                font-size: 0.98rem !important;
+                font-weight: 700 !important;
+                color: #475569 !important;
+                text-decoration: none !important;
+                transition: all 0.2s ease !important;
+                background: transparent !important;
+            }
+
+            .gk-dropdown-link:hover {
+                background: #f5f3ff !important;
+                color: #6c5ce7 !important;
+                transform: translateX(-4px) !important;
+            }
+
+            .gk-dropdown-item.current-menu-item .gk-dropdown-link {
+                background: #ede9fe !important;
+                color: #6c5ce7 !important;
+                font-weight: 800 !important;
+            }
+
+            /* زیرمنو در موبایل */
+            .gk-mobile-item-head {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                background: #f8fafc !important;
+                border: 1px solid #f1f5f9 !important;
+                border-radius: 16px !important;
+            }
+
+            .gk-mobile-item-head .gk-mobile-nav-link {
+                flex: 1 !important;
+                background: transparent !important;
+                border: none !important;
+            }
+
+            .gk-mobile-sub-toggle {
+                background: transparent !important;
+                border: none !important;
+                padding: 12px 16px !important;
+                cursor: pointer !important;
+                color: #64748b !important;
+                transition: transform 0.25s ease !important;
+            }
+
+            .gk-mobile-nav-item.open-sub .gk-mobile-sub-toggle svg {
+                transform: rotate(180deg) !important;
+            }
+
+            .gk-mobile-sub-list {
+                list-style: none !important;
+                margin: 6px 12px 0 0 !important;
+                padding: 0 0 0 10px !important;
+                border-right: 2px solid #e2e8f0 !important;
+                display: none !important;
+                flex-direction: column !important;
+                gap: 4px !important;
+            }
+
+            .gk-mobile-nav-item.open-sub .gk-mobile-sub-list {
+                display: flex !important;
+            }
+
+            .gk-mobile-sub-link {
+                display: block !important;
+                padding: 8px 14px !important;
+                border-radius: 10px !important;
+                font-size: 0.95rem !important;
+                font-weight: 700 !important;
+                color: #475569 !important;
+                text-decoration: none !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .gk-mobile-sub-link:hover {
+                color: #6c5ce7 !important;
+                background: #f5f3ff !important;
+            }
+                    /* سنتر و وسط‌چین کردن کامل ردیف‌های صفحه اصلی و بخش بازی‌ها */
+            .gk-games-grid {
+                max-width: 1240px !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                justify-content: center !important;
+            }
+
+            .fusion-builder-row,
+            .fusion-builder-container,
+            .fusion-fullwidth {
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+
+            .fusion-builder-column-1_1,
+            .fusion-builder-column {
+                margin-left: auto !important;
+                margin-right: auto !important;
+                float: none !important;
+            }
+        </style>
+        <?php
+    }
+
+    public function enforce_right_side_header_body_class($classes) {
+        $classes = array_diff($classes, ['side-header-left']);
+        $classes[] = 'side-header-right';
+        return $classes;
+    }
+
+    public function disable_cache_for_game_players() {
+        if (is_singular('gk_game')) {
+            if (!defined('DONOTCACHEPAGE')) {
+                define('DONOTCACHEPAGE', true);
+            }
+            if (has_action('litespeed_control_set_nocache')) {
+                do_action('litespeed_control_set_nocache', 'GhorbaniKids Live Game Subscription Check');
+            }
+        }
+    }
+
+    public function disable_select2_bug() {
+        wp_dequeue_script('selectWoo');
+        wp_deregister_script('selectWoo');
+        wp_dequeue_script('select2');
+        wp_deregister_script('select2');
+        wp_dequeue_style('select2');
+        wp_deregister_style('select2');
+        wp_dequeue_style('selectWoo');
+        wp_deregister_style('selectWoo');
+    }
+
+    public function prevent_hanging_cron_loopback($cron_request_array) {
+        if (!is_admin()) {
+            return false;
+        }
+        return $cron_request_array;
+    }
+
+    public function safe_pre_wp_mail($null, $atts) {
+        if (!function_exists('mail')) {
+            return true;
+        }
+        return null;
+    }
+
+    public function custom_min_password_strength() {
+        return 1;
+    }
+
+    public function auto_login_new_user($customer_id) {
+        wp_set_current_user($customer_id);
+        wp_set_auth_cookie($customer_id);
+    }
+
+    public function redirect_shop_to_pricing() {
+        if (is_shop()) {
+            wp_safe_redirect(home_url('/pricing/'), 301);
+            exit;
+        }
+    }
+
+    public function render_dashboard_subscription_box() {
+        $user_id = get_current_user_id();
+        $sub = self::user_has_active_subscription($user_id);
+        ?>
+        <div class="gk-myaccount-sub-box">
+            <?php if ($sub && !empty($sub['active'])): ?>
+                <div class="gk-sub-card active">
+                    <div class="gk-sub-icon">👑</div>
+                    <div>
+                        <h3 style="margin:0 0 6px; color:#15803d; font-weight:800;">اشتراک ویژه شما فعال است!</h3>
+                        <p style="margin:0; color:#166534; font-size:0.95rem;">
+                            شما به تمامی ۹ بازی و بازی‌های جدید آینده دسترسی نامحدود دارید.
+                            (<strong><?php echo $sub['days_left']; ?> روز</strong> باقی‌مانده)
+                        </p>
+                    </div>
+                    <a href="<?php echo esc_url(home_url('/games/')); ?>" class="gk-btn gk-btn-fullscreen" style="margin-right:auto; padding:10px 22px; border-radius:20px;">
+                        🎮 ورود به بازی‌ها
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="gk-sub-card inactive">
+                    <div class="gk-sub-icon">🔒</div>
+                    <div>
+                        <h3 style="margin:0 0 6px; color:#991b1b; font-weight:800;">هنوز اشتراک فعالی ندارید</h3>
+                        <p style="margin:0; color:#b91c1c; font-size:0.95rem;">
+                            برای دسترسی نامحدود به بازی‌های فکری و مهارتی، یکی از پلن‌های اشتراک را فعال کنید.
+                        </p>
+                    </div>
+                    <a href="<?php echo esc_url(home_url('/pricing/')); ?>" class="gk-btn gk-btn-subscribe" style="margin-right:auto; padding:10px 22px; border-radius:20px;">
+                        👑 خرید اشتراک ویژه
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * نوار مدرن و لوکس هدر با آیکون کله آدمک (بدون نام کاربری)
+     */
+    public function inject_header_user_bar() {
+        $this->inject_top_navbar();
+    }
+
+    public function inject_top_navbar() {
+        static $rendered = false;
+        if ($rendered) return;
+        $rendered = true;
+
+        $cart_count = 0;
+        if (function_exists('WC') && WC()->cart) {
+            $cart_count = WC()->cart->get_cart_contents_count();
+        }
+        $is_logged_in = is_user_logged_in();
+        $account_url = wc_get_page_permalink('myaccount') ?: home_url('/my-account/');
+        $cart_url = wc_get_page_permalink('cart') ?: home_url('/cart/');
+        $logo_url = 'https://ghorbanikids.ir/wp-content/uploads/2026/08/ghorbanikids_logo_512.png';
+
+        // تشخیص وضعیت صفحه جاری برای هایلایت منوها
+        $cur_uri = urldecode($_SERVER['REQUEST_URI'] ?? '/');
+        $cur_path = untrailingslashit(strtok($cur_uri, '?'));
+        $cur_cat = isset($_GET['cat']) ? sanitize_text_field(urldecode($_GET['cat'])) : '';
+        $cur_age = isset($_GET['age']) ? sanitize_text_field(urldecode($_GET['age'])) : '';
+        $is_games_page = is_page('games') || (strpos($cur_path, '/games') !== false) || is_singular('gk_game') || is_tax(['game_category', 'game_age_group']) || !empty($cur_cat) || !empty($cur_age);
+
+        // ساخت درخت منو از منوی وردپرس
+        $menu_tree = [];
+        $locations = get_nav_menu_locations();
+        if (!empty($locations['main_navigation'])) {
+            $wp_items = wp_get_nav_menu_items($locations['main_navigation']);
+            if (!empty($wp_items)) {
+                $items_by_id = [];
+                foreach ($wp_items as $item) {
+                    $items_by_id[$item->ID] = [
+                        'id' => $item->ID,
+                        'title' => $item->title,
+                        'url' => $item->url,
+                        'parent' => $item->menu_item_parent,
+                        'badge' => (stripos($item->url, 'pricing') !== false) ? 'ویژه' : '',
+                        'children' => [],
+                    ];
+                }
+                foreach ($items_by_id as $id => &$item_ref) {
+                    if ($item_ref['parent'] == 0) {
+                        $menu_tree[$id] = &$item_ref;
+                    } else if (isset($items_by_id[$item_ref['parent']])) {
+                        $items_by_id[$item_ref['parent']]['children'][] = &$item_ref;
+                    }
+                }
+            }
+        }
+
+        if (empty($menu_tree)) {
+            $menu_tree = [
+                ['title' => 'خانه', 'url' => home_url('/'), 'children' => []],
+                ['title' => 'بازی‌ها', 'url' => home_url('/games/'), 'children' => [
+                    ['title' => 'همه بازی‌ها', 'url' => home_url('/games/')],
+                    ['title' => 'دیداری و بصری', 'url' => home_url('/games/?cat=دیداری-و-بصری')],
+                    ['title' => 'حافظه و تمرکز', 'url' => home_url('/games/?cat=حافظه-و-تمرکز')],
+                    ['title' => 'هوش و ریاضی', 'url' => home_url('/games/?cat=هوش-و-ریاضی')],
+                    ['title' => 'سرگرمی و تفریحی', 'url' => home_url('/games/?cat=سرگرمی-و-تفریحی')],
+                    ['title' => 'شنیداری', 'url' => home_url('/games/?cat=شنیداری')],
+                ]],
+                ['title' => 'تست‌ها و استعدادیابی', 'url' => home_url('/tests/'), 'badge' => 'جدید', 'children' => []],
+                ['title' => 'خرید اشتراک', 'url' => home_url('/pricing/'), 'badge' => 'ویژه', 'children' => []],
+                ['title' => 'آخرین خبرها', 'url' => home_url('/latest-news/'), 'children' => []],
+                ['title' => 'درباره ما', 'url' => home_url('/about-us/'), 'children' => []],
+                ['title' => 'تماس با ما', 'url' => home_url('/contact-us/'), 'children' => []],
+            ];
+        }
+        ?>
+        <style id="gk-top-navbar-core-css" data-no-optimize="1">
+            #gkTopNavbar, #gkTopNavbar * {
+                box-sizing: border-box !important;
+            }
+            #gkTopNavbar ul, #gkTopNavbar li {
+                list-style: none !important;
+                list-style-type: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            #gkTopNavbar li:before, #gkTopNavbar li:after,
+            #gkTopNavbar a:before, #gkTopNavbar a:after {
+                display: none !important;
+                content: none !important;
+            }
+            .gk-top-navbar {
+                position: sticky !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                z-index: 999999 !important;
+                background: rgba(255, 255, 255, 0.96) !important;
+                backdrop-filter: blur(20px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08) !important;
+                direction: rtl !important;
+                font-family: 'IRANSansXFaNum', 'aviny', Tahoma, sans-serif !important;
+            }
+            .gk-navbar-container {
+                max-width: 1360px !important;
+                margin: 0 auto !important;
+                padding: 0 24px !important;
+                height: 74px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+            }
+            .gk-navbar-brand-col {
+                display: flex !important;
+                align-items: center !important;
+                flex-shrink: 0 !important;
+            }
+            .gk-navbar-brand {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+                text-decoration: none !important;
+            }
+            .gk-navbar-logo {
+                height: 48px !important;
+                width: auto !important;
+                max-width: 56px !important;
+                object-fit: contain !important;
+                display: block !important;
+            }
+            .gk-navbar-brand-title {
+                font-family: 'aviny', cursive, Tahoma, sans-serif !important;
+                font-size: 1.85rem !important;
+                font-weight: 800 !important;
+                color: #1e3a8a !important;
+                letter-spacing: 0 !important;
+                line-height: 1 !important;
+            }
+            .gk-navbar-nav-col {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex: 1 !important;
+                margin: 0 24px !important;
+            }
+            .gk-nav-list {
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                list-style: none !important;
+            }
+            .gk-nav-item {
+                position: relative !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                list-style: none !important;
+            }
+            .gk-nav-link {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 16px !important;
+                border-radius: 22px !important;
+                font-size: 1.05rem !important;
+                font-weight: 700 !important;
+                color: #334155 !important;
+                text-decoration: none !important;
+                transition: all 0.2s ease !important;
+            }
+            .gk-nav-link:hover {
+                color: #6c5ce7 !important;
+                background-color: #f5f3ff !important;
+            }
+            .gk-nav-item.current-menu-item > .gk-nav-link {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.35) !important;
+            }
+            .gk-nav-badge {
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%) !important;
+                color: #ffffff !important;
+                font-size: 0.72rem !important;
+                font-weight: 900 !important;
+                padding: 2px 8px !important;
+                border-radius: 12px !important;
+                margin-right: 4px !important;
+            }
+            .gk-dropdown-arrow {
+                transition: transform 0.25s ease !important;
+                opacity: 0.75 !important;
+                margin-right: 4px !important;
+            }
+            .gk-nav-item:hover .gk-dropdown-arrow {
+                transform: rotate(180deg) !important;
+                opacity: 1 !important;
+            }
+            .gk-dropdown-menu {
+                position: absolute !important;
+                top: 100% !important;
+                right: 0 !important;
+                min-width: 230px !important;
+                background: #ffffff !important;
+                border: 1.5px solid #e2e8f0 !important;
+                border-radius: 18px !important;
+                box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15) !important;
+                padding: 10px !important;
+                margin: 8px 0 0 0 !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                transform: translateY(10px) !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                pointer-events: none !important;
+                z-index: 1000000 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 4px !important;
+                list-style: none !important;
+            }
+            .gk-nav-item:hover .gk-dropdown-menu {
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: translateY(0) !important;
+                pointer-events: auto !important;
+            }
+            .gk-dropdown-item {
+                margin: 0 !important;
+                padding: 0 !important;
+                list-style: none !important;
+            }
+            .gk-dropdown-link {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                padding: 10px 14px !important;
+                border-radius: 12px !important;
+                font-size: 0.98rem !important;
+                font-weight: 700 !important;
+                color: #334155 !important;
+                text-decoration: none !important;
+                transition: all 0.2s ease !important;
+                background: transparent !important;
+            }
+            .gk-dropdown-link:hover {
+                background: #f5f3ff !important;
+                color: #6c5ce7 !important;
+                transform: translateX(-4px) !important;
+            }
+            .gk-dropdown-item.current-menu-item .gk-dropdown-link {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                font-weight: 800 !important;
+                box-shadow: 0 4px 12px rgba(108, 92, 231, 0.35) !important;
+                transform: translateX(-4px) !important;
+            }
+            .gk-dropdown-item.current-menu-item .gk-dropdown-link * {
+                color: #ffffff !important;
+            }
+            .gk-navbar-tools-col {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+                flex-shrink: 0 !important;
+            }
+            .gk-tool-btn-vip {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+                color: #ffffff !important;
+                padding: 8px 18px !important;
+                border-radius: 24px !important;
+                font-size: 0.95rem !important;
+                font-weight: 800 !important;
+                text-decoration: none !important;
+                box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+                transition: all 0.25s ease !important;
+            }
+            .gk-tool-btn-vip:hover {
+                transform: translateY(-2px) scale(1.03) !important;
+                box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45) !important;
+                color: #ffffff !important;
+            }
+            .gk-tool-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 42px !important;
+                height: 42px !important;
+                padding: 0 !important;
+                border-radius: 50% !important;
+                text-decoration: none !important;
+                transition: all 0.25s ease !important;
+                color: #334155 !important;
+                cursor: pointer !important;
+                border: 1.5px solid #e2e8f0 !important;
+                background: #ffffff !important;
+                position: relative !important;
+            }
+            .gk-tool-btn:hover {
+                transform: translateY(-2px) !important;
+            }
+            .gk-tool-cart:hover {
+                background: #6c5ce7 !important;
+                color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+            }
+            .gk-cart-count-badge {
+                position: absolute !important;
+                top: -5px !important;
+                right: -5px !important;
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%) !important;
+                color: #ffffff !important;
+                font-size: 0.74rem !important;
+                font-weight: 900 !important;
+                min-width: 20px !important;
+                height: 20px !important;
+                border-radius: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: 0 2px 8px rgba(232, 67, 147, 0.5) !important;
+                border: 2px solid #ffffff !important;
+                padding: 0 4px !important;
+            }
+            .gk-tool-user {
+                background: #f1f5f9 !important;
+                color: #1e293b !important;
+            }
+            .gk-tool-logout {
+                background: #fff1f2 !important;
+                color: #e11d48 !important;
+                border-color: #ffe4e6 !important;
+            }
+            .gk-tool-login {
+                width: auto !important;
+                padding: 0 18px !important;
+                height: 42px !important;
+                border-radius: 24px !important;
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                border: 1.5px solid #6c5ce7 !important;
+                gap: 8px !important;
+            }
+            .gk-login-label {
+                font-size: 0.92rem !important;
+                font-weight: 800 !important;
+            }
+            .gk-mobile-toggle-btn {
+                display: none !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 42px !important;
+                height: 42px !important;
+                border-radius: 14px !important;
+                background: #f8fafc !important;
+                border: 1.5px solid #e2e8f0 !important;
+                cursor: pointer !important;
+            }
+            .gk-hamburger-icon {
+                width: 20px !important;
+                height: 14px !important;
+                position: relative !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+            }
+            .gk-hamburger-icon span {
+                display: block !important;
+                height: 2.2px !important;
+                width: 100% !important;
+                background-color: #1e293b !important;
+                border-radius: 2px !important;
+            }
+            .gk-mobile-drawer {
+                display: none !important;
+                max-height: 0 !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
+                border-bottom: 2px solid #e2e8f0 !important;
+                box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12) !important;
+                transition: max-height 0.35s ease !important;
+            }
+            .gk-mobile-drawer.is-open {
+                max-height: 550px !important;
+            }
+            .gk-mobile-drawer-inner {
+                padding: 16px 20px 24px !important;
+            }
+            .gk-mobile-nav-list {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 6px !important;
+            }
+            .gk-mobile-nav-link {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 12px 18px !important;
+                border-radius: 16px !important;
+                font-size: 1.1rem !important;
+                font-weight: 700 !important;
+                color: #334155 !important;
+                text-decoration: none !important;
+                background: #f8fafc !important;
+            }
+            .gk-mobile-nav-item.active > .gk-mobile-item-head,
+            .gk-mobile-nav-item.active > .gk-mobile-nav-link {
+                background: #ede9fe !important;
+            }
+            .gk-mobile-nav-item.active .gk-mobile-nav-text {
+                color: #6c5ce7 !important;
+                font-weight: 800 !important;
+            }
+            .gk-mobile-item-head {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                background: #f8fafc !important;
+                border: 1px solid #f1f5f9 !important;
+                border-radius: 16px !important;
+            }
+            .gk-mobile-item-head .gk-mobile-nav-link {
+                flex: 1 !important;
+                background: transparent !important;
+            }
+            .gk-mobile-sub-toggle {
+                background: transparent !important;
+                border: none !important;
+                padding: 12px 16px !important;
+                cursor: pointer !important;
+                color: #64748b !important;
+            }
+            .gk-mobile-nav-item.open-sub .gk-mobile-sub-toggle svg {
+                transform: rotate(180deg) !important;
+            }
+            .gk-mobile-sub-list {
+                list-style: none !important;
+                margin: 6px 12px 0 0 !important;
+                padding: 0 0 0 10px !important;
+                border-right: 2px solid #e2e8f0 !important;
+                display: none !important;
+                flex-direction: column !important;
+                gap: 4px !important;
+            }
+            .gk-mobile-nav-item.open-sub .gk-mobile-sub-list {
+                display: flex !important;
+            }
+            .gk-mobile-sub-link {
+                display: block !important;
+                padding: 8px 14px !important;
+                border-radius: 10px !important;
+                font-size: 0.95rem !important;
+                font-weight: 700 !important;
+                color: #475569 !important;
+                text-decoration: none !important;
+            }
+            .gk-mobile-sub-item.active .gk-mobile-sub-link {
+                color: #6c5ce7 !important;
+                background: #ede9fe !important;
+                font-weight: 800 !important;
+            }
+            .gk-mobile-drawer-footer {
+                margin-top: 16px !important;
+                padding-top: 16px !important;
+                border-top: 1px solid #e2e8f0 !important;
+                display: flex !important;
+                justify-content: center !important;
+            }
+            .gk-mobile-phone-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                background: #f1f5f9 !important;
+                padding: 9px 20px !important;
+                border-radius: 22px !important;
+                color: #334155 !important;
+                font-weight: 800 !important;
+                font-size: 0.92rem !important;
+                text-decoration: none !important;
+                direction: ltr !important;
+            }
+            @media (max-width: 980px) {
+                .gk-navbar-nav-col, .gk-tool-btn-vip, .gk-login-label {
+                    display: none !important;
+                }
+                .gk-mobile-toggle-btn, .gk-mobile-drawer {
+                    display: flex !important;
+                }
+                .gk-mobile-drawer {
+                    display: block !important;
+                }
+                .gk-navbar-container {
+                    height: 66px !important;
+                    padding: 0 16px !important;
+                }
+                .gk-navbar-brand-title {
+                    font-size: 1.55rem !important;
+                }
+                .gk-navbar-logo {
+                    height: 42px !important;
+                }
+            }
+        </style>
+        <header id="gkTopNavbar" class="gk-top-navbar">
+            <div class="gk-navbar-container">
+                <!-- ۱. لوگو و برند (راست) -->
+                <div class="gk-navbar-brand-col">
+                    <a href="<?php echo esc_url(home_url('/')); ?>" class="gk-navbar-brand" title="قربانی کیدز - صفحه اصلی">
+                        <img src="<?php echo esc_url($logo_url); ?>" alt="قربانی کیدز" class="gk-navbar-logo" width="46" height="46" />
+                        <span class="gk-navbar-brand-title">قربانی کیدز</span>
+                    </a>
+                </div>
+
+                <!-- ۲. منوی اصلی دسکتاپ (وسط) -->
+                <nav class="gk-navbar-nav-col" aria-label="منوی ناوبری اصلی">
+                    <ul class="gk-nav-list">
+                        <?php foreach ($menu_tree as $item): 
+                            $item_url_clean = urldecode(untrailingslashit($item['url']));
+                            $home_url_clean = urldecode(untrailingslashit(home_url('/')));
+                            $is_home_item = ($item_url_clean === $home_url_clean);
+
+                            $is_active = false;
+                            if ($is_home_item && (is_front_page() || is_home())) {
+                                $is_active = true;
+                            } else if ($item['title'] === 'بازی‌ها' && $is_games_page) {
+                                $is_active = true;
+                            } else if ($item_url_clean === urldecode(untrailingslashit(home_url($cur_path)))) {
+                                $is_active = true;
+                            }
+
+                            $has_children = !empty($item['children']);
+                            $child_rendered_active = false;
+                        ?>
+                            <li class="gk-nav-item <?php echo $is_active ? 'current-menu-item' : ''; ?> <?php echo $has_children ? 'has-dropdown' : ''; ?>">
+                                <a href="<?php echo esc_url($item['url']); ?>" class="gk-nav-link">
+                                    <span class="gk-nav-text"><?php echo esc_html($item['title']); ?></span>
+                                    <?php if (!empty($item['badge'])): ?>
+                                        <span class="gk-nav-badge"><?php echo esc_html($item['badge']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if ($has_children): ?>
+                                        <svg class="gk-dropdown-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                        </svg>
+                                    <?php endif; ?>
+                                </a>
+
+                                <?php if ($has_children): ?>
+                                    <ul class="gk-dropdown-menu">
+                                        <?php foreach ($item['children'] as $child): 
+                                            $child_url_clean = urldecode(untrailingslashit($child['url']));
+                                            $is_child_active = false;
+                                            
+                                            if (!empty($cur_cat) && (stripos($child['title'], $cur_cat) !== false || stripos($child['url'], $cur_cat) !== false)) {
+                                                $is_child_active = true;
+                                            } else if (empty($cur_cat) && $is_games_page && ($child['title'] === 'همه بازی‌ها' || $child_url_clean === urldecode(home_url('/games')))) {
+                                                $is_child_active = true;
+                                            }
+                                        ?>
+                                            <li class="gk-dropdown-item <?php echo $is_child_active ? 'current-menu-item' : ''; ?>">
+                                                <a href="<?php echo esc_url($child['url']); ?>" class="gk-dropdown-link">
+                                                    <span><?php echo esc_html($child['title']); ?></span>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
+
+                <!-- ۳. ابزارهای کاربری، سبد خرید و ورود (چپ) -->
+                <div class="gk-navbar-tools-col">
+
+
+                    <!-- سبد خرید -->
+                    <a href="<?php echo esc_url($cart_url); ?>" class="gk-tool-btn gk-tool-cart" title="سبد خرید">
+                        <svg class="gk-svg-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <?php if ($cart_count > 0): ?>
+                            <span class="gk-cart-count-badge"><?php echo $cart_count; ?></span>
+                        <?php endif; ?>
+                    </a>
+
+                    <!-- حساب کاربری / خروج / ورود -->
+                    <?php if ($is_logged_in): ?>
+                        <a href="<?php echo esc_url($account_url); ?>" class="gk-tool-btn gk-tool-user" title="حساب کاربری من">
+                            <svg class="gk-svg-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </a>
+                        <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="gk-tool-btn gk-tool-logout" title="خروج از حساب">
+                            <svg class="gk-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo esc_url($account_url); ?>" class="gk-tool-btn gk-tool-login" title="ورود یا عضویت در سایت">
+                            <svg class="gk-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span class="gk-login-label">ورود / ثبت‌نام</span>
+                        </a>
+                    <?php endif; ?>
+
+                    <!-- دکمه همبرگری موبایل -->
+                    <button type="button" id="gkMobileMenuToggle" class="gk-mobile-toggle-btn" aria-label="منوی موبایل">
+                        <span class="gk-hamburger-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- منوی دراور موبایل -->
+            <div id="gkMobileMenuDrawer" class="gk-mobile-drawer">
+                <div class="gk-mobile-drawer-inner">
+                    <ul class="gk-mobile-nav-list">
+                        <?php foreach ($menu_tree as $item): 
+                            $item_url_clean = urldecode(untrailingslashit($item['url']));
+                            $home_url_clean = urldecode(untrailingslashit(home_url('/')));
+                            $is_home_item = ($item_url_clean === $home_url_clean);
+
+                            $is_active = false;
+                            if ($is_home_item && (is_front_page() || is_home())) {
+                                $is_active = true;
+                            } else if ($item['title'] === 'بازی‌ها' && $is_games_page) {
+                                $is_active = true;
+                            } else if ($item_url_clean === urldecode(untrailingslashit(home_url($cur_path)))) {
+                                $is_active = true;
+                            }
+
+                            $has_children = !empty($item['children']);
+                        ?>
+                            <li class="gk-mobile-nav-item <?php echo $is_active ? 'active' : ''; ?> <?php echo $has_children ? 'has-mobile-sub' : ''; ?>">
+                                <div class="gk-mobile-item-head">
+                                    <a href="<?php echo esc_url($item['url']); ?>" class="gk-mobile-nav-link">
+                                        <span class="gk-mobile-nav-text"><?php echo esc_html($item['title']); ?></span>
+                                        <?php if (!empty($item['badge'])): ?>
+                                            <span class="gk-nav-badge"><?php echo esc_html($item['badge']); ?></span>
+                                        <?php endif; ?>
+                                    </a>
+                                    <?php if ($has_children): ?>
+                                        <button type="button" class="gk-mobile-sub-toggle" aria-label="نمایش زیرمنو">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+
+                                <?php if ($has_children): ?>
+                                    <ul class="gk-mobile-sub-list">
+                                        <?php foreach ($item['children'] as $child): 
+                                            $child_url_clean = urldecode(untrailingslashit($child['url']));
+                                            $is_child_active = false;
+                                            if (!empty($cur_cat) && (stripos($child['title'], $cur_cat) !== false || stripos($child['url'], $cur_cat) !== false)) {
+                                                $is_child_active = true;
+                                            } else if (empty($cur_cat) && $is_games_page && ($child['title'] === 'همه بازی‌ها' || $child_url_clean === urldecode(home_url('/games')))) {
+                                                $is_child_active = true;
+                                            }
+                                        ?>
+                                            <li class="gk-mobile-sub-item <?php echo $is_child_active ? 'active' : ''; ?>">
+                                                <a href="<?php echo esc_url($child['url']); ?>" class="gk-mobile-sub-link">
+                                                    <span><?php echo esc_html($child['title']); ?></span>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+
+                    <div class="gk-mobile-drawer-footer">
+                        <a href="tel:09306197877" class="gk-mobile-phone-btn">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            <span>۰۹۳۰ ۶۱۹ ۷۸۷۷</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <script data-no-optimize="1">
+            document.addEventListener('DOMContentLoaded', function() {
+                var toggleBtn = document.getElementById('gkMobileMenuToggle');
+                var drawer = document.getElementById('gkMobileMenuDrawer');
+                if (toggleBtn && drawer) {
+                    toggleBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        toggleBtn.classList.toggle('is-open');
+                        drawer.classList.toggle('is-open');
+                    });
+                }
+
+                var subToggles = document.querySelectorAll('.gk-mobile-sub-toggle');
+                subToggles.forEach(function(btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var parentItem = btn.closest('.gk-mobile-nav-item');
+                        if (parentItem) {
+                            parentItem.classList.toggle('open-sub');
+                        }
+                    });
+                });
+            });
+        </script>
+        <?php
+    }
+
+    public function inject_top_navbar_fallback() {
+        // Fallback: If not already rendered, inject into body
+        $this->inject_top_navbar();
+    }
+
+    public function optimize_woocommerce_assets() {
+        if (!class_exists('WooCommerce')) return;
+
+        if (!is_woocommerce() && !is_cart() && !is_checkout() && !is_account_page() && !is_page(['pricing', 'cart', 'checkout', 'my-account'])) {
+            wp_dequeue_style('woocommerce-layout');
+            wp_dequeue_style('woocommerce-smallscreen');
+            wp_dequeue_style('woocommerce-general');
+            wp_dequeue_style('woocommerce_frontend_styles');
+            wp_dequeue_script('wc-add-to-cart');
+            wp_dequeue_script('wc-cart-fragments');
+            wp_dequeue_script('woocommerce');
+        }
+    }
+
+    public function disable_cart_fragments() {
+        if (!is_cart() && !is_checkout()) {
+            wp_dequeue_script('wc-cart-fragments');
+        }
+    }
+
+    public function simplify_checkout_fields($fields) {
+        unset($fields['billing']['billing_company']);
+        unset($fields['billing']['billing_country']);
+        unset($fields['billing']['billing_address_1']);
+        unset($fields['billing']['billing_address_2']);
+        unset($fields['billing']['billing_city']);
+        unset($fields['billing']['billing_state']);
+        unset($fields['billing']['billing_postcode']);
+
+        if (isset($fields['billing']['billing_first_name'])) {
+            $fields['billing']['billing_first_name']['label'] = 'نام';
+            $fields['billing']['billing_first_name']['placeholder'] = 'نام خود را وارد کنید';
+            $fields['billing']['billing_first_name']['class'] = ['form-row-first'];
+        }
+        if (isset($fields['billing']['billing_last_name'])) {
+            $fields['billing']['billing_last_name']['label'] = 'نام خانوادگی';
+            $fields['billing']['billing_last_name']['placeholder'] = 'نام خانوادگی';
+            $fields['billing']['billing_last_name']['class'] = ['form-row-last'];
+        }
+        if (isset($fields['billing']['billing_phone'])) {
+            $fields['billing']['billing_phone']['label'] = 'شماره موبایل';
+            $fields['billing']['billing_phone']['placeholder'] = '۰۹۱۲۳۴۵۶۷۸۹';
+            $fields['billing']['billing_phone']['required'] = true;
+        }
+        if (isset($fields['billing']['billing_email'])) {
+            $fields['billing']['billing_email']['label'] = 'آدرس ایمیل (جهت دریافت فاکتور و ورود)';
+            $fields['billing']['billing_email']['placeholder'] = 'yourname@example.com';
+            $fields['billing']['billing_email']['required'] = true;
+        }
+
+        return $fields;
+    }
+
+    public static function user_has_active_subscription($user_id = null) {
+        // VIP Bypass for Enrolled School Students & League participants
+        if (isset($_GET['st_token']) && !empty($_GET['st_token'])) {
+            global $wpdb;
+            $table_students = $wpdb->prefix . 'gk_students';
+            $st = $wpdb->get_row($wpdb->prepare("SELECT id, name FROM $table_students WHERE student_token = %s", sanitize_text_field($_GET['st_token'])));
+            if ($st) {
+                return [
+                    'active' => true,
+                    'days_left' => 365,
+                    'is_student' => true,
+                    'student_name' => $st->name,
+                    'expires_at' => null
+                ];
+            }
+        }
+
+        if ($user_id === null) {
+            $user_id = get_current_user_id();
+        }
+
+        if (!$user_id) {
+            return false;
+        }
+
+        if (user_can($user_id, 'manage_options') || user_can($user_id, 'edit_posts')) {
+            return [
+                'active' => true,
+                'days_left' => 999,
+                'is_admin' => true,
+                'expires_at' => null
+            ];
+        }
+
+        $expires_at = get_user_meta($user_id, '_gk_subscription_expires_at', true);
+        if (!$expires_at) {
+            return false;
+        }
+
+        $now = time();
+        if ($now < $expires_at) {
+            $days_left = ceil(($expires_at - $now) / 86400);
+            return [
+                'active' => true,
+                'days_left' => $days_left,
+                'is_admin' => false,
+                'expires_at' => $expires_at
+            ];
+        }
+
+        return false;
+    }
+
+    public function handle_subscription_order_on_change($order_id, $old_status, $new_status) {
+        if (in_array($new_status, ['completed', 'processing'])) {
+            $this->handle_subscription_order($order_id);
+        }
+    }
+
+    public function handle_subscription_order($order_id) {
+        $order = wc_get_order($order_id);
+        if (!$order) return;
+
+        $user_id = $order->get_user_id();
+        if (!$user_id) {
+            $user = get_user_by('email', $order->get_billing_email());
+            if ($user) $user_id = $user->ID;
+        }
+
+        if (!$user_id) return;
+
+        $total_days_to_add = 0;
+        foreach ($order->get_items() as $item) {
+            $product_id = $item->get_product_id();
+            $days = get_post_meta($product_id, '_gk_subscription_days', true);
+            if ($days) {
+                $total_days_to_add += (intval($days) * $item->get_quantity());
+            }
+        }
+
+        if ($total_days_to_add > 0) {
+            $current_expires = (int) get_user_meta($user_id, '_gk_subscription_expires_at', true);
+            $base_time = ($current_expires > time()) ? $current_expires : time();
+            $new_expires = $base_time + ($total_days_to_add * 86400);
+
+            update_user_meta($user_id, '_gk_subscription_expires_at', $new_expires);
+            update_user_meta($user_id, '_gk_last_subscription_order', $order_id);
+            $order->add_order_note("اشتراک به مدت {$total_days_to_add} روز برای کاربر #{$user_id} فعال/تمدید شد.");
+            
+            if (class_exists('LiteSpeed\Purge')) {
+                LiteSpeed\Purge::purge_all();
+            }
+        }
+    }
+
+    public function render_user_subscription_fields($user) {
+        if (!current_user_can('manage_options')) return;
+        $expires = get_user_meta($user->ID, '_gk_subscription_expires_at', true);
+        $date_str = $expires ? date_i18n('Y/m/d H:i', $expires) : 'اشتراک غیرفعال است';
+        $days_left = ($expires && $expires > time()) ? ceil(($expires - time()) / 86400) : 0;
+        ?>
+        <h3>👑 وضعیت اشتراک بازی‌های قربانی کیدز</h3>
+        <table class="form-table">
+            <tr>
+                <th><label>وضعیت فعلی:</label></th>
+                <td>
+                    <?php if ($days_left > 0): ?>
+                        <span style="color:green; font-weight:bold;">✅ فعال (<?php echo $days_left; ?> روز باقی‌مانده تا <?php echo $date_str; ?>)</span>
+                    <?php else: ?>
+                        <span style="color:red;">❌ منقضی / غیرفعال</span>
+                    <?php endif; ?>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="gk_add_days">افزودن روز دستی به اشتراک:</label></th>
+                <td>
+                    <input type="number" name="gk_add_days" id="gk_add_days" placeholder="تعداد روز (مثلاً ۳۰)" style="width:140px;" />
+                    <p class="description">برای تمدید دستی اشتراک کاربر توسط مدیر، تعداد روز را وارد کنید.</p>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+
+    public function save_user_subscription_fields($user_id) {
+        if (!current_user_can('manage_options')) return;
+        if (!empty($_POST['gk_add_days'])) {
+            $days = intval($_POST['gk_add_days']);
+            if ($days > 0) {
+                $current_expires = (int) get_user_meta($user_id, '_gk_subscription_expires_at', true);
+                $base_time = ($current_expires > time()) ? $current_expires : time();
+                $new_expires = $base_time + ($days * 86400);
+                update_user_meta($user_id, '_gk_subscription_expires_at', $new_expires);
+                if (class_exists('LiteSpeed\Purge')) {
+                    LiteSpeed\Purge::purge_all();
+                }
+            }
+        }
+    }
+
+    public function register_cpt_and_taxonomies() {
+        $labels = [
+            'name'                  => 'بازی‌ها',
+            'singular_name'         => 'بازی',
+            'menu_name'             => '🎮 بازی‌ها',
+            'name_admin_bar'        => 'بازی',
+            'add_new'               => 'افزودن بازی جدید',
+            'add_new_item'          => 'افزودن بازی جدید',
+            'new_item'              => 'بازی تازه',
+            'edit_item'             => 'ویرایش بازی',
+            'view_item'             => 'مشاهده بازی',
+            'all_items'             => 'همه بازی‌ها',
+            'search_items'          => 'جستجوی بازی‌ها',
+            'not_found'             => 'هیچ بازی‌ای پیدا نشد.',
+            'not_found_in_trash'    => 'هیچ بازی‌ای در سطل زباله پیدا نشد.'
+        ];
+
+        $args = [
+            'labels'             => $labels,
+            'public'             => true,
+            'publicly_queryable' => true,
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+            'rewrite'            => ['slug' => 'game', 'with_front' => false],
+            'capability_type'    => 'post',
+            'has_archive'        => false,
+            'hierarchical'       => false,
+            'menu_position'      => 6,
+            'menu_icon'          => 'dashicons-games',
+            'supports'           => ['title', 'editor', 'thumbnail', 'excerpt'],
+            'show_in_rest'       => true,
+        ];
+
+        register_post_type('gk_game', $args);
+
+        register_taxonomy('game_age_group', ['gk_game'], [
+            'hierarchical'      => true,
+            'labels'            => ['name' => 'رده‌های سنی', 'singular_name' => 'رده سنی', 'menu_name' => '🎂 رده‌های سنی'],
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => ['slug' => 'game-age'],
+            'show_in_rest'      => true,
+        ]);
+
+        register_taxonomy('game_category', ['gk_game'], [
+            'hierarchical'      => true,
+            'labels'            => ['name' => 'نوع و مهارت بازی', 'singular_name' => 'نوع بازی', 'menu_name' => '🧠 نوع و مهارت بازی'],
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => ['slug' => 'game-category'],
+            'show_in_rest'      => true,
+        ]);
+    }
+
+    public function add_meta_boxes() {
+        add_meta_box(
+            'gk_game_options',
+            '🎮 تنظیمات، فایل و دسترسی بازی (GhorbaniKids)',
+            [$this, 'render_meta_box'],
+            'gk_game',
+            'normal',
+            'high'
+        );
+    }
+
+    public function render_meta_box($post) {
+        wp_nonce_field('gk_game_meta_nonce', 'gk_game_meta_nonce_field');
+
+        $current_folder = get_post_meta($post->ID, '_gk_game_folder', true);
+        $aspect_ratio   = get_post_meta($post->ID, '_gk_game_aspect', true) ?: '16/9';
+        $access_type    = get_post_meta($post->ID, '_gk_game_access', true) ?: 'premium';
+
+        $games_base_dir = WP_CONTENT_DIR . '/games';
+        $available_folders = [];
+
+        if (is_dir($games_base_dir)) {
+            $items = scandir($games_base_dir);
+            foreach ($items as $item) {
+                if ($item !== '.' && $item !== '..' && is_dir($games_base_dir . '/' . $item)) {
+                    $has_index = file_exists($games_base_dir . '/' . $item . '/index.html') || file_exists($games_base_dir . '/' . $item . '/index.php');
+                    $available_folders[] = [
+                        'name' => $item,
+                        'has_index' => $has_index
+                    ];
+                }
+            }
+        }
+        ?>
+        <div style="padding: 12px; font-family: Tahoma, Arial, sans-serif; line-height: 1.8;">
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="gk_game_access"><strong>🔐 سطح دسترسی به بازی:</strong></label></th>
+                    <td>
+                        <select name="gk_game_access" id="gk_game_access" style="min-width: 280px; font-weight: bold;">
+                            <option value="premium" <?php selected($access_type, 'premium'); ?>>🔒 نیازمند اشتراک ویژه VIP (قفل‌دار)</option>
+                            <option value="free" <?php selected($access_type, 'free'); ?>>🟢 کاملاً رایگان برای همه (بدون قفل)</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="gk_game_folder"><strong>انتخاب پوشه بازی:</strong></label></th>
+                    <td>
+                        <select name="gk_game_folder_select" id="gk_game_folder_select" style="min-width: 280px;" onchange="document.getElementById('gk_game_folder').value = this.value;">
+                            <option value="">-- انتخاب از پوشه‌های اسکن‌شده در هاست --</option>
+                            <?php foreach ($available_folders as $folder): ?>
+                                <option value="<?php echo esc_attr($folder['name']); ?>" <?php selected($current_folder, $folder['name']); ?>>
+                                    <?php echo esc_html($folder['name']); ?> <?php echo $folder['has_index'] ? ' (✅ دارای index.html)' : ' (⚠️ بدون index.html)'; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <br><br>
+                        <input type="text" name="gk_game_folder" id="gk_game_folder" value="<?php echo esc_attr($current_folder); ?>" placeholder="مثلاً: bubble-detective" style="width: 280px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="gk_game_aspect"><strong>نسبت تصویر کادر بازی:</strong></label></th>
+                    <td>
+                        <select name="gk_game_aspect" id="gk_game_aspect" style="min-width: 280px;">
+                            <option value="16/9" <?php selected($aspect_ratio, '16/9'); ?>>۱۶:۹ (عریض استاندارد - پیشنهادی)</option>
+                            <option value="4/3" <?php selected($aspect_ratio, '4/3'); ?>>۴:۳ (مستطیلی کلاسیک)</option>
+                            <option value="1/1" <?php selected($aspect_ratio, '1/1'); ?>>۱:۱ (مربعی)</option>
+                            <option value="fullscreen" <?php selected($aspect_ratio, 'fullscreen'); ?>>ارتفاع بلند (۷۵۰ پیکسل)</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <?php
+    }
+
+    public function save_meta_box_data($post_id) {
+        if (!isset($_POST['gk_game_meta_nonce_field']) || !wp_verify_nonce($_POST['gk_game_meta_nonce_field'], 'gk_game_meta_nonce')) return;
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (!current_user_can('edit_post', $post_id)) return;
+
+        if (isset($_POST['gk_game_access'])) update_post_meta($post_id, '_gk_game_access', sanitize_text_field($_POST['gk_game_access']));
+        if (isset($_POST['gk_game_folder'])) update_post_meta($post_id, '_gk_game_folder', sanitize_text_field($_POST['gk_game_folder']));
+        if (isset($_POST['gk_game_aspect'])) update_post_meta($post_id, '_gk_game_aspect', sanitize_text_field($_POST['gk_game_aspect']));
+    }
+
+    public function override_archive_template($template) {
+        if (is_tax('game_age_group') || is_tax('game_category')) {
+            $term = get_queried_object();
+            if ($term && !empty($term->slug)) {
+                $param = is_tax('game_age_group') ? 'age' : 'cat';
+                wp_safe_redirect(add_query_arg($param, urlencode($term->name), home_url('/games/')), 301);
+                exit;
+            }
+        }
+        return $template;
+    }
+
+    public function inject_frontend_styles() {
+        ?>
+        <style>
+            /* =========================================================
+               هدر و نوار ناوبری یکپارچه تمام‌عرض بالای سایت (Top Navbar)
+               ========================================================= */
+
+            /* حذف کادرهای اشتراک‌گذاری قدیمی آوادا */
+            .fusion-sharing-box,
+            .fusion-social-sharing,
+            .sharing-box,
+            .fusion-blog-shortcode-post .fusion-meta-info .fusion-sharing-box {
+                display: none !important;
+            }
+
+            /* مخفی‌سازی کامل هدرهای قدیمی سایدبار و نوار کناری */
+            #side-header-wrapper,
+            #side-header,
+            .fusion-tb-header,
+            .fusion-header-wrapper,
+            .fusion-header,
+            .side-header-right #side-header-wrapper,
+            .side-header-left #side-header-wrapper {
+                display: none !important;
+            }
+
+            /* ریسِت کردن کامل ساختار سایت به حالت تمام‌عرض (100%) در دسکتاپ و موبایل */
+            body,
+            body.side-header-right,
+            body.side-header-left {
+                overflow-x: hidden !important;
+            }
+
+            #wrapper,
+            .side-header-right #wrapper,
+            .side-header-left #wrapper,
+            #boxed-wrapper,
+            body.side-header-right #wrapper,
+            body.side-header-left #wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                float: none !important;
+                position: relative !important;
+                left: 0 !important;
+                right: 0 !important;
+            }
+
+            #main {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .fusion-fullwidth,
+            .fusion-builder-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            /* =========================================================
+               استایل نوار هدر مدرن و شیشه‌ای (GhorbaniKids Top Navbar)
+               ========================================================= */
+            .gk-top-navbar {
+                position: sticky !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                z-index: 999999 !important;
+                background: rgba(255, 255, 255, 0.94) !important;
+                backdrop-filter: blur(20px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+                border-bottom: 1px solid rgba(226, 232, 240, 0.85) !important;
+                box-shadow: 0 4px 25px -4px rgba(15, 23, 42, 0.08) !important;
+                direction: rtl !important;
+                box-sizing: border-box !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .gk-navbar-container {
+                max-width: 1360px !important;
+                margin: 0 auto !important;
+                padding: 0 24px !important;
+                height: 74px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                box-sizing: border-box !important;
+            }
+
+            /* ۱. ستون لوگو و نام برند (راست در RTL) */
+            .gk-navbar-brand-col {
+                display: flex !important;
+                align-items: center !important;
+                flex-shrink: 0 !important;
+            }
+
+            .gk-navbar-brand {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+                text-decoration: none !important;
+                transition: transform 0.25s ease !important;
+            }
+
+            .gk-navbar-brand:hover {
+                transform: scale(1.03) !important;
+            }
+
+            .gk-navbar-logo {
+                height: 48px !important;
+                width: auto !important;
+                max-width: 56px !important;
+                object-fit: contain !important;
+                display: block !important;
+                filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.12)) !important;
+            }
+
+            .gk-navbar-brand-title {
+                font-family: 'aviny', cursive, Tahoma, sans-serif !important;
+                font-size: 1.85rem !important;
+                font-weight: 800 !important;
+                color: #1e3a8a !important;
+                letter-spacing: 0 !important;
+                line-height: 1 !important;
+                text-shadow: 0 2px 4px rgba(30, 58, 138, 0.08) !important;
+            }
+
+            /* ۲. ستون منوی ناوبری اصلی (وسط در دسکتاپ) */
+            .gk-navbar-nav-col {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex: 1 !important;
+                margin: 0 24px !important;
+            }
+
+            .gk-nav-list {
+                list-style: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+            }
+
+            .gk-nav-item {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .gk-nav-link {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 16px !important;
+                border-radius: 22px !important;
+                font-size: 1.05rem !important;
+                font-weight: 700 !important;
+                color: #334155 !important;
+                text-decoration: none !important;
+                transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                position: relative !important;
+            }
+
+            .gk-nav-link:hover {
+                color: #6c5ce7 !important;
+                background-color: #f5f3ff !important;
+                transform: translateY(-1px) !important;
+            }
+
+            .gk-nav-item.current-menu-item .gk-nav-link {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.35) !important;
+            }
+
+            .gk-nav-badge {
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%) !important;
+                color: #ffffff !important;
+                font-size: 0.72rem !important;
+                font-weight: 900 !important;
+                padding: 2px 8px !important;
+                border-radius: 12px !important;
+                line-height: 1.2 !important;
+                letter-spacing: 0 !important;
+                margin-right: 4px !important;
+            }
+
+            /* ۳. ستون ابزارهای کاربری (چپ در RTL) */
+            .gk-navbar-tools-col {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* دکمه خرید اشتراک ویژه هدر */
+            .gk-tool-btn-vip {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+                color: #ffffff !important;
+                padding: 8px 18px !important;
+                border-radius: 24px !important;
+                font-size: 0.95rem !important;
+                font-weight: 800 !important;
+                text-decoration: none !important;
+                box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+                transition: all 0.25s ease !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            }
+
+            .gk-tool-btn-vip:hover {
+                transform: translateY(-2px) scale(1.03) !important;
+                box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45) !important;
+                color: #ffffff !important;
+            }
+
+            /* آیکون‌های گرد دایره‌ای ابزارها */
+            .gk-tool-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 42px !important;
+                height: 42px !important;
+                padding: 0 !important;
+                border-radius: 50% !important;
+                text-decoration: none !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                color: #334155 !important;
+                cursor: pointer !important;
+                border: 1.5px solid #e2e8f0 !important;
+                background: #ffffff !important;
+                position: relative !important;
+                box-sizing: border-box !important;
+            }
+
+            .gk-tool-btn:hover {
+                transform: translateY(-2px) !important;
+            }
+
+            /* سبد خرید */
+            .gk-tool-cart {
+                color: #475569 !important;
+                background: #f8fafc !important;
+            }
+
+            .gk-tool-cart:hover {
+                background: #6c5ce7 !important;
+                color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.35) !important;
+            }
+
+            .gk-cart-count-badge {
+                position: absolute !important;
+                top: -5px !important;
+                right: -5px !important;
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%) !important;
+                color: #ffffff !important;
+                font-size: 0.74rem !important;
+                font-weight: 900 !important;
+                min-width: 20px !important;
+                height: 20px !important;
+                border-radius: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: 0 2px 8px rgba(232, 67, 147, 0.5) !important;
+                border: 2px solid #ffffff !important;
+                padding: 0 4px !important;
+            }
+
+            /* آدمک حساب کاربری */
+            .gk-tool-user {
+                background: #f1f5f9 !important;
+                color: #1e293b !important;
+            }
+
+            .gk-tool-user:hover {
+                background: #e2e8f0 !important;
+                color: #0f172a !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+            }
+
+            /* دکمه خروج */
+            .gk-tool-logout {
+                background: #fff1f2 !important;
+                color: #e11d48 !important;
+                border-color: #ffe4e6 !important;
+            }
+
+            .gk-tool-logout:hover {
+                background: #e11d48 !important;
+                color: #ffffff !important;
+                border-color: #e11d48 !important;
+                transform: scale(1.08) !important;
+                box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35) !important;
+            }
+
+            /* دکمه ورود / ثبت‌نام برای مهمان */
+            .gk-tool-login {
+                width: auto !important;
+                padding: 0 18px !important;
+                height: 42px !important;
+                border-radius: 24px !important;
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                border: 1.5px solid #6c5ce7 !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3) !important;
+                gap: 8px !important;
+            }
+
+            .gk-tool-login:hover {
+                transform: translateY(-2px) scale(1.03) !important;
+                box-shadow: 0 6px 18px rgba(108, 92, 231, 0.45) !important;
+                color: #ffffff !important;
+            }
+
+            .gk-login-label {
+                font-size: 0.92rem !important;
+                font-weight: 800 !important;
+                white-space: nowrap !important;
+            }
+
+            /* دکمه منوی همبرگری موبایل */
+            .gk-mobile-toggle-btn {
+                display: none !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 42px !important;
+                height: 42px !important;
+                padding: 0 !important;
+                border-radius: 14px !important;
+                background: #f8fafc !important;
+                border: 1.5px solid #e2e8f0 !important;
+                cursor: pointer !important;
+                transition: all 0.25s ease !important;
+            }
+
+            .gk-mobile-toggle-btn:hover {
+                background: #f1f5f9 !important;
+                border-color: #cbd5e1 !important;
+            }
+
+            .gk-hamburger-icon {
+                width: 20px !important;
+                height: 14px !important;
+                position: relative !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+            }
+
+            .gk-hamburger-icon span {
+                display: block !important;
+                height: 2.2px !important;
+                width: 100% !important;
+                background-color: #1e293b !important;
+                border-radius: 2px !important;
+                transition: all 0.25s ease !important;
+            }
+
+            .gk-mobile-toggle-btn.is-open .gk-hamburger-icon span:nth-child(1) {
+                transform: translateY(6px) rotate(45deg) !important;
+            }
+            .gk-mobile-toggle-btn.is-open .gk-hamburger-icon span:nth-child(2) {
+                opacity: 0 !important;
+            }
+            .gk-mobile-toggle-btn.is-open .gk-hamburger-icon span:nth-child(3) {
+                transform: translateY(-6px) rotate(-45deg) !important;
+            }
+
+            /* منوی کشویی موبایل */
+            .gk-mobile-drawer {
+                display: none !important;
+                max-height: 0 !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
+                border-bottom: 2px solid #e2e8f0 !important;
+                box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12) !important;
+                transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+
+            .gk-mobile-drawer.is-open {
+                max-height: 550px !important;
+            }
+
+            .gk-mobile-drawer-inner {
+                padding: 16px 20px 24px !important;
+            }
+
+            .gk-mobile-nav-list {
+                list-style: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 6px !important;
+            }
+
+            .gk-mobile-nav-item {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .gk-mobile-nav-link {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 12px 18px !important;
+                border-radius: 16px !important;
+                font-size: 1.1rem !important;
+                font-weight: 700 !important;
+                color: #334155 !important;
+                text-decoration: none !important;
+                background: #f8fafc !important;
+                border: 1px solid #f1f5f9 !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .gk-mobile-nav-link:hover,
+            .gk-mobile-nav-item.active .gk-mobile-nav-link {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3) !important;
+            }
+
+            .gk-mobile-drawer-footer {
+                margin-top: 16px !important;
+                padding-top: 16px !important;
+                border-top: 1px solid #e2e8f0 !important;
+                display: flex !important;
+                justify-content: center !important;
+            }
+
+            .gk-mobile-phone-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                background: #f1f5f9 !important;
+                padding: 9px 20px !important;
+                border-radius: 22px !important;
+                color: #334155 !important;
+                font-weight: 800 !important;
+                font-size: 0.92rem !important;
+                text-decoration: none !important;
+                direction: ltr !important;
+            }
+
+            /* رسپانسیو در تبلت و موبایل */
+            @media (max-width: 980px) {
+                .gk-navbar-nav-col,
+                .gk-tool-btn-vip,
+                .gk-login-label {
+                    display: none !important;
+                }
+                .gk-mobile-toggle-btn {
+                    display: inline-flex !important;
+                }
+                .gk-mobile-drawer {
+                    display: block !important;
+                }
+                .gk-navbar-container {
+                    height: 66px !important;
+                    padding: 0 16px !important;
+                }
+                .gk-navbar-brand-title {
+                    font-size: 1.55rem !important;
+                }
+                .gk-navbar-logo {
+                    height: 42px !important;
+                }
+            }
+
+            /* استایل فوتر اختصاصی */
+            #footer,
+            .fusion-footer-copyright-area {
+                background-color: #1e1e38 !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+                padding: 25px 0 20px !important;
+            }
+            .fusion-copyright-content a[href*="theme-fusion"],
+            .fusion-copyright-content a[href*="wordpress.org"],
+            .fusion-copyright-content a[href*="themeforest"] {
+                display: none !important;
+            }
+
+            .gk-footer-content-box,
+            .gk-footer-copyright-text,
+            .fusion-copyright-notice,
+            .fusion-footer-widget-area,
+            .fusion-footer-widget-area .fusion-builder-row,
+            .fusion-footer-widget-area .fusion-builder-column,
+            .fusion-footer-widget-area .fusion-column-wrapper,
+            .fusion-footer-widget-area .fusion-text,
+            .fusion-footer-copyright-area,
+            .fusion-footer-copyright-area .fusion-copyright-content {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+                width: 100% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                float: none !important;
+            }
+            .gk-footer-copyright-text,
+            .fusion-copyright-notice {
+                text-align: center !important;
+                display: block !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+            }
+
+            /* آیکون شبکه‌های اجتماعی فوتر */
+            .gk-footer-social-row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 10px;
+            }
+            .gk-s-btn {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff !important;
+                text-decoration: none !important;
+                transition: all 0.25s ease;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            }
+            .gk-s-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+            .gk-s-telegram { background: linear-gradient(135deg, #229ED9 0%, #0088cc 100%); }
+            .gk-s-bale { background: linear-gradient(135deg, #0d9488 0%, #059669 100%); }
+            .gk-s-btn:hover { transform: translateY(-3px) scale(1.1); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28); }
+
+            /* حذف پیام‌های نامرتب آوادا */
+            .avada-myaccount-user,
+            .avada-myaccount-user-column,
+            .fusion-flyout-cart-wrapper,
+            .fusion-sliding-bar-toggle,
+            .fusion-alert.alert-info,
+            .fusion-alert.alert-custom {
+                display: none !important;
+            }
+
+            /* =========================================================
+               طراحی سوپرلوکس و کاملاً تب‌بندی شده فرم ورود و عضویت (Customer Login)
+               ========================================================= */
+            .woocommerce-account:not(.logged-in) .woocommerce {
+                max-width: 520px !important;
+                margin: 35px auto 60px !important;
+                padding: 0 15px !important;
+                direction: rtl !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            /* تب‌بار سوییچ بین ورود و عضویت */
+            .gk-auth-tabs-header {
+                display: flex !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                margin: 0 auto 30px auto !important;
+                max-width: 440px !important;
+                background: #f1f5f9 !important;
+                padding: 6px !important;
+                border-radius: 40px !important;
+                box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+            }
+
+            .gk-auth-tab-btn {
+                flex: 1 !important;
+                padding: 13px 20px !important;
+                border-radius: 30px !important;
+                font-size: 1.05rem !important;
+                font-weight: 800 !important;
+                color: #64748b !important;
+                background: transparent !important;
+                border: none !important;
+                cursor: pointer !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                text-align: center !important;
+            }
+
+            .gk-auth-tab-btn.active {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                box-shadow: 0 6px 18px rgba(108, 92, 231, 0.35) !important;
+            }
+
+            /* حذف قطعی تمامی کادرهای قرمز، خطوط و کادرهای نامرتب آوادا */
+            #customer_login {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                display: block !important;
+                width: 100% !important;
+            }
+
+            #customer_login .col-1,
+            #customer_login .col-2,
+            #customer_login .u-column1,
+            #customer_login .u-column2 {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+                box-shadow: none !important;
+                float: none !important;
+                width: 100% !important;
+                max-width: 480px !important;
+            }
+
+            #customer_login h2 {
+                display: none !important;
+                border: none !important;
+            }
+
+            /* استایل کارت‌های شکیل ورود و ثبت‌نام */
+            .woocommerce form.login,
+            .woocommerce form.register {
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+                border-radius: 28px !important;
+                box-shadow: 0 16px 40px rgba(15, 23, 42, 0.07) !important;
+                padding: 40px 32px !important;
+                margin: 0 auto !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+
+            /* نمایش انحصاری فرم فعال بر اساس تب انتخابی */
+            #customer_login.show-login .col-2,
+            #customer_login.show-login .u-column2,
+            #customer_login.show-login .u-columns .col-2 {
+                display: none !important;
+            }
+            #customer_login.show-login .col-1,
+            #customer_login.show-login .u-column1,
+            #customer_login.show-login .u-columns .col-1 {
+                display: block !important;
+                animation: gkAuthFade 0.3s ease forwards !important;
+            }
+
+            #customer_login.show-register .col-1,
+            #customer_login.show-register .u-column1,
+            #customer_login.show-register .u-columns .col-1 {
+                display: none !important;
+            }
+            #customer_login.show-register .col-2,
+            #customer_login.show-register .u-column2,
+            #customer_login.show-register .u-columns .col-2 {
+                display: block !important;
+                animation: gkAuthFade 0.3s ease forwards !important;
+            }
+
+            @keyframes gkAuthFade {
+                from { opacity: 0; transform: translateY(10px) scale(0.98); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+
+            /* اصلاح المان‌های داخل فرم ورود و عضویت */
+            .woocommerce-form-login__rememberme {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                font-size: 0.95rem !important;
+                font-weight: 700 !important;
+                color: #475569 !important;
+                margin: 15px 0 !important;
+                cursor: pointer !important;
+            }
+
+            .woocommerce-form-login__rememberme input[type="checkbox"] {
+                width: 18px !important;
+                height: 18px !important;
+                cursor: pointer !important;
+                accent-color: #6c5ce7 !important;
+                margin: 0 !important;
+            }
+
+            .woocommerce-LostPassword {
+                margin-top: 15px !important;
+                text-align: center !important;
+            }
+
+            .woocommerce-LostPassword a {
+                color: #6c5ce7 !important;
+                font-weight: 700 !important;
+                font-size: 0.92rem !important;
+                text-decoration: none !important;
+            }
+            .woocommerce-LostPassword a:hover {
+                text-decoration: underline !important;
+            }
+
+            .woocommerce-privacy-policy-text {
+                font-size: 0.88rem !important;
+                color: #64748b !important;
+                line-height: 1.8 !important;
+                margin: 15px 0 20px !important;
+            }
+
+            .woocommerce-privacy-policy-text a {
+                color: #6c5ce7 !important;
+                font-weight: 700 !important;
+            }
+
+            .woocommerce form.login .woocommerce-button,
+            .woocommerce form.register .woocommerce-button,
+            .woocommerce form.login button[type="submit"],
+            .woocommerce form.register button[type="submit"] {
+                width: 100% !important;
+                margin-top: 10px !important;
+            }
+
+            /* =========================================================
+               طراحی و چیدمان لوکس دو ستونه حساب کاربری من (My Account)
+               ========================================================= */
+            .woocommerce-account.logged-in .woocommerce {
+                display: flex !important;
+                flex-direction: row-reverse !important;
+                align-items: flex-start !important;
+                gap: 28px !important;
+                width: 100% !important;
+                max-width: 1160px !important;
+                margin: 35px auto 60px !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 15px !important;
+                box-sizing: border-box !important;
+                direction: rtl !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation {
+                width: 260px !important;
+                min-width: 260px !important;
+                max-width: 270px !important;
+                float: none !important;
+                margin: 0 !important;
+                padding: 18px 14px !important;
+                background: #ffffff !important;
+                border-radius: 24px !important;
+                border: 2px solid #e2e8f0 !important;
+                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+                box-sizing: border-box !important;
+                position: sticky !important;
+                top: 90px !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation ul {
+                list-style: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li {
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                float: none !important;
+                width: 100% !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li a {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                padding: 13px 18px !important;
+                border-radius: 14px !important;
+                font-size: 1rem !important;
+                font-weight: 800 !important;
+                color: #475569 !important;
+                background: #f8fafc !important;
+                border: 1.5px solid transparent !important;
+                transition: all 0.25s ease !important;
+                text-decoration: none !important;
+                gap: 10px !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--dashboard a::before { content: "🏠 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--orders a::before { content: "📦 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--downloads a::before { content: "📥 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--edit-address a::before { content: "📍 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--edit-account a::before { content: "👤 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout a::before { content: "🚪 "; }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li a:hover {
+                background: #ede9fe !important;
+                color: #6c5ce7 !important;
+                border-color: #c4b5fd !important;
+                transform: translateX(-4px) !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li.is-active a {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 6px 18px rgba(108, 92, 231, 0.35) !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-content {
+                flex: 1 !important;
+                width: calc(100% - 290px) !important;
+                float: none !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                padding: 35px 35px !important;
+                border-radius: 24px !important;
+                border: 2px solid #e2e8f0 !important;
+                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+                box-sizing: border-box !important;
+                line-height: 1.9 !important;
+                color: #334155 !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-content > h2:first-child,
+            .woocommerce-account .woocommerce-MyAccount-content .title h2,
+            .woocommerce-account .woocommerce-MyAccount-content .title h3 {
+                font-size: 1.45rem !important;
+                font-weight: 900 !important;
+                color: #1e293b !important;
+                margin-top: 0 !important;
+                margin-bottom: 20px !important;
+                padding-bottom: 12px !important;
+                border-bottom: 2px solid #f1f5f9 !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-content p {
+                font-size: 1.02rem !important;
+                color: #475569 !important;
+                margin-bottom: 18px !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-content p a {
+                color: #6c5ce7 !important;
+                font-weight: 700 !important;
+                text-decoration: none !important;
+                transition: color 0.2s !important;
+            }
+            .woocommerce-account .woocommerce-MyAccount-content p a:hover {
+                color: #4f46e5 !important;
+                text-decoration: underline !important;
+            }
+
+            @media (max-width: 860px) {
+                .woocommerce-account.logged-in .woocommerce {
+                    flex-direction: column !important;
+                    gap: 20px !important;
+                }
+                .woocommerce-account .woocommerce-MyAccount-navigation {
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    max-width: 100% !important;
+                    position: static !important;
+                }
+                .woocommerce-account .woocommerce-MyAccount-content {
+                    width: 100% !important;
+                    padding: 25px 20px !important;
+                }
+            }
+
+            /* =========================================================
+               طراحی سوپرلوکس و کاملاً جذاب سبد خرید خالی (GhorbaniKids Empty Cart)
+               ========================================================= */
+            .woocommerce-cart .woocommerce {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 20px auto !important;
+            }
+
+            .gk-empty-cart-card {
+                background: #ffffff;
+                max-width: 650px;
+                margin: 40px auto 60px;
+                padding: 50px 30px;
+                border-radius: 30px;
+                border: 2px solid #edf2f7;
+                box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+                text-align: center;
+                direction: rtl;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                animation: gkFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @keyframes gkFadeIn {
+                from { opacity: 0; transform: translateY(15px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .gk-empty-cart-illustration {
+                margin-bottom: 20px;
+            }
+
+            .gk-empty-cart-icon-circle {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+                box-shadow: 0 8px 24px rgba(108, 92, 231, 0.15);
+                border: 3px solid #ffffff;
+            }
+
+            .gk-empty-cart-title {
+                font-size: 1.55rem;
+                font-weight: 900;
+                color: #1e293b;
+                margin: 0 0 12px 0 !important;
+                line-height: 1.5;
+            }
+
+            .gk-empty-cart-subtitle {
+                font-size: 1.05rem;
+                color: #64748b;
+                max-width: 480px;
+                line-height: 1.8;
+                margin: 0 0 30px 0 !important;
+            }
+
+            .gk-empty-cart-actions {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+            }
+
+            .gk-empty-cart-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 14px 32px;
+                border-radius: 30px;
+                font-size: 1.05rem;
+                font-weight: 800;
+                text-decoration: none !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+            }
+
+            .gk-empty-cart-btn-primary {
+                background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+                color: #ffffff !important;
+                box-shadow: 0 8px 22px rgba(108, 92, 231, 0.38);
+            }
+
+            .gk-empty-cart-btn-primary:hover {
+                transform: translateY(-3px) scale(1.03);
+                box-shadow: 0 12px 30px rgba(108, 92, 231, 0.5);
+                color: #ffffff !important;
+            }
+
+            .gk-empty-cart-btn-secondary {
+                background: #f8fafc;
+                color: #475569 !important;
+                border: 2px solid #e2e8f0;
+            }
+
+            .gk-empty-cart-btn-secondary:hover {
+                background: #f1f5f9;
+                color: #1e293b !important;
+                border-color: #cbd5e1;
+                transform: translateY(-2px);
+            }
+
+            /* حذف قطعی تمامی آیکون‌های اضافه و نامرتب ووکامرس و آوادا در صفحه سبد خرید */
+            .woocommerce-cart .wc-empty-cart-message,
+            .woocommerce-cart .woocommerce-notices-wrapper,
+            .woocommerce-cart p.return-to-shop,
+            .woocommerce-cart .wc-backward:before,
+            .woocommerce-cart .wc-backward:after,
+            .woocommerce-cart .return-to-shop:before,
+            .woocommerce-cart .return-to-shop:after,
+            .woocommerce-cart .cart-empty:before,
+            .woocommerce-cart .cart-empty:after,
+            .woocommerce-cart .woocommerce-info:before,
+            .woocommerce-cart .woocommerce-info:after {
+                display: none !important;
+                content: none !important;
+            }
+
+            /* استایل پیام‌های اعلان بالای سایت */
+            .woocommerce-message,
+            .woocommerce-info,
+            .woocommerce-error {
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+                border-radius: 18px !important;
+                padding: 16px 22px !important;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                flex-wrap: wrap !important;
+                gap: 15px !important;
+                color: #1e293b !important;
+                font-size: 1rem !important;
+                font-weight: 700 !important;
+                line-height: 1.8 !important;
+                margin: 20px 0 30px !important;
+            }
+            .woocommerce-message { border-left: 6px solid #10b981 !important; }
+            .woocommerce-info { border-left: 6px solid #3b82f6 !important; }
+            .woocommerce-error { border-left: 6px solid #ef4444 !important; }
+
+            .woocommerce-message .button,
+            .woocommerce-info .button {
+                background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%) !important;
+                color: #ffffff !important;
+                padding: 10px 22px !important;
+                border-radius: 20px !important;
+                font-size: 0.95rem !important;
+                font-weight: 800 !important;
+                border: none !important;
+                text-decoration: none !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3) !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                margin: 0 !important;
+                float: none !important;
+            }
+            .woocommerce-message .button:hover { transform: scale(1.05) !important; color: #ffffff !important; }
+
+            /* استایل بومی و شیک کمبوباکس‌ها و دراپ‌داون‌ها (بدون چشمک زدن) */
+            select.country_select,
+            select.state_select,
+            .woocommerce form select {
+                background-color: #f8fafc !important;
+                border: 2px solid #cbd5e1 !important;
+                color: #0f172a !important;
+                padding: 12px 16px !important;
+                border-radius: 12px !important;
+                font-size: 1rem !important;
+                font-weight: 600 !important;
+                width: 100% !important;
+                cursor: pointer !important;
+                display: block !important;
+                appearance: auto !important;
+                -webkit-appearance: auto !important;
+            }
+            select.country_select:focus,
+            select.state_select:focus,
+            .woocommerce form select:focus {
+                border-color: #6c5ce7 !important;
+                outline: none !important;
+                background-color: #ffffff !important;
+                box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.15) !important;
+            }
+
+            /* باکس اشتراک در داشبورد کاربر */
+            .gk-myaccount-sub-box { margin-bottom: 30px; }
+            .gk-sub-card {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 22px 24px;
+                border-radius: 18px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            }
+            .gk-sub-card.active { background: #f0fdf4; border: 2px solid #bbf7d0; }
+            .gk-sub-card.inactive { background: #fef2f2; border: 2px solid #fecaca; }
+            .gk-sub-icon { font-size: 2.8rem; }
+
+            /* استایل فرم‌های تسویه‌حساب */
+            .woocommerce form.checkout {
+                background: #ffffff !important;
+                padding: 35px 30px !important;
+                border-radius: 24px !important;
+                border: 2px solid #e2e8f0 !important;
+                box-shadow: 0 12px 35px rgba(0,0,0,0.06) !important;
+                color: #1e293b !important;
+                margin-top: 20px;
+                margin-bottom: 40px;
+            }
+
+            .woocommerce form .form-row label {
+                font-weight: 700 !important;
+                color: #334155 !important;
+                margin-bottom: 8px !important;
+                display: block !important;
+                font-size: 0.95rem !important;
+            }
+            .woocommerce form .form-row input.input-text,
+            .woocommerce form .form-row textarea {
+                background-color: #f8fafc !important;
+                border: 2px solid #cbd5e1 !important;
+                color: #0f172a !important;
+                padding: 12px 16px !important;
+                border-radius: 12px !important;
+                font-size: 1rem !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+                transition: all 0.2s ease !important;
+            }
+            .woocommerce form .form-row input.input-text:focus,
+            .woocommerce form .form-row textarea:focus {
+                background-color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.15) !important;
+                outline: none !important;
+            }
+            .woocommerce-checkout-review-order-table {
+                border: 2px solid #f1f5f9 !important;
+                border-radius: 16px !important;
+                overflow: hidden !important;
+                margin-bottom: 25px !important;
+                width: 100% !important;
+            }
+            .woocommerce-checkout-review-order-table th,
+            .woocommerce-checkout-review-order-table td {
+                padding: 14px 18px !important;
+                color: #1e293b !important;
+                font-size: 1rem !important;
+            }
+            .woocommerce-checkout-review-order-table th { background: #f8fafc !important; font-weight: 800 !important; }
+            .woocommerce-checkout #payment {
+                background: #f8fafc !important;
+                border-radius: 18px !important;
+                border: 2px solid #e2e8f0 !important;
+                padding: 20px !important;
+            }
+            .woocommerce-checkout #payment ul.payment_methods {
+                padding: 0 !important;
+                list-style: none !important;
+                margin-bottom: 20px !important;
+            }
+            .woocommerce-checkout #payment ul.payment_methods li {
+                padding: 10px 0 !important;
+                color: #1e293b !important;
+                font-weight: 700 !important;
+            }
+            .woocommerce-checkout #payment div.payment_box {
+                background: #e0f2fe !important;
+                color: #0369a1 !important;
+                padding: 16px !important;
+                border-radius: 12px !important;
+                border: 1px solid #bae6fd !important;
+                line-height: 1.8 !important;
+                font-weight: normal !important;
+            }
+            .woocommerce-checkout #payment div.payment_box::before { display: none !important; }
+            .woocommerce #place_order,
+            .woocommerce button.button,
+            .woocommerce input.button.alt,
+            .woocommerce .button.wc-forward {
+                background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%) !important;
+                color: #ffffff !important;
+                padding: 14px 34px !important;
+                border-radius: 30px !important;
+                font-size: 1.15rem !important;
+                font-weight: 800 !important;
+                border: none !important;
+                cursor: pointer !important;
+                transition: transform 0.2s, box-shadow 0.2s !important;
+                box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3) !important;
+                display: inline-block !important;
+                text-align: center !important;
+            }
+            .woocommerce #place_order:hover,
+            .woocommerce button.button:hover,
+            .woocommerce .button.wc-forward:hover {
+                transform: scale(1.03) !important;
+                box-shadow: 0 12px 28px rgba(108, 92, 231, 0.45) !important;
+                color: #ffffff !important;
+            }
+
+            /* استایل بخش بازی‌ها و قفل بازی */
+            .gk-game-container {
+                max-width: 1000px;
+                margin: 20px auto 40px;
+                background: #ffffff;
+                border-radius: 24px;
+                box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+                overflow: hidden;
+                border: 2px solid #f0f3f8;
+            }
+            .gk-game-header {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 22px;
+                background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+                border-bottom: 2px solid #edf2f7;
+                gap: 12px;
+            }
+            .gk-game-badges { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+            .gk-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 0.84rem;
+                font-weight: bold;
+                text-decoration: none;
+            }
+            .gk-badge-age { background: #ffeaa7; color: #d63031; }
+            .gk-badge-cat { background: #e0f2fe; color: #0284c7; }
+            .gk-badge-vip { background: #fef08a; color: #854d0e; border: 1px solid #facc15; }
+            .gk-badge-free { background: #dcfce7; color: #166534; }
+
+            .gk-game-actions { display: flex; gap: 10px; }
+            .gk-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 8px 16px;
+                border-radius: 12px;
+                font-size: 0.9rem;
+                font-weight: bold;
+                cursor: pointer;
+                border: none;
+                transition: all 0.2s ease;
+                text-decoration: none;
+            }
+            .gk-btn-fullscreen { background: #6c5ce7; color: #fff !important; }
+            .gk-btn-fullscreen:hover { background: #5b4cc4; transform: translateY(-2px); }
+            .gk-btn-back { background: #edf2f7; color: #4a5568 !important; }
+
+            .gk-player-wrapper {
+                position: relative;
+                width: 100%;
+                background: #1a1a24;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .gk-player-wrapper.aspect-16-9 { aspect-ratio: 16 / 9; min-height: 480px; }
+            .gk-player-wrapper.aspect-4-3 { aspect-ratio: 4 / 3; min-height: 480px; }
+            .gk-player-wrapper.aspect-1-1 { aspect-ratio: 1 / 1; min-height: 400px; }
+            .gk-player-wrapper.aspect-fullscreen { min-height: 720px; }
+            .gk-game-iframe { width: 100%; height: 100%; border: none; display: block; }
+            .gk-game-footer { padding: 25px 30px; line-height: 1.9; color: #4a5568; }
+
+            .gk-locked-box {
+                padding: 60px 25px;
+                text-align: center;
+                background: linear-gradient(135deg, #1e1e38 0%, #2d1a4e 100%);
+                color: #fff;
+                min-height: 440px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            .gk-lock-icon { font-size: 4.5rem; margin-bottom: 15px; animation: float-lock 2.5s ease-in-out infinite alternate; }
+            @keyframes float-lock { to { transform: translateY(-10px) scale(1.05); } }
+            .gk-lock-title { font-size: 1.8rem; font-weight: 900; color: #ffe600; margin-bottom: 12px; }
+            .gk-lock-desc { font-size: 1.1rem; color: #e2e8f0; max-width: 520px; line-height: 1.8; margin-bottom: 25px; }
+            .gk-lock-buttons { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+            .gk-btn-subscribe {
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%);
+                color: #fff !important;
+                padding: 14px 34px;
+                border-radius: 30px;
+                font-size: 1.15rem;
+                font-weight: 800;
+                box-shadow: 0 8px 25px rgba(232, 67, 147, 0.4);
+                transition: transform 0.2s;
+            }
+            .gk-btn-subscribe:hover { transform: scale(1.06); }
+            .gk-btn-login {
+                background: rgba(255,255,255,0.15);
+                color: #fff !important;
+                border: 2px solid rgba(255,255,255,0.3);
+                padding: 14px 28px;
+                border-radius: 30px;
+                font-size: 1.05rem;
+                font-weight: 700;
+            }
+
+            /* جدول پلن‌های قیمت‌گذاری */
+            .gk-pricing-container { max-width: 1100px; margin: 30px auto 50px; padding: 0 15px; }
+            .gk-pricing-header { text-align: center; margin-bottom: 40px; }
+            .gk-pricing-header h2 { font-size: 2.2rem; font-weight: 900; color: #1e293b; margin-bottom: 10px; }
+            .gk-pricing-header p { font-size: 1.15rem; color: #64748b; }
+            .gk-pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+            .gk-pricing-card {
+                background: #ffffff;
+                border-radius: 24px;
+                padding: 30px 22px;
+                text-align: center;
+                border: 2px solid #e2e8f0;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+                transition: all 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                position: relative;
+            }
+            .gk-pricing-card:hover { transform: translateY(-8px); box-shadow: 0 18px 40px rgba(108, 92, 231, 0.18); }
+            .gk-pricing-card.featured { border-color: #6c5ce7; background: linear-gradient(180deg, #faf5ff 0%, #ffffff 100%); }
+            .gk-ribbon {
+                position: absolute;
+                top: -12px;
+                right: 20px;
+                background: #ff7675;
+                color: #fff;
+                font-size: 0.8rem;
+                font-weight: 800;
+                padding: 4px 14px;
+                border-radius: 12px;
+                box-shadow: 0 4px 10px rgba(255, 118, 117, 0.4);
+            }
+            .gk-plan-icon { font-size: 3.2rem; margin-bottom: 12px; }
+            .gk-plan-name { font-size: 1.35rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+            .gk-plan-duration { font-size: 0.9rem; color: #64748b; margin-bottom: 18px; }
+            .gk-plan-price { font-size: 2rem; font-weight: 900; color: #6c5ce7; margin-bottom: 20px; }
+            .gk-plan-price span { font-size: 0.95rem; font-weight: 600; color: #64748b; }
+            .gk-plan-features { list-style: none; padding: 0; margin: 0 0 25px; text-align: right; font-size: 0.95rem; color: #475569; line-height: 2.2; }
+            .gk-plan-features li::before { content: "✨ "; }
+            .gk-btn-buy {
+                display: block;
+                width: 100%;
+                padding: 12px;
+                background: #6c5ce7;
+                color: #fff !important;
+                border-radius: 16px;
+                font-weight: 800;
+                font-size: 1.05rem;
+                text-decoration: none;
+                transition: all 0.2s;
+            }
+            .gk-btn-buy:hover { background: #5b4cc4; box-shadow: 0 6px 18px rgba(108, 92, 231, 0.35); }
+            .gk-pricing-card.featured .gk-btn-buy { background: linear-gradient(135deg, #ff7675 0%, #e84393 100%); }
+            .gk-pricing-card.featured .gk-btn-buy:hover { box-shadow: 0 6px 18px rgba(232, 67, 147, 0.35); }
+
+            /* آرشیو بازی‌ها */
+            .gk-archive-header { text-align: center; margin: 20px 0 35px; }
+            .gk-archive-title { font-size: 2.2rem; color: #2d3748; margin-bottom: 10px; font-weight: 800; }
+            .gk-archive-desc { font-size: 1.1rem; color: #718096; }
+            .gk-filters-bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 35px; }
+            .gk-filter-btn {
+                padding: 8px 18px;
+                background: #fff;
+                border: 2px solid #e2e8f0;
+                border-radius: 25px;
+                font-size: 0.92rem;
+                font-weight: bold;
+                color: #4a5568;
+                cursor: pointer;
+                transition: all 0.25s ease;
+                text-decoration: none;
+            }
+            .gk-filter-btn:hover, .gk-filter-btn.active {
+                background: #6c5ce7;
+                border-color: #6c5ce7;
+                color: #fff !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+            }
+            .gk-games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 26px; margin: 20px 0 40px; }
+            .gk-game-card {
+                background: #ffffff;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+                transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+                border: 2px solid #edf2f7;
+                display: flex;
+                flex-direction: column;
+            }
+            .gk-game-card:hover { transform: translateY(-6px); box-shadow: 0 16px 35px rgba(108, 92, 231, 0.15); border-color: #c7d2fe; }
+            .gk-card-thumb { position: relative; width: 100%; aspect-ratio: 16 / 10; background: #f1f5f9; overflow: hidden; }
+            .gk-card-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+            .gk-game-card:hover .gk-card-thumb img { transform: scale(1.06); }
+            .gk-card-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+            .gk-card-title { font-size: 1.2rem; font-weight: 700; margin: 0 0 10px; color: #1e293b; }
+            .gk-card-title a { color: inherit; text-decoration: none; }
+            .gk-card-title a:hover { color: #6c5ce7; }
+            .gk-card-excerpt { font-size: 0.9rem; color: #64748b; line-height: 1.7; margin-bottom: 16px; flex-grow: 1; }
+            .gk-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid #f1f5f9; }
+            .gk-play-btn {
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%);
+                color: #fff !important;
+                padding: 8px 18px;
+                border-radius: 12px;
+                font-weight: bold;
+                font-size: 0.92rem;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                transition: all 0.2s;
+            }
+            .gk-play-btn:hover { transform: scale(1.05); box-shadow: 0 6px 15px rgba(232, 67, 147, 0.35); }
+            .gk-default-thumb { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 3.2rem; color: #fff; }
+        </style>
+        <?php
+    }
+
+    public function render_game_content($content) {
+        if (is_singular('gk_game') && in_the_loop() && is_main_query()) {
+            $post_id     = get_the_ID();
+            $game_folder = get_post_meta($post_id, '_gk_game_folder', true);
+            $aspect      = get_post_meta($post_id, '_gk_game_aspect', true) ?: '16/9';
+            $access_type = get_post_meta($post_id, '_gk_game_access', true) ?: 'premium';
+
+            $aspect_class = 'aspect-16-9';
+            if ($aspect === '4/3') $aspect_class = 'aspect-4-3';
+            if ($aspect === '1/1') $aspect_class = 'aspect-1-1';
+            if ($aspect === 'fullscreen') $aspect_class = 'aspect-fullscreen';
+
+            $age_terms = get_the_terms($post_id, 'game_age_group');
+            $cat_terms = get_the_terms($post_id, 'game_category');
+
+            $sub_status = self::user_has_active_subscription();
+            $has_access = ($access_type === 'free') || ($sub_status !== false);
+
+            $game_url = '';
+            if (!empty($game_folder)) {
+                $game_url = content_url('games/' . trailingslashit($game_folder));
+            }
+
+            ob_start();
+            ?>
+            <div class="gk-game-container">
+                <div class="gk-game-header">
+                    <div class="gk-game-badges">
+                        <?php if ($access_type === 'free'): ?>
+                            <span class="gk-badge gk-badge-free">🟢 بازی رایگان</span>
+                        <?php elseif ($sub_status): ?>
+                            <span class="gk-badge gk-badge-vip">👑 اشتراک فعال (<?php echo $sub_status['days_left']; ?> روز مانده)</span>
+                        <?php else: ?>
+                            <span class="gk-badge gk-badge-vip">🔒 نیازمند اشتراک ویژه</span>
+                        <?php endif; ?>
+
+                        <?php if (!empty($age_terms) && !is_wp_error($age_terms)): ?>
+                            <?php foreach ($age_terms as $age): ?>
+                                <span class="gk-badge gk-badge-age">🎂 <?php echo esc_html($age->name); ?></span>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                        <?php if (!empty($cat_terms) && !is_wp_error($cat_terms)): ?>
+                            <?php foreach ($cat_terms as $cat): ?>
+                                <span class="gk-badge gk-badge-cat">🧠 <?php echo esc_html($cat->name); ?></span>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="gk-game-actions">
+                        <a href="<?php echo esc_url(home_url('/games/')); ?>" class="gk-btn gk-btn-back">⬅ همه بازی‌ها</a>
+                        <?php if ($has_access): ?>
+                            <button class="gk-btn gk-btn-fullscreen" onclick="toggleGkFullscreen()">⛶ تمام‌صفحه</button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <?php if ($has_access): ?>
+                    <div class="gk-player-wrapper <?php echo esc_attr($aspect_class); ?>" id="gkPlayerWrapper">
+                        <?php if (!empty($game_url)): ?>
+                            <iframe src="<?php echo esc_url($game_url); ?>" class="gk-game-iframe" id="gkGameIframe" allowfullscreen="true" scrolling="no"></iframe>
+                        <?php else: ?>
+                            <div style="color: #fff; padding: 40px; text-align: center;">
+                                <p style="font-size: 1.2rem;">⚠️ هنوز پوشه بازی برای این پست انتخاب نشده است.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="gk-locked-box">
+                        <div class="gk-lock-icon">🔒</div>
+                        <h2 class="gk-lock-title">این بازی مخصوص اعضای ویژه قربانی کیدز است!</h2>
+                        <p class="gk-lock-desc">
+                            برای ورود به دنیای بازی‌های مهارتی، فکری و آموزشی و دسترسی به تمام مراحل این بازی، اشتراک ویژه خود را فعال کنید.
+                        </p>
+                        <div class="gk-lock-buttons">
+                            <a href="<?php echo esc_url(home_url('/pricing/')); ?>" class="gk-btn gk-btn-subscribe">👑 مشاهده و خرید پلن‌های اشتراک 🚀</a>
+                            <?php if (!is_user_logged_in()): ?>
+                                <a href="<?php echo esc_url(wp_login_url(get_permalink())); ?>" class="gk-btn gk-btn-login">🔑 قبلاً ثبت‌نام کرده‌اید؟ ورود</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty(trim($content))): ?>
+                    <div class="gk-game-footer">
+                        <h3>📖 راهنما و اهداف بازی</h3>
+                        <?php echo $content; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <script data-no-optimize="1">
+                function toggleGkFullscreen() {
+                    var elem = document.getElementById("gkPlayerWrapper");
+                    if (!elem) return;
+                    if (!document.fullscreenElement) {
+                        if (elem.requestFullscreen) elem.requestFullscreen();
+                        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                        else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+                    } else {
+                        if (document.exitFullscreen) document.exitFullscreen();
+                    }
+                }
+            </script>
+            <?php
+            return ob_get_clean();
+        }
+
+        if (is_tax('game_age_group') || is_tax('game_category')) {
+            return $this->render_games_archive_shortcode([]);
+        }
+
+        return $content;
+    }
+
+    public function render_pricing_table_shortcode($atts) {
+        $plans_query = new WP_Query([
+            'post_type' => 'product',
+            'posts_per_page' => 10,
+            'meta_key' => '_gk_subscription_days',
+            'orderby' => 'meta_value_num',
+            'order' => 'ASC'
+        ]);
+
+        $card_icons = [
+            30 => '🥉',
+            90 => '🥈',
+            180 => '🥇',
+            365 => '👑'
+        ];
+
+        ob_start();
+        ?>
+        <div class="gk-pricing-container">
+            <div class="gk-pricing-header">
+                <h2>👑 پلن‌های اشتراک ویژه قربانی کیدز</h2>
+                <p>با یک‌بار خرید اشتراک، به تمام بازی‌های فکری، تمرکزی و آموزشی کودک دسترسی نامحدود داشته باشید.</p>
+            </div>
+
+            <div class="gk-pricing-grid">
+                <?php if ($plans_query->have_posts()): while ($plans_query->have_posts()): $plans_query->the_post();
+                    $product = wc_get_product(get_the_ID());
+                    $days = (int) get_post_meta(get_the_ID(), '_gk_subscription_days', true);
+                    $icon = $card_icons[$days] ?? '⭐';
+                    $is_featured = ($days === 90 || $days === 365);
+                    $add_to_cart_url = wc_get_cart_url() . '?add-to-cart=' . get_the_ID();
+                ?>
+                    <div class="gk-pricing-card <?php echo $is_featured ? 'featured' : ''; ?>">
+                        <?php if ($days === 90): ?>
+                            <div class="gk-ribbon">🔥 محبوب‌ترین</div>
+                        <?php elseif ($days === 365): ?>
+                            <div class="gk-ribbon">⭐ بیشترین تخفیف</div>
+                        <?php endif; ?>
+
+                        <div>
+                            <div class="gk-plan-icon"><?php echo $icon; ?></div>
+                            <h3 class="gk-plan-name"><?php the_title(); ?></h3>
+                            <div class="gk-plan-duration">مدت دسترسی: <?php echo $days; ?> روز کامل</div>
+                            <div class="gk-plan-price">
+                                <?php echo number_format($product->get_price(), 0, '', '،'); ?>
+                                <span>تومان</span>
+                            </div>
+
+                            <ul class="gk-plan-features">
+                                <li>دسترسی نامحدود به تمام ۹ بازی</li>
+                                <li>دسترسی به بازی‌های جدید آینده</li>
+                                <li>بدون محدودیت تعداد دفعات بازی</li>
+                                <li>پشتیبانی و امکان اجرا در موبایل و تبلت</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <a href="<?php echo esc_url($add_to_cart_url); ?>" class="gk-btn-buy">
+                                💳 خرید اشتراک و پرداخت
+                            </a>
+                        </div>
+                    </div>
+                <?php endwhile; wp_reset_postdata(); endif; ?>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_games_archive_shortcode($atts) {
+        $atts = shortcode_atts([
+            'posts_per_page' => -1,
+        ], $atts);
+
+        $selected_age = isset($_GET['age']) ? sanitize_text_field(urldecode($_GET['age'])) : '';
+        $selected_cat = isset($_GET['cat']) ? sanitize_text_field(urldecode($_GET['cat'])) : '';
+        $search_query = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
+
+        // دریافت تمام بازی‌ها
+        $games_query = new WP_Query([
+            'post_type'      => 'gk_game',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish',
+            'orderby'        => 'date',
+            'order'          => 'DESC'
+        ]);
+
+        $cat_icons = [
+            'دیداری و بصری' => '👁️',
+            'حافظه و تمرکز' => '🧠',
+            'هوش و ریاضی'   => '🔢',
+            'سرگرمی و تفریحی' => '🎯',
+            'شنیداری'        => '🎧'
+        ];
+
+        $age_icons = [
+            'زیر ۳ سال'   => '👶',
+            '۳ تا ۵ سال'  => '🧸',
+            '۶ تا ۸ سال'  => '🎒',
+            '۹ تا ۱۲ سال' => '🚀'
+        ];
+
+        $gradient_colors = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+            'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
+        ];
+        $default_game_icons = ['🧩', '🔍', '💎', '✨', '⚡', '🛸', '🏰', '🚀', '🐾', '🎨'];
+
+        $cat_terms = get_terms(['taxonomy' => 'game_category', 'hide_empty' => false]);
+        $age_terms = get_terms(['taxonomy' => 'game_age_group', 'hide_empty' => false]);
+
+        ob_start();
+        ?>
+                <style id="gk-games-archive-styles" data-no-optimize="1">
+            /* =========================================================
+               استایل کامل صفحه بازی‌ها، نوار جستجو و فیلترهای تفکیک‌شده
+               ========================================================= */
+            .fusion-page-title-bar,
+            .fusion-page-title-bar-wrapper,
+            .avada-page-titlebar,
+            .fusion-breadcrumbs {
+                display: none !important;
+            }
+
+            .gk-archive-wrapper {
+                max-width: 1280px !important;
+                margin: 30px auto 60px !important;
+                padding: 0 20px !important;
+                direction: rtl !important;
+                font-family: 'IRANSansXFaNum', 'aviny', Tahoma, sans-serif !important;
+                box-sizing: border-box !important;
+            }
+
+            .gk-archive-wrapper * {
+                box-sizing: border-box !important;
+            }
+
+            /* هدر بالای صفحه بازی‌ها */
+            .gk-archive-hero {
+                text-align: center !important;
+                margin-bottom: 28px !important;
+                padding: 10px 0 !important;
+            }
+
+            .gk-hero-badge {
+                display: inline-block !important;
+                background: #ede9fe !important;
+                color: #6c5ce7 !important;
+                font-size: 0.92rem !important;
+                font-weight: 800 !important;
+                padding: 6px 18px !important;
+                border-radius: 20px !important;
+                margin-bottom: 12px !important;
+            }
+
+            .gk-archive-title {
+                font-family: 'aviny', cursive, Tahoma, sans-serif !important;
+                font-size: 2.6rem !important;
+                font-weight: 900 !important;
+                color: #1e293b !important;
+                margin: 0 0 10px !important;
+                line-height: 1.3 !important;
+            }
+
+            .gk-archive-desc {
+                font-size: 1.05rem !important;
+                color: #64748b !important;
+                max-width: 650px !important;
+                margin: 0 auto 24px !important;
+                line-height: 1.7 !important;
+            }
+
+            /* نوار جستجوی زنده مدرن */
+            .gk-search-box-wrapper {
+                max-width: 580px !important;
+                margin: 0 auto !important;
+            }
+
+            .gk-search-input-box {
+                position: relative !important;
+                display: flex !important;
+                align-items: center !important;
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+                border-radius: 35px !important;
+                box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06) !important;
+                padding: 4px 18px !important;
+                transition: all 0.25s ease !important;
+            }
+
+            .gk-search-input-box:focus-within {
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 10px 30px rgba(108, 92, 231, 0.18) !important;
+                transform: translateY(-2px) !important;
+            }
+
+            .gk-search-icon {
+                color: #94a3b8 !important;
+                flex-shrink: 0 !important;
+                margin-left: 10px !important;
+            }
+
+            .gk-search-input {
+                width: 100% !important;
+                border: none !important;
+                outline: none !important;
+                background: transparent !important;
+                font-family: inherit !important;
+                font-size: 1.05rem !important;
+                font-weight: 600 !important;
+                color: #1e293b !important;
+                padding: 10px 0 !important;
+                box-shadow: none !important;
+            }
+
+            .gk-search-clear-btn {
+                background: #f1f5f9 !important;
+                border: none !important;
+                color: #64748b !important;
+                width: 28px !important;
+                height: 28px !important;
+                border-radius: 50% !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0.85rem !important;
+                cursor: pointer !important;
+                flex-shrink: 0 !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .gk-search-clear-btn:hover {
+                background: #e2e8f0 !important;
+                color: #0f172a !important;
+            }
+
+            /* بخش فیلترهای تفکیک‌شده */
+            .gk-filters-container {
+                background: #ffffff !important;
+                border: 1.5px solid #f1f5f9 !important;
+                border-radius: 24px !important;
+                padding: 20px 24px !important;
+                box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04) !important;
+                margin-bottom: 25px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+
+            .gk-filter-group {
+                display: flex !important;
+                align-items: center !important;
+                gap: 14px !important;
+                flex-wrap: wrap !important;
+            }
+
+            .gk-filter-label {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                font-size: 0.95rem !important;
+                font-weight: 800 !important;
+                color: #475569 !important;
+                min-width: 140px !important;
+                flex-shrink: 0 !important;
+            }
+
+            .gk-filter-label-icon {
+                font-size: 1.15rem !important;
+            }
+
+            .gk-filter-chips-row {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                flex-wrap: wrap !important;
+                flex: 1 !important;
+            }
+
+            .gk-chip-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                background: #f8fafc !important;
+                border: 1.5px solid #e2e8f0 !important;
+                color: #475569 !important;
+                font-family: inherit !important;
+                font-size: 0.95rem !important;
+                font-weight: 700 !important;
+                padding: 7px 16px !important;
+                border-radius: 20px !important;
+                cursor: pointer !important;
+                transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                white-space: nowrap !important;
+                user-select: none !important;
+            }
+
+            .gk-chip-btn:hover {
+                background: #f1f5f9 !important;
+                border-color: #cbd5e1 !important;
+                color: #1e293b !important;
+                transform: translateY(-1px) !important;
+            }
+
+            .gk-chip-btn.active {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                border-color: #6c5ce7 !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3) !important;
+                transform: translateY(-1px) !important;
+            }
+
+            /* نوار نتایج */
+            .gk-results-bar {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                margin-bottom: 20px !important;
+                padding: 0 6px !important;
+                font-size: 0.95rem !important;
+                color: #64748b !important;
+            }
+
+            .gk-results-count strong {
+                color: #6c5ce7 !important;
+                font-size: 1.15rem !important;
+            }
+
+            .gk-reset-filters-btn {
+                background: #fee2e2 !important;
+                border: none !important;
+                color: #dc2626 !important;
+                font-family: inherit !important;
+                font-size: 0.86rem !important;
+                font-weight: 800 !important;
+                padding: 5px 14px !important;
+                border-radius: 14px !important;
+                cursor: pointer !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .gk-reset-filters-btn:hover {
+                background: #fca5a5 !important;
+            }
+
+            /* گرید کارت‌های بازی */
+            .gk-games-grid {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+                gap: 24px !important;
+            }
+
+            .gk-game-card-item {
+                transition: all 0.3s ease !important;
+            }
+
+            .gk-game-card {
+                background: #ffffff !important;
+                border-radius: 20px !important;
+                overflow: hidden !important;
+                box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06) !important;
+                border: 1.5px solid #f1f5f9 !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                height: 100% !important;
+            }
+
+            .gk-game-card:hover {
+                transform: translateY(-6px) !important;
+                box-shadow: 0 16px 35px rgba(15, 23, 42, 0.12) !important;
+                border-color: #cbd5e1 !important;
+            }
+
+            .gk-card-thumb {
+                position: relative !important;
+                height: 180px !important;
+                overflow: hidden !important;
+                background: #f1f5f9 !important;
+            }
+
+            .gk-card-thumb img {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                transition: transform 0.4s ease !important;
+            }
+
+            .gk-game-card:hover .gk-card-thumb img {
+                transform: scale(1.06) !important;
+            }
+
+            .gk-default-thumb {
+                width: 100% !important;
+                height: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 3.5rem !important;
+            }
+
+            .gk-card-body {
+                padding: 18px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                flex: 1 !important;
+            }
+
+            .gk-card-badges-row {
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                margin-bottom: 10px !important;
+                flex-wrap: wrap !important;
+            }
+
+            .gk-badge {
+                font-size: 0.74rem !important;
+                font-weight: 800 !important;
+                padding: 3px 9px !important;
+                border-radius: 12px !important;
+            }
+
+            .gk-badge-free {
+                background: #dcfce7 !important;
+                color: #15803d !important;
+            }
+
+            .gk-badge-vip {
+                background: #fef3c7 !important;
+                color: #b45309 !important;
+            }
+
+            .gk-badge-age {
+                background: #f1f5f9 !important;
+                color: #475569 !important;
+            }
+
+            .gk-card-title {
+                font-size: 1.15rem !important;
+                font-weight: 800 !important;
+                color: #1e293b !important;
+                margin: 0 0 10px !important;
+                line-height: 1.4 !important;
+            }
+
+            .gk-card-title a {
+                color: inherit !important;
+                text-decoration: none !important;
+                transition: color 0.2s ease !important;
+            }
+
+            .gk-card-title a:hover {
+                color: #6c5ce7 !important;
+            }
+
+            .gk-card-meta-cats {
+                font-size: 0.86rem !important;
+                color: #64748b !important;
+                margin-bottom: 16px !important;
+                line-height: 1.5 !important;
+            }
+
+            .gk-card-action {
+                margin-top: auto !important;
+            }
+
+            .gk-play-btn {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                font-weight: 800 !important;
+                font-size: 0.98rem !important;
+                padding: 10px 16px !important;
+                border-radius: 14px !important;
+                text-decoration: none !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.25) !important;
+                transition: all 0.25s ease !important;
+            }
+
+            .gk-play-btn:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 18px rgba(108, 92, 231, 0.4) !important;
+                color: #ffffff !important;
+            }
+
+            /* کادر عدم یافتن نتیجه */
+            .gk-no-results-box {
+                text-align: center !important;
+                padding: 50px 20px !important;
+                background: #ffffff !important;
+                border-radius: 24px !important;
+                border: 2px dashed #cbd5e1 !important;
+                margin: 20px 0 !important;
+            }
+
+            .gk-no-results-icon {
+                font-size: 3.5rem !important;
+                margin-bottom: 12px !important;
+            }
+
+            .gk-no-results-box h3 {
+                font-size: 1.4rem !important;
+                font-weight: 800 !important;
+                color: #334155 !important;
+                margin: 0 0 8px !important;
+            }
+
+            .gk-no-results-box p {
+                font-size: 1rem !important;
+                color: #64748b !important;
+                margin: 0 0 20px !important;
+            }
+
+            .gk-btn-show-all {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                border: none !important;
+                color: #ffffff !important;
+                font-family: inherit !important;
+                font-size: 1rem !important;
+                font-weight: 800 !important;
+                padding: 10px 24px !important;
+                border-radius: 20px !important;
+                cursor: pointer !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3) !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .gk-btn-show-all:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 18px rgba(108, 92, 231, 0.45) !important;
+            }
+
+            /* ریسپانسیو موبایل و تبلت */
+            @media (max-width: 768px) {
+                .gk-archive-wrapper {
+                    margin: 15px auto 40px !important;
+                    padding: 0 14px !important;
+                }
+                .gk-archive-title {
+                    font-size: 1.9rem !important;
+                }
+                .gk-archive-desc {
+                    font-size: 0.95rem !important;
+                    margin-bottom: 18px !important;
+                }
+                .gk-filters-container {
+                    padding: 14px !important;
+                    border-radius: 18px !important;
+                    gap: 12px !important;
+                }
+                .gk-filter-group {
+                    flex-direction: column !important;
+                    align-items: flex-start !important;
+                    gap: 8px !important;
+                }
+                .gk-filter-chips-row {
+                    width: 100% !important;
+                    overflow-x: auto !important;
+                    flex-wrap: nowrap !important;
+                    padding-bottom: 6px !important;
+                    -webkit-overflow-scrolling: touch !important;
+                }
+                .gk-filter-chips-row::-webkit-scrollbar {
+                    display: none !important;
+                }
+                .gk-chip-btn {
+                    font-size: 0.88rem !important;
+                    padding: 6px 14px !important;
+                }
+                .gk-games-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+                    gap: 16px !important;
+                }
+            }
+        </style>
+        <div id="gkGamesArchiveApp" class="gk-archive-wrapper" data-initial-cat="<?php echo esc_attr($selected_cat); ?>" data-initial-age="<?php echo esc_attr($selected_age); ?>">
+            <!-- هدر بخش بازی‌ها -->
+            <div class="gk-archive-hero">
+                <div class="gk-hero-badge">🎮 دنیای بازی‌های مهارتی و آموزشی</div>
+                <h1 class="gk-archive-title">بازی‌های هوش، تمرکز و سرگرمی کودکانه</h1>
+                <p class="gk-archive-desc">مجموعه‌ای از بازی‌های تعاملی و هدفمند جهت تقویت مهارت‌های دیداری، شنیداری، حافظه و تمرکز کودکان</p>
+                
+                <!-- نوار سرچ زنده -->
+                <div class="gk-search-box-wrapper">
+                    <div class="gk-search-input-box">
+                        <svg class="gk-search-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="gkGameSearchInput" class="gk-search-input" placeholder="جستجوی نام یا موضوع بازی (مثلاً: تمرکز، استروپ، برج...)" value="<?php echo esc_attr($search_query); ?>" autocomplete="off" />
+                        <button type="button" id="gkSearchClearBtn" class="gk-search-clear-btn" style="display:none;" aria-label="پاک کردن">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بخش فیلترهای تفکیک‌شده و مرتب -->
+            <div class="gk-filters-container">
+                <!-- ردیف ۱: دسته‌بندی و مهارت بازی -->
+                <div class="gk-filter-group">
+                    <div class="gk-filter-label">
+                        <span class="gk-filter-label-icon">🧠</span>
+                        <span>مهارت و موضوع بازی:</span>
+                    </div>
+                    <div class="gk-filter-chips-row" id="gkCatChips">
+                        <button type="button" class="gk-chip-btn gk-cat-chip <?php echo empty($selected_cat) ? 'active' : ''; ?>" data-cat="">
+                            🎮 همه مهارت‌ها
+                        </button>
+                        <?php if (!empty($cat_terms) && !is_wp_error($cat_terms)): ?>
+                            <?php foreach ($cat_terms as $term): 
+                                $icon = $cat_icons[$term->name] ?? '🎯';
+                                $is_active = ($selected_cat === $term->name || $selected_cat === $term->slug);
+                            ?>
+                                <button type="button" class="gk-chip-btn gk-cat-chip <?php echo $is_active ? 'active' : ''; ?>" data-cat="<?php echo esc_attr($term->name); ?>" data-slug="<?php echo esc_attr($term->slug); ?>">
+                                    <?php echo esc_html($icon . ' ' . $term->name); ?>
+                                </button>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- ردیف ۲: رده سنی کودک -->
+                <div class="gk-filter-group">
+                    <div class="gk-filter-label">
+                        <span class="gk-filter-label-icon">🎂</span>
+                        <span>رده سنی کودک:</span>
+                    </div>
+                    <div class="gk-filter-chips-row" id="gkAgeChips">
+                        <button type="button" class="gk-chip-btn gk-age-chip <?php echo empty($selected_age) ? 'active' : ''; ?>" data-age="">
+                            👶 همه سنین
+                        </button>
+                        <?php if (!empty($age_terms) && !is_wp_error($age_terms)): ?>
+                            <?php foreach ($age_terms as $term): 
+                                $icon = $age_icons[$term->name] ?? '🎂';
+                                $is_active = ($selected_age === $term->name || $selected_age === $term->slug);
+                            ?>
+                                <button type="button" class="gk-chip-btn gk-age-chip <?php echo $is_active ? 'active' : ''; ?>" data-age="<?php echo esc_attr($term->name); ?>" data-slug="<?php echo esc_attr($term->slug); ?>">
+                                    <?php echo esc_html($icon . ' ' . $term->name); ?>
+                                </button>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نوار آمار و نتایج -->
+            <div class="gk-results-bar">
+                <div class="gk-results-count">
+                    <span>تعداد بازی‌های یافت شده: </span>
+                    <strong id="gkGamesCount">0</strong>
+                </div>
+                <button type="button" id="gkResetFiltersBtn" class="gk-reset-filters-btn" style="display:none;">
+                    🔄 پاک کردن فیلترها
+                </button>
+            </div>
+
+            <!-- گرید کارت‌های بازی -->
+            <div class="gk-games-grid" id="gkGamesGrid">
+                <?php if ($games_query->have_posts()): 
+                    $card_idx = 0;
+                    while ($games_query->have_posts()): $games_query->the_post();
+                        $post_id = get_the_ID();
+                        $age_objs = get_the_terms($post_id, 'game_age_group') ?: [];
+                        $cat_objs = get_the_terms($post_id, 'game_category') ?: [];
+                        
+                        $age_names = wp_list_pluck($age_objs, 'name');
+                        $cat_names = wp_list_pluck($cat_objs, 'name');
+                        $age_slugs = wp_list_pluck($age_objs, 'slug');
+                        $cat_slugs = wp_list_pluck($cat_objs, 'slug');
+
+                        $access_type = get_post_meta($post_id, '_gk_game_access', true) ?: 'premium';
+                        $bg = $gradient_colors[$card_idx % count($gradient_colors)];
+                        $icon = $default_game_icons[$card_idx % count($default_game_icons)];
+                        $card_idx++;
+                    ?>
+                        <div class="gk-game-card-item" 
+                             data-title="<?php echo esc_attr(mb_strtolower(get_the_title())); ?>" 
+                             data-cats="<?php echo esc_attr(implode(',', array_merge($cat_names, $cat_slugs))); ?>" 
+                             data-ages="<?php echo esc_attr(implode(',', array_merge($age_names, $age_slugs))); ?>">
+                            <div class="gk-game-card">
+                                <div class="gk-card-thumb">
+                                    <a href="<?php the_permalink(); ?>">
+                                        <?php if (has_post_thumbnail()): ?>
+                                            <?php the_post_thumbnail('medium_large'); ?>
+                                        <?php else: ?>
+                                            <div class="gk-default-thumb" style="background: <?php echo esc_attr($bg); ?>;">
+                                                <span><?php echo esc_html($icon); ?></span>
+                                            </div>
+                                        <?php endif; ?>
+                                    </a>
+                                </div>
+                                <div class="gk-card-body">
+                                    <div class="gk-card-badges-row">
+                                        <?php if ($access_type === 'free'): ?>
+                                            <span class="gk-badge gk-badge-free">🟢 رایگان</span>
+                                        <?php else: ?>
+                                            <span class="gk-badge gk-badge-vip">👑 اشتراک ویژه</span>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($age_names)): ?>
+                                            <span class="gk-badge gk-badge-age">🎂 <?php echo esc_html($age_names[0]); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <h3 class="gk-card-title">
+                                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                                    </h3>
+
+                                    <?php if (!empty($cat_names)): ?>
+                                        <div class="gk-card-meta-cats">
+                                            <span>🧠 <?php echo esc_html(implode('، ', $cat_names)); ?></span>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="gk-card-action">
+                                        <a href="<?php the_permalink(); ?>" class="gk-play-btn">
+                                            <span>شروع بازی</span>
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endwhile; wp_reset_postdata(); ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- پیام عدم یافتن نتیجه -->
+            <div id="gkNoResults" class="gk-no-results-box" style="display:none;">
+                <div class="gk-no-results-icon">🔍</div>
+                <h3>هیچ بازی‌ای با این مشخصات پیدا نشد!</h3>
+                <p>می‌توانید کلمه جستجو را تغییر دهید یا فیلترهای دیگر را انتخاب نمایید.</p>
+                <button type="button" class="gk-btn-show-all" onclick="window.gkResetAllFilters()">🎮 مشاهده همه بازی‌ها</button>
+            </div>
+        </div>
+
+        <script data-no-optimize="1">
+        (function() {
+            function initGameFilter() {
+                var searchInput = document.getElementById('gkGameSearchInput');
+                var clearBtn = document.getElementById('gkSearchClearBtn');
+                var catChips = document.querySelectorAll('.gk-cat-chip');
+                var ageChips = document.querySelectorAll('.gk-age-chip');
+                var cards = document.querySelectorAll('.gk-game-card-item');
+                var countElem = document.getElementById('gkGamesCount');
+                var noResults = document.getElementById('gkNoResults');
+                var resetBtn = document.getElementById('gkResetFiltersBtn');
+                var app = document.getElementById('gkGamesArchiveApp');
+
+                function norm(str) {
+                    if (!str) return '';
+                    try { str = decodeURIComponent(str); } catch(e) {}
+                    return str.replace(/[-_+]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+                }
+
+                var urlParams = new URLSearchParams(window.location.search);
+                var currentCat = norm(urlParams.get('cat') || (app ? app.getAttribute('data-initial-cat') : ''));
+                var currentAge = norm(urlParams.get('age') || (app ? app.getAttribute('data-initial-age') : ''));
+                var currentSearch = (urlParams.get('s') || '').trim().toLowerCase();
+
+                if (searchInput && currentSearch) {
+                    searchInput.value = currentSearch;
+                }
+
+                function syncActiveChips() {
+                    var foundCat = false;
+                    catChips.forEach(function(c) {
+                        var cCat = norm(c.getAttribute('data-cat'));
+                        var cSlug = norm(c.getAttribute('data-slug'));
+                        if (currentCat && (cCat === currentCat || cSlug === currentCat || currentCat.indexOf(cCat) !== -1 || cCat.indexOf(currentCat) !== -1)) {
+                            c.classList.add('active');
+                            foundCat = true;
+                        } else {
+                            c.classList.remove('active');
+                        }
+                    });
+                    if (!foundCat && catChips.length > 0) {
+                        catChips[0].classList.add('active');
+                    }
+
+                    var foundAge = false;
+                    ageChips.forEach(function(a) {
+                        var aAge = norm(a.getAttribute('data-age'));
+                        var aSlug = norm(a.getAttribute('data-slug'));
+                        if (currentAge && (aAge === currentAge || aSlug === currentAge || currentAge.indexOf(aAge) !== -1 || aAge.indexOf(currentAge) !== -1)) {
+                            a.classList.add('active');
+                            foundAge = true;
+                        } else {
+                            a.classList.remove('active');
+                        }
+                    });
+                    if (!foundAge && ageChips.length > 0) {
+                        ageChips[0].classList.add('active');
+                    }
+                }
+
+                function filterGames() {
+                    var query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+                    if (clearBtn) clearBtn.style.display = query ? 'flex' : 'none';
+
+                    var visibleCount = 0;
+                    cards.forEach(function(card) {
+                        var title = norm(card.getAttribute('data-title'));
+                        var cats = norm(card.getAttribute('data-cats'));
+                        var ages = norm(card.getAttribute('data-ages'));
+
+                        var matchesSearch = !query || title.indexOf(query) !== -1 || cats.indexOf(query) !== -1;
+                        var matchesCat = !currentCat || cats.indexOf(currentCat) !== -1;
+                        var matchesAge = !currentAge || ages.indexOf(currentAge) !== -1;
+
+                        if (matchesSearch && matchesCat && matchesAge) {
+                            card.style.display = 'block';
+                            visibleCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    if (countElem) countElem.textContent = visibleCount;
+                    if (noResults) noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
+                    if (resetBtn) resetBtn.style.display = (currentCat || currentAge || query) ? 'inline-flex' : 'none';
+
+                    // تغییر URL بدون رفرش
+                    var newUrl = new URL(window.location.href);
+                    if (currentCat) newUrl.searchParams.set('cat', currentCat); else newUrl.searchParams.delete('cat');
+                    if (currentAge) newUrl.searchParams.set('age', currentAge); else newUrl.searchParams.delete('age');
+                    if (query) newUrl.searchParams.set('s', query); else newUrl.searchParams.delete('s');
+                    window.history.replaceState({}, '', newUrl.toString());
+                }
+
+                if (searchInput) {
+                    searchInput.addEventListener('input', filterGames);
+                }
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', function() {
+                        searchInput.value = '';
+                        filterGames();
+                    });
+                }
+
+                catChips.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        catChips.forEach(function(c) { c.classList.remove('active'); });
+                        btn.classList.add('active');
+                        currentCat = norm(btn.getAttribute('data-cat'));
+                        filterGames();
+                    });
+                });
+
+                ageChips.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        ageChips.forEach(function(a) { a.classList.remove('active'); });
+                        btn.classList.add('active');
+                        currentAge = norm(btn.getAttribute('data-age'));
+                        filterGames();
+                    });
+                });
+
+                window.gkResetAllFilters = function() {
+                    if (searchInput) searchInput.value = '';
+                    currentCat = '';
+                    currentAge = '';
+                    syncActiveChips();
+                    filterGames();
+                };
+
+                if (resetBtn) {
+                    resetBtn.addEventListener('click', window.gkResetAllFilters);
+                }
+
+                syncActiveChips();
+                filterGames();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initGameFilter);
+            } else {
+                initGameFilter();
+            }
+        })();
+        </script>
+        <?php
+        return ob_get_clean();
+    }
+
+}
+
+GhorbaniKids_Games::get_instance();

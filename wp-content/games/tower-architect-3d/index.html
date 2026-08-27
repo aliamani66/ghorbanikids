@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>معماری برج رویایی | 3D Tower Architect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- کتابخانه Three.js و OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 50% 30%, #0d1326 0%, #030611 100%);
+      --accent-gold: #ffd700;
+      --accent-cyan: #00f0ff;
+      --accent-pink: #ff0077;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    /* ناحیهٔ اختصاصی HUD در بالای صفحه - جدا از نمای سه‌بعدی */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 15;
+      background: linear-gradient(180deg, rgba(4, 8, 20, 0.97) 0%, rgba(4, 8, 20, 0.9) 80%, rgba(4, 8, 20, 0) 100%);
+      border-bottom: 1px solid rgba(0, 240, 255, 0.25);
+      display: flex;
+      justify-content: center;
+      padding-bottom: 14px;
+    }
+
+    #webgl-container {
+      position: fixed;
+      left: 0;
+      width: 100vw;
+      z-index: 1;
+      /* top و height به‌صورت داینامیک با جاوااسکریپت بر اساس ارتفاع top-bar تنظیم می‌شوند
+         تا نمای سه‌بعدی هرگز زیر ناحیهٔ امتیاز/مرحله نرود */
+    }
+
+    /* نوار کنترل بالا */
+    .ui-layer {
+      position: relative;
+      width: 100%;
+      max-width: 700px;
+      padding: 14px 14px 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .top-stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: rgba(13, 22, 48, 0.75);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      backdrop-filter: blur(12px);
+      padding: 6px 16px;
+      border-radius: 16px;
+      text-align: center;
+      flex: 1;
+      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.15);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #8da4d0;
+    }
+
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+    }
+
+    /* تایمر و وضعیت */
+    .timer-wrapper {
+      width: 100%;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff0077);
+      transition: width 0.1s linear;
+    }
+
+    .guide-banner {
+      background: rgba(8, 14, 30, 0.85);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      padding: 8px 18px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-gold);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    }
+
+    /* پنل ساخت قطعات پایین */
+    .build-dock {
+      position: fixed;
+      bottom: 20px;
+      z-index: 10;
+      width: min(94vw, 650px);
+      background: rgba(10, 18, 40, 0.85);
+      border: 2px solid rgba(0, 240, 255, 0.35);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .build-dock.hidden {
+      transform: translateY(160%);
+      pointer-events: none;
+    }
+
+    .dock-title {
+      font-size: 0.85rem;
+      color: #9cb5e3;
+      text-align: center;
+    }
+
+    .palette-grid {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    .piece-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      padding: 8px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      min-width: 80px;
+    }
+
+    .piece-card:hover {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--accent-cyan);
+      transform: translateY(-3px);
+    }
+
+    .piece-card.selected {
+      background: rgba(255, 215, 0, 0.2);
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
+
+    .piece-color-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .action-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background: rgba(0, 240, 255, 0.2);
+      border-color: var(--accent-cyan);
+    }
+
+    .btn-place {
+      background: linear-gradient(90deg, #00f0ff, #0088ff);
+      color: #030a1c;
+      font-weight: 900;
+      border: none;
+    }
+
+    /* پرده شروع / مراحل */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 17, 0.9);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal-box {
+      background: linear-gradient(145deg, #101c3d, #210d3b);
+      border: 2px solid var(--accent-cyan);
+      border-radius: 30px;
+      padding: 36px 44px;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.4), inset 0 0 25px rgba(255, 0, 119, 0.2);
+      max-width: 90vw;
+    }
+
+    .btn-start {
+      margin-top: 24px;
+      padding: 14px 44px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #040918;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+      transition: transform 0.2s ease;
+    }
+
+    .btn-start:hover {
+      transform: scale(1.08);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="webgl-container"></div>
+
+  <!-- نوار آمار و راهنما: ناحیهٔ ثابت و مجزا از نمای سه‌بعدی -->
+  <div class="top-bar">
+    <div class="ui-layer" id="ui-layer">
+      <div class="top-stats">
+        <div class="stat-card">
+          <div class="stat-label">مرحله معماری</div>
+          <div class="stat-value" id="ui-level">۱</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">امتیاز مهندسی</div>
+          <div class="stat-value" id="ui-score">۰</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">لایه‌های تکمیل‌شده</div>
+          <div class="stat-value" id="ui-layers">۰ / ۰</div>
+        </div>
+      </div>
+
+      <div class="timer-wrapper">
+        <div class="timer-fill" id="ui-timer-bar"></div>
+      </div>
+
+      <div class="guide-banner" id="ui-guide">
+        🔍 سازه سه‌بعدی را بچرخانید و به خاطر بسپارید!
+      </div>
+    </div>
+  </div>
+
+  <!-- داشبورد قطعات ساختمانی -->
+  <div class="build-dock hidden" id="build-dock">
+    <div class="dock-title">یک قطعه انتخاب کنید، زاویه آن را تنظیم کنید و در لایه جاری قرار دهید:</div>
+    <div class="palette-grid" id="pieces-palette"></div>
+
+    <div class="action-controls">
+      <button class="btn-action" onclick="rotateSelectedPiece()">🔄 چرخش ۹۰° (<span id="ui-angle">۰°</span>)</button>
+      <button class="btn-action btn-place" onclick="placeCurrentPiece()">🏗️ ساخت و تثبیت قطعه</button>
+    </div>
+  </div>
+
+  <!-- مودال شروع و پایان -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-box">
+      <h2 style="font-size: 2.2rem; color: #fff; margin-bottom: 12px; text-shadow: 0 0 15px var(--accent-cyan);" id="modal-title">معماری برج رویایی 🏛️✨</h2>
+      <p style="color: #c9dbff; font-size: 1.05rem; line-height: 1.6;" id="modal-desc">
+        سازه سه‌بعدی را با ماوس یا لمس ۳۶۰ درجه بررسی کنید. پس از پایان زمان نمایش، برج ناپدید می‌شود و باید دقیقاً از لایه پایین به بالا آن را با هندسه، رنگ و زاویه صحیح بازسازی کنید!
+      </p>
+      <button class="btn-start" id="modal-btn" onclick="startLevelFlow()">شروع شبیه‌سازی 🚀</button>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // ۱. سیستم صوتی مدرن (Web Audio API)
+    // ==========================================
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      },
+      playTone(freq, duration = 0.15, type = 'sine', gainVal = 0.25) {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = autoGain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(gainVal, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      },
+      playPick() { this.playTone(480, 0.08, 'sine', 0.2); },
+      playRotate() { this.playTone(320, 0.1, 'triangle', 0.3); },
+      playLock(layer) {
+        const base = 400 + (layer * 120);
+        this.playTone(base, 0.2, 'sine', 0.35);
+      },
+      playError() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.linearRampToValueAtTime(70, now + 0.3);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      },
+      playWin() {
+        [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((f, i) => {
+          setTimeout(() => this.playTone(f, 0.25, 'triangle', 0.3), i * 90);
+        });
+      }
+    };
+
+    // ==========================================
+    // ۲. موتور سه‌بعدی Three.js
+    // ==========================================
+    let scene, camera, renderer, controls;
+    let targetStructureGroup, playerStructureGroup, ghostPreviewMesh;
+    const SHAPE_DEFS = {
+      cube: { name: 'مکعب', geom: () => new THREE.BoxGeometry(1.4, 1.4, 1.4) },
+      cylinder: { name: 'استوانه', geom: () => new THREE.CylinderGeometry(0.7, 0.7, 1.4, 32) },
+      cone: { name: 'مخروط', geom: () => new THREE.ConeGeometry(0.85, 1.5, 32) },
+      prism: { name: 'منشور ۳‌وجهی', geom: () => new THREE.CylinderGeometry(0.8, 0.8, 1.4, 3) },
+      arch: { name: 'مکعب ستونی', geom: () => new THREE.BoxGeometry(1.6, 0.8, 0.8) }
+    };
+
+    const PALETTE_COLORS = [
+      { name: 'فیروزه‌ای نئون', hex: 0x00f0ff, css: '#00f0ff' },
+      { name: 'یاقوتی سلطنتی', hex: 0xff0055, css: '#ff0055' },
+      { name: 'طلای کریستالی', hex: 0xffd700, css: '#ffd700' },
+      { name: 'زمرد کهکشانی', hex: 0x00ff88, css: '#00ff88' },
+      { name: 'آمیتیست بنفش', hex: 0xa855f7, css: '#a855f7' }
+    ];
+
+    // اندازه‌گیری ارتفاع نوار HUD بالا تا نمای سه‌بعدی هرگز زیر آن قرار نگیرد
+    const topBarEl = document.querySelector('.top-bar');
+    const webglContainer = document.getElementById('webgl-container');
+
+    function getTopBarHeight() {
+      return Math.ceil(topBarEl.getBoundingClientRect().height);
+    }
+
+    function layoutViewport() {
+      const barHeight = getTopBarHeight();
+      const availableHeight = window.innerHeight - barHeight;
+      webglContainer.style.top = barHeight + 'px';
+      webglContainer.style.height = availableHeight + 'px';
+
+      if (camera && renderer) {
+        camera.aspect = window.innerWidth / availableHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, availableHeight);
+      }
+    }
+
+    function init3D() {
+      const container = webglContainer;
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x030611, 0.035);
+
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 5, 10);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2 + 0.1; // عدم رفتن زیر زمین
+      // نقطه کانونی چرخش کمی بالاتر از پایه تا سازه در ناحیهٔ آزاد زیر HUD بهتر جا شود
+      controls.target.set(0, 2.2, 0);
+
+      // نورپردازی استودیویی و سایبر
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.DirectionalLight(0xffffff, 0.9);
+      mainLight.position.set(8, 15, 10);
+      mainLight.castShadow = true;
+      scene.add(mainLight);
+
+      const rimLight = new THREE.PointLight(0x00f0ff, 1.2, 20);
+      rimLight.position.set(-6, 8, -6);
+      scene.add(rimLight);
+
+      // پلتفرم پایه برج
+      const baseGeo = new THREE.CylinderGeometry(2.4, 2.6, 0.4, 32);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x1a264a, metalness: 0.8, roughness: 0.2 });
+      const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+      baseMesh.position.y = -0.2;
+      scene.add(baseMesh);
+
+      const gridHelper = new THREE.GridHelper(20, 20, 0x00f0ff, 0x102142);
+      gridHelper.position.y = -0.4;
+      scene.add(gridHelper);
+
+      targetStructureGroup = new THREE.Group();
+      playerStructureGroup = new THREE.Group();
+      scene.add(targetStructureGroup);
+      scene.add(playerStructureGroup);
+
+      layoutViewport();
+      window.addEventListener('resize', layoutViewport);
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    init3D();
+
+    // ==========================================
+    // ۳. پیکربندی مراحل و منطق معماری
+    // ==========================================
+    const LEVELS = [
+      { layers: 3, memorizeTime: 7, buildTime: 40, hasRotation: false, desc: 'آشنایی با ۳ لایه پایه' },
+      { layers: 4, memorizeTime: 6, buildTime: 35, hasRotation: true, desc: '۴ لایه همراه با چرخش ۹۰ درجه' },
+      { layers: 5, memorizeTime: 5, buildTime: 30, hasRotation: true, desc: '۵ لایه با تنوع اشکال و زوایا' },
+      { layers: 6, memorizeTime: 5, buildTime: 25, hasRotation: true, desc: 'چالش فوق‌العاده سخت: ۶ لایه با محدودیت شدید زمان!' }
+    ];
+
+    let currentLevelIdx = 0;
+    let score = 0;
+    let currentTargetLayers = [];
+    let currentBuildingLayer = 0;
+    let selectedPieceIndex = null;
+    let selectedRotationY = 0;
+    let timerInterval = null;
+
+    const levelEl = document.getElementById('ui-level');
+    const scoreEl = document.getElementById('ui-score');
+    const layersEl = document.getElementById('ui-layers');
+    const guideEl = document.getElementById('ui-guide');
+    const timerBar = document.getElementById('ui-timer-bar');
+    const buildDock = document.getElementById('build-dock');
+    const paletteGrid = document.getElementById('pieces-palette');
+    const angleText = document.getElementById('ui-angle');
+    const modalEl = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalBtn = document.getElementById('modal-btn');
+
+    function startLevelFlow() {
+      modalEl.classList.add('hidden');
+      AudioEngine.init();
+
+      const conf = LEVELS[currentLevelIdx] || LEVELS[LEVELS.length - 1];
+      currentBuildingLayer = 0;
+      selectedPieceIndex = null;
+      selectedRotationY = 0;
+      angleText.textContent = '۰°';
+
+      levelEl.textContent = (currentLevelIdx + 1).toLocaleString('fa-IR');
+      scoreEl.textContent = score.toLocaleString('fa-IR');
+      layersEl.textContent = `۰ / ${conf.layers.toLocaleString('fa-IR')}`;
+      guideEl.textContent = `🔍 برج اصلی را به خاطر بسپارید! (${conf.memorizeTime} ثانیه)`;
+
+      buildDock.classList.add('hidden');
+      clear3DGroup(playerStructureGroup);
+      clear3DGroup(targetStructureGroup);
+      layoutViewport();
+
+      // ساخت سازه هدف
+      generateTargetTower(conf.layers, conf.hasRotation);
+      targetStructureGroup.visible = true;
+
+      // دوربین روی حالت اتوماتیک نرم به دور برج
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 2.5;
+
+      // تایمر حفظ کردن
+      runTimer(conf.memorizeTime, () => {
+        // پایان زمان حفظ کردن -> ناپدید کردن برج هدف
+        targetStructureGroup.visible = false;
+        controls.autoRotate = false;
+        startBuildPhase(conf);
+      });
+    }
+
+    function generateTargetTower(layerCount, allowRotation) {
+      currentTargetLayers = [];
+      const shapeKeys = Object.keys(SHAPE_DEFS);
+
+      let currentY = 0.5;
+      for (let i = 0; i < layerCount; i++) {
+        const shapeKey = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
+        const colorObj = PALETTE_COLORS[Math.floor(Math.random() * PALETTE_COLORS.length)];
+        const rotY = (allowRotation && (shapeKey === 'prism' || shapeKey === 'arch' || shapeKey === 'cube'))
+          ? Math.floor(Math.random() * 4) * (Math.PI / 2)
+          : 0;
+
+        const pieceData = { shapeKey, color: colorObj, rotY, y: currentY };
+        currentTargetLayers.push(pieceData);
+
+        const mesh = createPieceMesh(pieceData);
+        targetStructureGroup.add(mesh);
+
+        currentY += 1.35; // فاصله لایه‌ها
+      }
+    }
+
+    function createPieceMesh(piece) {
+      const geo = SHAPE_DEFS[piece.shapeKey].geom();
+      const mat = new THREE.MeshStandardMaterial({
+        color: piece.color.hex,
+        metalness: 0.5,
+        roughness: 0.2,
+        emissive: piece.color.hex,
+        emissiveIntensity: 0.15
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.y = piece.y;
+      mesh.rotation.y = piece.rotY;
+      mesh.castShadow = true;
+      return mesh;
+    }
+
+    function startBuildPhase(conf) {
+      guideEl.textContent = `🏗️ برج را بازسازی کنید! لایه ۱ از ${conf.layers.toLocaleString('fa-IR')}`;
+      buildDock.classList.remove('hidden');
+
+      populatePalette();
+      runTimer(conf.buildTime, () => {
+        handleGameOver('⏰ زمان به پایان رسید! سازه کامل نشد.');
+      });
+    }
+
+    function populatePalette() {
+      paletteGrid.innerHTML = '';
+      // ساخت گزینه‌ها شامل قطعات صحیح و چند قطعه انحرافی
+      const pool = [...currentTargetLayers];
+      // اضافه کردن قطعات گمراه‌کننده
+      const shapeKeys = Object.keys(SHAPE_DEFS);
+      for (let i = 0; i < 2; i++) {
+        pool.push({
+          shapeKey: shapeKeys[Math.floor(Math.random() * shapeKeys.length)],
+          color: PALETTE_COLORS[Math.floor(Math.random() * PALETTE_COLORS.length)]
+        });
+      }
+      const shuffled = pool.sort(() => Math.random() - 0.5);
+
+      shuffled.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = 'piece-card';
+        card.innerHTML = `
+          <div class="piece-color-dot" style="background: ${p.color.css}"></div>
+          <div style="font-size: 0.75rem; font-weight:700;">${SHAPE_DEFS[p.shapeKey].name}</div>
+        `;
+        card.onclick = () => selectPalettePiece(card, p);
+        paletteGrid.appendChild(card);
+      });
+    }
+
+    function selectPalettePiece(cardEl, pieceData) {
+      AudioEngine.playPick();
+      document.querySelectorAll('.piece-card').forEach(c => c.classList.remove('selected'));
+      cardEl.classList.add('selected');
+      selectedPieceIndex = pieceData;
+      updateGhostPreview();
+    }
+
+    function rotateSelectedPiece() {
+      AudioEngine.playRotate();
+      selectedRotationY = (selectedRotationY + Math.PI / 2) % (Math.PI * 2);
+      const degrees = Math.round((selectedRotationY * 180) / Math.PI);
+      angleText.textContent = `${degrees.toLocaleString('fa-IR')}°`;
+      updateGhostPreview();
+    }
+
+    function updateGhostPreview() {
+      if (ghostPreviewMesh) scene.remove(ghostPreviewMesh);
+      if (!selectedPieceIndex) return;
+
+      const targetPiece = currentTargetLayers[currentBuildingLayer];
+      const geo = SHAPE_DEFS[selectedPieceIndex.shapeKey].geom();
+      const mat = new THREE.MeshBasicMaterial({
+        color: selectedPieceIndex.color.hex,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.6
+      });
+      ghostPreviewMesh = new THREE.Mesh(geo, mat);
+      ghostPreviewMesh.position.y = targetPiece.y;
+      ghostPreviewMesh.rotation.y = selectedRotationY;
+      scene.add(ghostPreviewMesh);
+    }
+
+    function placeCurrentPiece() {
+      if (!selectedPieceIndex) {
+        AudioEngine.playError();
+        guideEl.textContent = '⚠️ لطفاً ابتدا یک قطعه انتخاب کنید!';
+        return;
+      }
+
+      const expected = currentTargetLayers[currentBuildingLayer];
+      const isShapeMatch = selectedPieceIndex.shapeKey === expected.shapeKey;
+      const isColorMatch = selectedPieceIndex.color.hex === expected.color.hex;
+
+      // بررسی زاویه (برای استوانه و مخروط زاویه بی‌اثر است)
+      let isRotMatch = true;
+      if (expected.shapeKey === 'prism' || expected.shapeKey === 'arch' || expected.shapeKey === 'cube') {
+        const diff = Math.abs((selectedRotationY % Math.PI) - (expected.rotY % Math.PI));
+        if (expected.shapeKey === 'arch' && (diff > 0.1 && Math.abs(diff - Math.PI) > 0.1)) isRotMatch = false;
+        else if (expected.shapeKey !== 'arch' && Math.abs(selectedRotationY - expected.rotY) > 0.1) isRotMatch = false;
+      }
+
+      if (isShapeMatch && isColorMatch && isRotMatch) {
+        // لایه صحیح
+        AudioEngine.playLock(currentBuildingLayer + 1);
+        if (ghostPreviewMesh) scene.remove(ghostPreviewMesh);
+
+        const realMesh = createPieceMesh(expected);
+        playerStructureGroup.add(realMesh);
+
+        currentBuildingLayer++;
+        score += 150 * (currentLevelIdx + 1);
+        scoreEl.textContent = score.toLocaleString('fa-IR');
+        layersEl.textContent = `${currentBuildingLayer.toLocaleString('fa-IR')} / ${currentTargetLayers.length.toLocaleString('fa-IR')}`;
+
+        guideEl.textContent = `✨ عالی بود! لایه ${currentBuildingLayer.toLocaleString('fa-IR')} با موفقیت نصب شد.`;
+
+        if (currentBuildingLayer === currentTargetLayers.length) {
+          handleLevelComplete();
+        } else {
+          selectedPieceIndex = null;
+          document.querySelectorAll('.piece-card').forEach(c => c.classList.remove('selected'));
+        }
+      } else {
+        // اشتباه در هندسه، رنگ یا چرخش
+        AudioEngine.playError();
+        guideEl.textContent = '❌ عدم تطابق مهندسی! قطعه یا زاویه اشتباه است.';
+        score = Math.max(0, score - 30);
+        scoreEl.textContent = score.toLocaleString('fa-IR');
+      }
+    }
+
+    function handleLevelComplete() {
+      clearInterval(timerInterval);
+      AudioEngine.playWin();
+      buildDock.classList.add('hidden');
+
+      setTimeout(() => {
+        if (currentLevelIdx < LEVELS.length - 1) {
+          currentLevelIdx++;
+          modalTitle.textContent = '🏛️ شاهکار معماری!';
+          modalDesc.textContent = `تبریک! برج لایه به لایه ساخته شد. مرحله بعدی: ${LEVELS[currentLevelIdx].desc}`;
+          modalBtn.textContent = 'صعود به مرحله بعد 🚀';
+          modalEl.classList.remove('hidden');
+        } else {
+          // ارسال امتیاز بازی به سیستم قربانی کیدز
+          if (window.parent) {
+            window.parent.postMessage({
+              type: 'GK_SUBMIT_SCORE',
+              score: score
+            }, '*');
+          }
+          modalTitle.textContent = '👑 معمار ارشد کهکشان!';
+          modalDesc.textContent = `شاهکار تمام‌عیار! پیچیده‌ترین برج‌های سه‌بعدی را ساختید. امتیاز کل: ${score.toLocaleString('fa-IR')}`;
+          modalBtn.textContent = 'ساخت مجدد 🔄';
+          modalBtn.onclick = () => {
+            currentLevelIdx = 0;
+            score = 0;
+            startLevelFlow();
+          };
+          modalEl.classList.remove('hidden');
+        }
+      }, 800);
+    }
+
+    function handleGameOver(msg) {
+      clearInterval(timerInterval);
+      AudioEngine.playError();
+      buildDock.classList.add('hidden');
+
+      // ارسال امتیاز بازی به سیستم قربانی کیدز
+      if (window.parent) {
+        window.parent.postMessage({
+          type: 'GK_SUBMIT_SCORE',
+          score: score
+        }, '*');
+      }
+
+      modalTitle.textContent = 'فروریختن سازه! ⚠️';
+      modalDesc.textContent = msg;
+      modalBtn.textContent = 'تلاش دوباره 🔄';
+      modalBtn.onclick = () => startLevelFlow();
+      modalEl.classList.remove('hidden');
+    }
+
+    function runTimer(seconds, onComplete) {
+      clearInterval(timerInterval);
+      const startTime = Date.now();
+      const duration = seconds * 1000;
+
+      timerInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, duration - elapsed);
+        const pct = (remaining / duration) * 100;
+        timerBar.style.width = `${pct}%`;
+
+        if (remaining <= 0) {
+          clearInterval(timerInterval);
+          onComplete();
+        }
+      }, 50);
+    }
+
+    function clear3DGroup(group) {
+      while (group.children.length > 0) {
+        const obj = group.children[0];
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) obj.material.dispose();
+        group.remove(obj);
+      }
+    }
+  </script>
+</body>
+</html>

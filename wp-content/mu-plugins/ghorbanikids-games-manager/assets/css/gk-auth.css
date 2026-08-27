@@ -1,0 +1,54 @@
+/* =========================================================
+   GhorbaniKids Customer Login / Register Tabs Styles
+   ========================================================= */
+
+.gk-auth-tabs-header {
+    display: flex !important;
+    gap: 12px !important;
+    margin-bottom: 24px !important;
+    max-width: 480px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    background: #f1f5f9 !important;
+    padding: 6px !important;
+    border-radius: 18px !important;
+}
+
+.gk-auth-tab-btn {
+    flex: 1 !important;
+    padding: 12px 18px !important;
+    border-radius: 14px !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    color: #64748b !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.gk-auth-tab-btn.active {
+    background: #ffffff !important;
+    color: #0284c7 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+}
+
+#customer_login {
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 24px !important;
+    padding: 30px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
+}
+
+#customer_login.show-login .col-2,
+#customer_login.show-login .u-column2 {
+    display: none !important;
+}
+
+#customer_login.show-register .col-1,
+#customer_login.show-register .u-column1 {
+    display: none !important;
+}

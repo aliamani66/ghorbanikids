@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>کارت‌های وارونه با فرمول | Symbol-Color Pairs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 50% 15%, #1e1b4b, #0f172a, #030712);
+      --primary: #38bdf8;
+      --accent: #a855f7;
+      --gold: #fbbf24;
+      --success: #10b981;
+      --danger: #f43f5e;
+      --panel-bg: rgba(30, 41, 59, 0.7);
+      --glow-color: rgba(56, 189, 248, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: var(--bg);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .game-wrapper {
+      width: min(94vw, 430px);
+      height: min(94vh, 760px);
+      background: var(--panel-bg);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.7), 0 0 35px var(--glow-color);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      perspective: 1200px;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 10px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .hud-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hud-title {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .hud-value {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .rule-container {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 10px;
+      text-align: center;
+      margin: 6px 0;
+      position: relative;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .rule-title {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .rule-formula {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .rule-token {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .token-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+    }
+
+    .timer-bar-wrap {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      transform-origin: right;
+      transition: transform 0.1s linear;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: auto 0;
+      perspective: 1000px;
+    }
+
+    .card {
+      aspect-ratio: 1 / 1.15;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 6px 6px 14px #080d1a, -4px -4px 12px #223049;
+    }
+
+    .card-front {
+      background: linear-gradient(145deg, #1e293b, #0b1120);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    .card-front::after {
+      content: '✦';
+      font-size: 1.4rem;
+      color: rgba(255, 255, 255, 0.15);
+    }
+
+    .card-back {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      transform: rotateY(180deg);
+      padding: 12px;
+    }
+
+    .symbol-svg {
+      width: 80%;
+      height: 80%;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
+      transition: transform 0.3s ease;
+    }
+
+    .card.selected {
+      transform: rotateY(180deg) translateZ(15px);
+      box-shadow: 0 0 25px var(--primary);
+    }
+
+    .card.matched {
+      animation: matchSuccess 0.5s forwards;
+      pointer-events: none;
+    }
+
+    .card.error-shake {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes matchSuccess {
+      0% { transform: rotateY(180deg) scale(1); }
+      50% { transform: rotateY(180deg) scale(1.1); box-shadow: 0 0 30px var(--success); }
+      100% { transform: rotateY(180deg) scale(0.95); opacity: 0.3; filter: grayscale(0.5); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotateY(180deg) translateX(0); }
+      25% { transform: rotateY(180deg) translateX(-8px); }
+      75% { transform: rotateY(180deg) translateX(8px); }
+    }
+
+    .status-msg {
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #94a3b8;
+      min-height: 24px;
+    }
+
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 15, 30, 0.95);
+      backdrop-filter: blur(25px);
+      border-radius: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 100;
+      transition: opacity 0.4s ease, visibility 0.4s;
+    }
+
+    .overlay-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .overlay-title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .overlay-desc {
+      font-size: 0.92rem;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      color: white;
+      border: none;
+      padding: 13px 40px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      font-family: inherit;
+      border-radius: 99px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-wrapper">
+    <div class="hud">
+      <div class="hud-box">
+        <span class="hud-title">مرحله</span>
+        <span class="hud-value" id="lvl-val">۱</span>
+      </div>
+      <div class="hud-box">
+        <span class="hud-title">امتیاز</span>
+        <span class="hud-value" id="score-val">۰</span>
+      </div>
+      <div class="hud-box">
+        <span class="hud-title">فرصت</span>
+        <span class="hud-value" id="lives-val">❤️❤️❤️</span>
+      </div>
+    </div>
+
+    <div class="rule-container">
+      <div class="rule-title">فرمول جفت هدف در این مرحله:</div>
+      <div class="rule-formula" id="formula-display"></div>
+      <div class="timer-bar-wrap">
+        <div class="timer-fill" id="timer-bar"></div>
+      </div>
+    </div>
+
+    <div class="cards-grid" id="grid"></div>
+
+    <div class="status-msg" id="status-text">کارت‌ها را خوب به خاطر بسپارید...</div>
+
+    <div class="overlay-screen" id="modal">
+      <h1 class="overlay-title" id="modal-title">کارت‌های وارونه فرمولی</h1>
+      <p class="overlay-desc" id="modal-desc">
+        در هر مرحله یک فرمول مشخص می‌شود (مثلاً <b>دایره زرد</b> با <b>مثلث آبی</b>).<br>
+        جایگاه کارت‌ها را حین نمایش حفظ کرده و پس از وارونه شدن، دو کارتی که فرمول مرحله را می‌سازند به درستی انتخاب کنید!
+      </p>
+      <button class="btn-action" id="start-btn">شروع بازی</button>
+    </div>
+  </div>
+
+  <script>
+    const Sound = {
+      ctx: null,
+      init() {
+        if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      },
+      playFlip() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(350, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(700, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      },
+      playMatch() {
+        if (!this.ctx) return;
+        const freqs = [523.25, 659.25, 783.99, 1046.5];
+        freqs.forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = f;
+          const t = this.ctx.currentTime + i * 0.06;
+          gain.gain.setValueAtTime(0.2, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.22);
+        });
+      },
+      playError() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(110, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      }
+    };
+
+    const SHAPES = {
+      circle: (color) => `<svg class="symbol-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="${color}" stroke="#ffffff" stroke-width="4"/></svg>`,
+      triangle: (color) => `<svg class="symbol-svg" viewBox="0 0 100 100"><polygon points="50,15 85,80 15,80" fill="${color}" stroke="#ffffff" stroke-width="4"/></svg>`,
+      square: (color) => `<svg class="symbol-svg" viewBox="0 0 100 100"><rect x="18" y="18" width="64" height="64" rx="10" fill="${color}" stroke="#ffffff" stroke-width="4"/></svg>`,
+      star: (color) => `<svg class="symbol-svg" viewBox="0 0 100 100"><polygon points="50,10 61,38 91,38 67,56 76,85 50,68 24,85 33,56 9,38 39,38" fill="${color}" stroke="#ffffff" stroke-width="4"/></svg>`
+    };
+
+    const SHAPE_NAMES = { circle: 'دایره', triangle: 'مثلث', square: 'مربع', star: 'ستاره' };
+
+    const COLORS = [
+      { id: 'blue', hex: '#38bdf8', name: 'آبی' },
+      { id: 'yellow', hex: '#facc15', name: 'زرد' },
+      { id: 'green', hex: '#22c55e', name: 'سبز' },
+      { id: 'pink', hex: '#f43f5e', name: 'قرمز' }
+    ];
+
+    const STATE = {
+      level: 1,
+      score: 0,
+      lives: 3,
+      phase: 'IDLE',
+      formula: [],
+      cards: [],
+      selectedIndices: []
+    };
+
+    const gridEl = document.getElementById('grid');
+    const lvlVal = document.getElementById('lvl-val');
+    const scoreVal = document.getElementById('score-val');
+    const livesVal = document.getElementById('lives-val');
+    const formulaDisplay = document.getElementById('formula-display');
+    const timerBar = document.getElementById('timer-bar');
+    const statusText = document.getElementById('status-text');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const startBtn = document.getElementById('start-btn');
+
+    function getRandomItem(usedSet = new Set()) {
+      const shapeKeys = Object.keys(SHAPES);
+      let item, key;
+      do {
+        const s = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
+        const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+        key = `${s}_${c.id}`;
+        item = { shape: s, color: c.hex, colorId: c.id, shapeName: SHAPE_NAMES[s], colorName: c.name, key };
+      } while (usedSet.has(key));
+      usedSet.add(key);
+      return item;
+    }
+
+    function startRound() {
+      STATE.phase = 'MEMORIZE';
+      STATE.selectedIndices = [];
+      const cardCount = STATE.level >= 4 ? 9 : 6;
+
+      gridEl.style.gridTemplateColumns = 'repeat(3, 1fr)';
+
+      const usedCombos = new Set();
+      const targetA = getRandomItem(usedCombos);
+      const targetB = getRandomItem(usedCombos);
+      STATE.formula = [targetA, targetB];
+
+      const cardsList = [targetA, targetB];
+      for (let i = 2; i < cardCount; i++) {
+        cardsList.push(getRandomItem(usedCombos));
+      }
+
+      STATE.cards = cardsList.sort(() => 0.5 - Math.random());
+
+      renderFormulaUI();
+
+      gridEl.innerHTML = '';
+      STATE.cards.forEach((card, index) => {
+        const cardEl = document.createElement('div');
+        cardEl.className = 'card flipped';
+        cardEl.dataset.index = index;
+        cardEl.innerHTML = `
+          <div class="card-face card-front"></div>
+          <div class="card-face card-back">
+            ${SHAPES[card.shape](card.color)}
+          </div>
+        `;
+        cardEl.addEventListener('click', () => handleCardClick(index));
+        gridEl.appendChild(cardEl);
+      });
+
+      Sound.playFlip();
+      statusText.textContent = 'مکان کارت‌ها را به خاطر بسپارید...';
+      statusText.style.color = '#38bdf8';
+
+      const memorizeDuration = Math.max(1300, 3600 - (STATE.level - 1) * 280);
+
+      timerBar.style.transition = 'none';
+      timerBar.style.transform = 'scaleX(1)';
+      setTimeout(() => {
+        timerBar.style.transition = `transform ${memorizeDuration}ms linear`;
+        timerBar.style.transform = 'scaleX(0)';
+      }, 40);
+
+      setTimeout(() => {
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('flipped'));
+        Sound.playFlip();
+        STATE.phase = 'GUESS';
+        statusText.textContent = 'دو کارت جفت فرمول بالا را انتخاب کنید!';
+        statusText.style.color = '#fbbf24';
+      }, memorizeDuration);
+    }
+
+    function renderFormulaUI() {
+      formulaDisplay.innerHTML = `
+        <div class="rule-token">
+          <span class="token-icon">${SHAPES[STATE.formula[0].shape](STATE.formula[0].color)}</span>
+          <span>${STATE.formula[0].shapeName} ${STATE.formula[0].colorName}</span>
+        </div>
+        <span style="color:var(--accent); font-weight:900;">+</span>
+        <div class="rule-token">
+          <span class="token-icon">${SHAPES[STATE.formula[1].shape](STATE.formula[1].color)}</span>
+          <span>${STATE.formula[1].shapeName} ${STATE.formula[1].colorName}</span>
+        </div>
+      `;
+    }
+
+    function handleCardClick(index) {
+      if (STATE.phase !== 'GUESS' || STATE.selectedIndices.includes(index)) return;
+
+      const cardElements = document.querySelectorAll('.card');
+      const clickedCard = cardElements[index];
+
+      clickedCard.classList.add('flipped', 'selected');
+      Sound.playFlip();
+      STATE.selectedIndices.push(index);
+
+      if (STATE.selectedIndices.length === 2) {
+        STATE.phase = 'EVALUATION';
+        evaluateSelection();
+      }
+    }
+
+    function evaluateSelection() {
+      const cardElements = document.querySelectorAll('.card');
+      const [idx1, idx2] = STATE.selectedIndices;
+      const card1 = STATE.cards[idx1];
+      const card2 = STATE.cards[idx2];
+
+      const targetKeys = [STATE.formula[0].key, STATE.formula[1].key];
+      const isCard1InTarget = targetKeys.includes(card1.key);
+      const isCard2InTarget = targetKeys.includes(card2.key);
+      const isCorrect = isCard1InTarget && isCard2InTarget && (card1.key !== card2.key);
+
+      setTimeout(() => {
+        if (isCorrect) {
+          Sound.playMatch();
+          cardElements[idx1].classList.add('matched');
+          cardElements[idx2].classList.add('matched');
+          STATE.score += 150 * STATE.level;
+          STATE.level += 1;
+          statusText.textContent = 'عالی بود! جفت صحیح پیدا شد ✨';
+          statusText.style.color = '#10b981';
+          updateHUD();
+
+          setTimeout(startRound, 1200);
+        } else {
+          Sound.playError();
+          cardElements[idx1].classList.add('error-shake');
+          cardElements[idx2].classList.add('error-shake');
+          STATE.lives -= 1;
+          updateHUD();
+
+          setTimeout(() => {
+            cardElements.forEach(c => c.classList.add('flipped'));
+          }, 300);
+
+          statusText.textContent = 'اشتباه بود! جایگاه درست کارت‌ها مشخص شد.';
+          statusText.style.color = '#f43f5e';
+
+          setTimeout(() => {
+            if (STATE.lives > 0) {
+              startRound();
+            } else {
+              gameOver();
+            }
+          }, 1800);
+        }
+      }, 500);
+    }
+
+    function updateHUD() {
+      lvlVal.textContent = STATE.level;
+      scoreVal.textContent = STATE.score;
+      livesVal.textContent = '❤️'.repeat(Math.max(0, STATE.lives));
+    }
+
+    function gameOver() {
+      modalTitle.textContent = 'پایان بازی!';
+      modalDesc.innerHTML = `
+        مجموع امتیاز کسب شده: <b>${STATE.score}</b><br>
+        تا مرحله <b>${STATE.level}</b> پیش رفتید.
+      `;
+      startBtn.textContent = 'تلاش مجدد';
+      modal.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', () => {
+      Sound.init();
+      STATE.level = 1;
+      STATE.score = 0;
+      STATE.lives = 3;
+      updateHUD();
+      modal.classList.add('hidden');
+      startRound();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+/* =========================================================
+   GhorbaniKids Informational Pages: About Us, Contact, News
+   ========================================================= */
+
+.page-id-16 #main, /* About Us */
+.page-id-10 #main, /* Contact Us */
+.page-id-14 #main, /* Latest News */
+.blog #main,
+.single-post #main {
+    max-width: 1200px !important;
+    margin: 30px auto !important;
+    padding: 0 20px !important;
+    direction: rtl !important;
+    font-family: inherit !important;
+}
+
+.page-id-16 h1, .page-id-10 h1, .page-id-14 h1 {
+    font-weight: 900 !important;
+    color: #1e293b !important;
+    margin-bottom: 20px !important;
+    border-bottom: 3px solid #0284c7 !important;
+    padding-bottom: 10px !important;
+    display: inline-block !important;
+}
+
+.page-id-16 p, .page-id-10 p, .page-id-14 p {
+    font-size: 1.05rem !important;
+    line-height: 2 !important;
+    color: #334155 !important;
+}
+
+/* فرم تماس با ما */
+.page-id-10 .wpcf7 form,
+.page-id-10 form {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 20px !important;
+    padding: 30px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+}

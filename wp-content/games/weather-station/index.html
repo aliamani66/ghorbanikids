@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بازی ایستگاه هواشناسی - فارسی اول دبستان</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      overflow-x: hidden;
+      transition: background 0.6s ease;
+    }
+
+    body.night-mode {
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      color: #f8fafc;
+    }
+
+    header {
+      width: 100%;
+      max-width: 850px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      z-index: 10;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0369a1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 2px solid #7dd3fc;
+    }
+
+    .night-mode .badge {
+      background: rgba(30, 41, 59, 0.9);
+      color: #38bdf8;
+      border-color: #0369a1;
+    }
+
+    .reporter-board {
+      background: #ffffff;
+      border: 4px solid #38bdf8;
+      border-radius: 24px;
+      padding: 12px 28px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(3, 105, 161, 0.12);
+      max-width: 650px;
+      width: 95%;
+      margin-bottom: 16px;
+      z-index: 10;
+    }
+
+    .night-mode .reporter-board {
+      background: #1e293b;
+      border-color: #60a5fa;
+      color: #f8fafc;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+
+    .board-title {
+      font-size: 1rem;
+      color: #0284c7;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .night-mode .board-title {
+      color: #93c5fd;
+    }
+
+    .board-prompt {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .night-mode .board-prompt {
+      color: #ffffff;
+    }
+
+    .highlight-word {
+      color: #d97706;
+      text-decoration: underline wavy #f59e0b;
+      padding: 0 4px;
+    }
+
+    .station-window {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      height: 250px;
+      background: #e2e8f0;
+      border: 8px solid #64748b;
+      border-radius: 32px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.15), 0 12px 28px rgba(0,0,0,0.15);
+      margin-bottom: 20px;
+      transition: background 0.5s ease;
+    }
+
+    .weather-view {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .weather-icon-big {
+      font-size: 4.5rem;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));
+      animation: floatIcon 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatIcon {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-8px) scale(1.05); }
+    }
+
+    .weather-desc {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #334155;
+      background: rgba(255,255,255,0.6);
+      padding: 2px 12px;
+      border-radius: 12px;
+    }
+
+    .night-mode .weather-desc {
+      color: #f1f5f9;
+      background: rgba(15,23,42,0.5);
+    }
+
+    .particle-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .raindrop {
+      position: absolute;
+      width: 3px;
+      height: 18px;
+      background: #38bdf8;
+      border-radius: 2px;
+      animation: fallRain linear infinite;
+    }
+
+    @keyframes fallRain {
+      0% { transform: translateY(-30px); opacity: 0; }
+      20% { opacity: 0.8; }
+      100% { transform: translateY(270px); opacity: 0.2; }
+    }
+
+    .snowflake {
+      position: absolute;
+      color: #ffffff;
+      font-size: 1.4rem;
+      animation: fallSnow linear infinite;
+    }
+
+    @keyframes fallSnow {
+      0% { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+      20% { opacity: 0.9; }
+      100% { transform: translateY(270px) rotate(360deg); opacity: 0.3; }
+    }
+
+    .windline {
+      position: absolute;
+      height: 3px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 3px;
+      animation: blowWind linear infinite;
+    }
+
+    @keyframes blowWind {
+      0% { transform: translateX(-60px); opacity: 0; }
+      15% { opacity: 0.9; }
+      100% { transform: translateX(620px); opacity: 0; }
+    }
+
+    .star-twinkle {
+      position: absolute;
+      color: #fde68a;
+      font-size: 1.2rem;
+      animation: twinkle ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+
+    .cloud-drift {
+      position: absolute;
+      font-size: 2.2rem;
+      opacity: 0.85;
+      animation: driftCloud linear infinite;
+    }
+
+    @keyframes driftCloud {
+      0% { transform: translateX(-80px); }
+      100% { transform: translateX(600px); }
+    }
+
+    .thunder-flash {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      animation: flashSky 1.4s ease-in-out infinite;
+    }
+
+    @keyframes flashSky {
+      0%, 100% { opacity: 0; }
+      8% { opacity: 0.85; }
+      14% { opacity: 0; }
+      40% { opacity: 0.5; }
+      46% { opacity: 0; }
+    }
+
+    .fog-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.65) 100%);
+    }
+
+    .fog-band {
+      position: absolute;
+      height: 22px;
+      width: 140%;
+      background: rgba(255,255,255,0.55);
+      border-radius: 50%;
+      filter: blur(2px);
+      animation: driftFog linear infinite;
+    }
+
+    @keyframes driftFog {
+      0% { transform: translateX(-30%); }
+      100% { transform: translateX(10%); }
+    }
+
+    .rainbow-arc {
+      position: absolute;
+      bottom: -70px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 8px solid #ef4444;
+      box-shadow:
+        0 0 0 8px #f97316,
+        0 0 0 16px #facc15,
+        0 0 0 24px #22c55e,
+        0 0 0 32px #3b82f6,
+        0 0 0 40px #8b5cf6;
+      clip-path: inset(0 0 50% 0);
+      animation: floatIcon 3s ease-in-out infinite alternate;
+    }
+
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      max-width: 800px;
+      z-index: 10;
+      margin-bottom: 12px;
+    }
+
+    .weather-card {
+      background: #ffffff;
+      border: 3px solid #7dd3fc;
+      border-radius: 24px;
+      width: 140px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .weather-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 10px 22px rgba(3, 105, 161, 0.2);
+      border-color: #0284c7;
+    }
+
+    .weather-card:active {
+      transform: translateY(2px) scale(0.97);
+    }
+
+    .card-icon {
+      font-size: 2.4rem;
+      margin-bottom: 4px;
+    }
+
+    .card-label {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #0369a1;
+    }
+
+    .success-pulse {
+      animation: pulseGreen 0.5s ease-out;
+    }
+
+    @keyframes pulseGreen {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); border-color: #22c55e; }
+      100% { transform: scale(1); }
+    }
+
+    .shake-card {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
+    }
+
+    .cheer-msg {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-40px);
+      background: #22c55e;
+      color: white;
+      font-weight: 800;
+      font-size: 1.1rem;
+      padding: 10px 24px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: all 0.4s ease;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .cheer-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    footer {
+      z-index: 10;
+      margin-top: 8px;
+    }
+
+    .restart-btn {
+      background: #ffffff;
+      border: 2px solid #94a3b8;
+      color: #475569;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .restart-btn:hover {
+      background: #f1f5f9;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cheer-msg" id="cheer-msg">🎉 آفرین! عالی بود!</div>
+
+  <header>
+    <div class="badge">⭐ پیش‌بینی‌های درست: <span id="score-val">۰</span></div>
+    <div class="badge">🌦️ گزارش شماره: <span id="round-val">۱</span></div>
+  </header>
+
+  <div class="reporter-board">
+    <div class="board-title">🎙️ گزارشگر هواشناسی می‌گوید:</div>
+    <div class="board-prompt" id="prompt-text">
+      امروز هوا چطور است؟ کارت کلمه مناسب را انتخاب کن!
+    </div>
+  </div>
+
+  <div class="station-window" id="station-window">
+    <div class="particle-layer" id="particle-layer"></div>
+    <div class="weather-view" id="weather-view">
+      <span class="weather-icon-big" id="current-icon">☀️</span>
+      <span class="weather-desc" id="current-hint">آسمان آفتابی و گرم است</span>
+    </div>
+  </div>
+
+  <div class="cards-container" id="cards-container"></div>
+
+  <footer>
+    <button class="restart-btn" id="restart-btn">🔄 شروع دوباره</button>
+  </footer>
+
+  <script>
+    // GhorbaniKids Score Submission Protocol
+    function gkSendScore(finalScore) {
+        try {
+            var sc = parseInt(finalScore) || 0;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'GK_SUBMIT_SCORE',
+                    score: sc
+                }, '*');
+            }
+        } catch(e) { console.error('GK postMessage error:', e); }
+    }
+    
+    const WEATHER_DATA = [
+      {
+        id: 'rain',
+        word: 'باران',
+        icon: '🌧️',
+        bg: '#94a3b8',
+        isNight: false,
+        hint: 'از آسمان قطره‌های آب می‌بارد',
+        prompt: 'ابرها باریدند! کارت <span class="highlight-word">باران</span> را نشان بده:'
+      },
+      {
+        id: 'snow',
+        word: 'برف',
+        icon: '❄️',
+        bg: '#cbd5e1',
+        isNight: false,
+        hint: 'زمین سفیدپوش و هوا بسیار سرد است',
+        prompt: 'هوا برفی شد! کارت <span class="highlight-word">برف</span> کجاست؟'
+      },
+      {
+        id: 'sun',
+        word: 'آفتاب',
+        icon: '☀️',
+        bg: '#fef08a',
+        isNight: false,
+        hint: 'خورشید درخشان و آسمان روشن است',
+        prompt: 'خورشید می‌تابد! کارت <span class="highlight-word">آفتاب</span> را انتخاب کن:'
+      },
+      {
+        id: 'wind',
+        word: 'باد',
+        icon: '💨',
+        bg: '#bae6fd',
+        isNight: false,
+        hint: 'برگ‌های درختان در حال رقصیدن هستند',
+        prompt: 'صدای هوهو می‌آید! کارت <span class="highlight-word">باد</span> را بزن:'
+      },
+      {
+        id: 'cloud',
+        word: 'ابر',
+        icon: '☁️',
+        bg: '#cbd5e1',
+        isNight: false,
+        hint: 'توده‌های سفید در آسمان حرکت می‌کنند',
+        prompt: 'آسمان پر از توده‌های سفید است! کارت <span class="highlight-word">ابر</span> کدام است؟'
+      },
+      {
+        id: 'star',
+        word: 'ستاره',
+        icon: '⭐',
+        bg: '#0f172a',
+        isNight: true,
+        hint: 'شب شده و نقطه‌های درخشان چشمک می‌زنند',
+        prompt: 'آسمان شب روشن شد! کارت <span class="highlight-word">ستاره</span> را پیدا کن:'
+      },
+      {
+        id: 'storm',
+        word: 'طوفان',
+        icon: '🌪️',
+        bg: '#64748b',
+        isNight: false,
+        hint: 'باد خیلی شدید می‌وزد و همه‌چیز را تکان می‌دهد',
+        prompt: 'باد خیلی تند و قوی شد! کارت <span class="highlight-word">طوفان</span> را نشان بده:'
+      },
+      {
+        id: 'thunder',
+        word: 'رعدوبرق',
+        icon: '⚡',
+        bg: '#334155',
+        isNight: false,
+        hint: 'صدای بلندی می‌آید و نور روشنی در آسمان دیده می‌شود',
+        prompt: 'صدای بلندی از آسمان آمد! کارت <span class="highlight-word">رعدوبرق</span> را پیدا کن:'
+      },
+      {
+        id: 'fog',
+        word: 'مه',
+        icon: '🌫️',
+        bg: '#e2e8f0',
+        isNight: false,
+        hint: 'همه‌جا سفید و کدر است و دیدن سخت می‌شود',
+        prompt: 'همه‌جا کدر و سفید شد! کارت <span class="highlight-word">مه</span> کجاست؟'
+      },
+      {
+        id: 'rainbow',
+        word: 'رنگین‌کمان',
+        icon: '🌈',
+        bg: '#bfdbfe',
+        isNight: false,
+        hint: 'بعد از باران رنگ‌های زیبا در آسمان ظاهر می‌شوند',
+        prompt: 'بعد از باران چیز رنگی پیدا شد! کارت <span class="highlight-word">رنگین‌کمان</span> را انتخاب کن:'
+      }
+    ];
+
+    let score = 0;
+    let currentRound = 1;
+    let currentTarget = null;
+    let isLocked = false;
+    let audioCtx = null;
+
+    const scoreVal = document.getElementById('score-val');
+    const roundVal = document.getElementById('round-val');
+    const promptText = document.getElementById('prompt-text');
+    const currentIcon = document.getElementById('current-icon');
+    const currentHint = document.getElementById('current-hint');
+    const stationWindow = document.getElementById('station-window');
+    const particleLayer = document.getElementById('particle-layer');
+    const cardsContainer = document.getElementById('cards-container');
+    const cheerMsg = document.getElementById('cheer-msg');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // AudioContext فقط بعد از اولین تعامل کاربر ساخته می‌شود تا مرورگرها بلاکش نکنند
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playAudioTone(type) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.08);
+        osc.frequency.setValueAtTime(783.99, now + 0.16);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(140, now + 0.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+    }
+
+    function toPersianDigits(num) {
+      const digits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return num.toString().replace(/\d/g, d => digits[d]);
+    }
+
+    function updateParticles(type) {
+      particleLayer.innerHTML = '';
+
+      if (type === 'rain') {
+        for (let i = 0; i < 24; i++) {
+          const drop = document.createElement('div');
+          drop.className = 'raindrop';
+          drop.style.left = `${Math.random() * 100}%`;
+          drop.style.animationDuration = `${0.5 + Math.random() * 0.4}s`;
+          drop.style.animationDelay = `${Math.random() * 0.8}s`;
+          particleLayer.appendChild(drop);
+        }
+      } else if (type === 'snow') {
+        for (let i = 0; i < 16; i++) {
+          const flake = document.createElement('div');
+          flake.className = 'snowflake';
+          flake.textContent = '❄';
+          flake.style.left = `${Math.random() * 100}%`;
+          flake.style.fontSize = `${0.8 + Math.random() * 0.8}rem`;
+          flake.style.animationDuration = `${1.5 + Math.random() * 1.5}s`;
+          flake.style.animationDelay = `${Math.random() * 1}s`;
+          particleLayer.appendChild(flake);
+        }
+      } else if (type === 'wind') {
+        for (let i = 0; i < 10; i++) {
+          const line = document.createElement('div');
+          line.className = 'windline';
+          line.style.top = `${10 + Math.random() * 80}%`;
+          line.style.width = `${30 + Math.random() * 50}px`;
+          line.style.animationDuration = `${0.9 + Math.random() * 0.8}s`;
+          line.style.animationDelay = `${Math.random() * 1}s`;
+          particleLayer.appendChild(line);
+        }
+      } else if (type === 'star') {
+        for (let i = 0; i < 14; i++) {
+          const star = document.createElement('div');
+          star.className = 'star-twinkle';
+          star.textContent = '✦';
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 70}%`;
+          star.style.animationDuration = `${1 + Math.random() * 1.5}s`;
+          star.style.animationDelay = `${Math.random() * 1.5}s`;
+          particleLayer.appendChild(star);
+        }
+      } else if (type === 'cloud') {
+        for (let i = 0; i < 3; i++) {
+          const cloud = document.createElement('div');
+          cloud.className = 'cloud-drift';
+          cloud.textContent = '☁️';
+          cloud.style.top = `${10 + i * 25}%`;
+          cloud.style.animationDuration = `${8 + i * 3}s`;
+          cloud.style.animationDelay = `${i * 1.5}s`;
+          particleLayer.appendChild(cloud);
+        }
+      } else if (type === 'storm') {
+        for (let i = 0; i < 22; i++) {
+          const line = document.createElement('div');
+          line.className = 'windline';
+          line.style.top = `${5 + Math.random() * 90}%`;
+          line.style.width = `${40 + Math.random() * 70}px`;
+          line.style.animationDuration = `${0.35 + Math.random() * 0.35}s`;
+          line.style.animationDelay = `${Math.random() * 0.6}s`;
+          particleLayer.appendChild(line);
+        }
+      } else if (type === 'thunder') {
+        const flash = document.createElement('div');
+        flash.className = 'thunder-flash';
+        particleLayer.appendChild(flash);
+        for (let i = 0; i < 14; i++) {
+          const drop = document.createElement('div');
+          drop.className = 'raindrop';
+          drop.style.left = `${Math.random() * 100}%`;
+          drop.style.animationDuration = `${0.5 + Math.random() * 0.4}s`;
+          drop.style.animationDelay = `${Math.random() * 0.8}s`;
+          particleLayer.appendChild(drop);
+        }
+      } else if (type === 'fog') {
+        const overlay = document.createElement('div');
+        overlay.className = 'fog-overlay';
+        particleLayer.appendChild(overlay);
+        for (let i = 0; i < 5; i++) {
+          const band = document.createElement('div');
+          band.className = 'fog-band';
+          band.style.top = `${15 + i * 15}%`;
+          band.style.animationDuration = `${4 + i}s`;
+          band.style.animationDelay = `${i * 0.4}s`;
+          particleLayer.appendChild(band);
+        }
+      } else if (type === 'rainbow') {
+        const arc = document.createElement('div');
+        arc.className = 'rainbow-arc';
+        particleLayer.appendChild(arc);
+      }
+    }
+
+    function showCheer() {
+      const messages = ['🎉 آفرین! عالی بود!', '👏 دمت گرم!', '🌟 فوق‌العاده بود!', '✨ خیلی خوب!'];
+      cheerMsg.textContent = messages[Math.floor(Math.random() * messages.length)];
+      cheerMsg.classList.add('show');
+      setTimeout(() => cheerMsg.classList.remove('show'), 1000);
+    }
+
+    function setupRound() {
+      isLocked = false;
+      cardsContainer.innerHTML = '';
+
+      const remainingTargets = WEATHER_DATA.filter(item => !currentTarget || item.id !== currentTarget.id);
+      currentTarget = remainingTargets[Math.floor(Math.random() * remainingTargets.length)];
+
+      promptText.innerHTML = currentTarget.prompt;
+      currentIcon.textContent = currentTarget.icon;
+      currentHint.textContent = currentTarget.hint;
+      stationWindow.style.background = currentTarget.bg;
+
+      if (currentTarget.isNight) {
+        document.body.classList.add('night-mode');
+      } else {
+        document.body.classList.remove('night-mode');
+      }
+
+      updateParticles(currentTarget.id);
+
+      const otherOptions = WEATHER_DATA.filter(item => item.id !== currentTarget.id);
+      const shuffledOthers = otherOptions.sort(() => 0.5 - Math.random()).slice(0, 3);
+      const roundCards = [currentTarget, ...shuffledOthers].sort(() => 0.5 - Math.random());
+
+      roundCards.forEach(cardData => {
+        const card = document.createElement('div');
+        card.className = 'weather-card';
+        card.innerHTML = `
+          <span class="card-icon">${cardData.icon}</span>
+          <span class="card-label">${cardData.word}</span>
+        `;
+        card.addEventListener('click', () => handleCardChoice(cardData, card));
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    function handleCardChoice(cardData, cardElement) {
+      if (isLocked) return;
+      ensureAudio();
+
+      if (cardData.id === currentTarget.id) {
+        isLocked = true;
+        playAudioTone('success');
+        score += 10;
+        try { gkSendScore(score); } catch(e){}
+        currentRound += 1;
+
+        scoreVal.textContent = toPersianDigits(score);
+        roundVal.textContent = toPersianDigits(currentRound);
+
+        cardElement.classList.add('success-pulse');
+        stationWindow.classList.add('success-pulse');
+        showCheer();
+
+        setTimeout(() => {
+          stationWindow.classList.remove('success-pulse');
+          setupRound();
+        }, 1100);
+
+      } else {
+        playAudioTone('error');
+        cardElement.classList.add('shake-card');
+        setTimeout(() => {
+          cardElement.classList.remove('shake-card');
+        }, 400);
+      }
+    }
+
+    restartBtn.addEventListener('click', () => {
+      ensureAudio();
+      score = 0;
+      currentRound = 1;
+      currentTarget = null;
+      scoreVal.textContent = toPersianDigits(score);
+      roundVal.textContent = toPersianDigits(currentRound);
+      setupRound();
+    });
+
+    setupRound();
+  </script>
+</body>
+</html>

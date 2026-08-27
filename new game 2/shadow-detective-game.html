@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>کارآگاه سایه دقیق | Shadow Detective</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0f1226;
+    --bg-panel:#181c3a;
+    --bg-panel-2:#20254a;
+    --gold:#f0b93d;
+    --gold-dim:#caa23a;
+    --crimson:#e0464f;
+    --ink:#eef0ff;
+    --ink-dim:#9aa0c8;
+    --spotlight:#fff6da;
+    --ok:#3ddc97;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;user-select:none;font-family:'Vazirmatn',system-ui,Tahoma,sans-serif;}
+  body{
+    min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
+    background:
+      radial-gradient(circle at 50% -10%, #24284f 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg-deep) 0%, #090b19 100%);
+  }
+  #game-container{
+    position:relative;width:840px;max-width:96vw;height:640px;max-height:96vh;
+    background:var(--bg-panel);border-radius:18px;
+    border:1px solid rgba(240,185,61,0.25);
+    box-shadow:0 30px 70px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.03);
+    display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+    padding:18px 22px;overflow:hidden;
+  }
+
+  /* نوار پرونده بالا */
+  .case-header{width:100%;display:flex;justify-content:space-between;align-items:center;}
+  .case-badge{
+    background:var(--bg-panel-2);color:var(--ink);font-weight:800;font-size:0.9rem;
+    padding:7px 16px;border-radius:8px 8px 2px 2px;border-bottom:3px solid var(--gold);
+    display:flex;align-items:center;gap:6px;letter-spacing:0.2px;
+  }
+  .case-badge b{color:var(--gold);font-weight:900;}
+
+  .timer-wrap{width:100%;height:5px;background:rgba(255,255,255,0.08);border-radius:6px;margin-top:10px;overflow:hidden;}
+  .timer-bar{width:100%;height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));transition:width 0.1s linear;}
+  .timer-bar.danger{background:linear-gradient(90deg,#c0392b,var(--crimson));}
+
+  .case-tag{
+    margin-top:10px;font-size:0.78rem;font-weight:800;color:var(--bg-deep);
+    background:var(--gold);padding:3px 14px;border-radius:20px;
+  }
+
+  /* استیج مدرک با نورافکن */
+  .evidence-stage{position:relative;width:100%;height:180px;display:flex;align-items:center;justify-content:center;}
+
+  .spotlight-cone{
+    position:absolute;top:-60px;left:50%;width:0;height:0;
+    border-left:120px solid transparent;border-right:120px solid transparent;
+    border-top:220px solid rgba(255,246,218,0.05);
+    transform-origin:50% 0%;transform:translateX(-50%) rotate(0deg);
+    animation:coneSweep 5s ease-in-out infinite;pointer-events:none;
+  }
+  @keyframes coneSweep{0%,100%{transform:translateX(-50%) rotate(-4deg);}50%{transform:translateX(-50%) rotate(4deg);}}
+
+  .evidence-box{
+    position:relative;width:140px;height:140px;background:#0d0f22;
+    border-radius:14px;border:3px solid var(--gold);
+    box-shadow:0 0 0 6px rgba(240,185,61,0.08), 0 0 40px rgba(240,185,61,0.25);
+    display:flex;align-items:center;justify-content:center;padding:16px;
+    transition:box-shadow 0.4s, border-color 0.4s, background 0.4s;
+    z-index:2;
+  }
+  .evidence-label{
+    position:absolute;top:-13px;right:14px;background:var(--crimson);color:#fff;
+    font-size:0.68rem;font-weight:800;padding:2px 10px;border-radius:4px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  }
+  .evidence-box svg{width:100%;height:100%;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
+
+  .evidence-box.concealed{
+    background:#05060f;border-color:rgba(255,255,255,0.18);
+    box-shadow:inset 0 0 30px rgba(0,0,0,0.7);
+  }
+  .evidence-box.concealed svg{opacity:0;}
+  .evidence-box.concealed::after{content:'؟';font-size:3rem;color:var(--ink-dim);position:absolute;font-weight:900;}
+
+  .prompt-msg{font-size:1.05rem;font-weight:800;color:var(--ink);text-align:center;min-height:26px;text-shadow:0 2px 8px rgba(0,0,0,0.5);padding:0 10px;}
+
+  /* پنل ردیف مظنونین (لاین‌آپ) */
+  .lineup-panel{width:100%;background:var(--bg-panel-2);border-radius:16px;padding:12px 14px 16px;border:1px solid rgba(255,255,255,0.06);}
+  .lineup-title{color:var(--ink-dim);font-size:0.82rem;font-weight:700;text-align:center;margin-bottom:10px;}
+
+  .lineup-backdrop{
+    position:relative;width:100%;min-height:170px;border-radius:10px;overflow:visible;
+    background:
+      repeating-linear-gradient(90deg, #2a2f5c 0px, #2a2f5c 2px, #232750 2px, #232750 48px),
+      linear-gradient(180deg,#242952,#1b1f42);
+    display:flex;align-items:flex-end;justify-content:center;gap:14px;flex-wrap:wrap;padding:14px 10px 8px;
+  }
+  .lineup-backdrop::before{
+    content:'';position:absolute;left:0;right:0;top:14px;height:1px;background:rgba(255,255,255,0.15);
+  }
+  .lineup-backdrop::after{
+    content:'';position:absolute;left:0;right:0;top:38px;height:1px;background:rgba(255,255,255,0.1);
+  }
+
+  .suspect{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:zoom-in;}
+  .suspect-card{
+    width:96px;height:96px;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.18);
+    border-radius:12px;display:flex;align-items:center;justify-content:center;padding:12px;
+    transition:transform 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+  .suspect:hover .suspect-card{transform:translateY(-5px) scale(1.06);border-color:var(--gold);background:rgba(240,185,61,0.1);box-shadow:0 10px 20px rgba(0,0,0,0.35);}
+  .suspect:active .suspect-card{transform:scale(0.96);}
+  .suspect-plate{
+    background:#101431;color:var(--ink-dim);font-size:0.72rem;font-weight:800;
+    padding:2px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.12);min-width:20px;text-align:center;
+  }
+  .suspect.correct-pick .suspect-card{border-color:var(--ok);background:rgba(61,220,151,0.15);box-shadow:0 0 0 3px rgba(61,220,151,0.3);}
+  .suspect.wrong-pick .suspect-card{border-color:var(--crimson);background:rgba(224,70,79,0.18);box-shadow:0 0 0 3px rgba(224,70,79,0.3);}
+
+  .shadow-silhouette{width:100%;height:100%;filter:brightness(0);}
+
+  /* فلاش دوربین برای پاسخ غلط */
+  .camera-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:25;}
+  .camera-flash.flash{animation:flashPop 0.35s ease-out;}
+  @keyframes flashPop{0%{opacity:0.85;}100%{opacity:0;}}
+
+  .overlay{
+    position:absolute;inset:0;background:rgba(6,8,20,0.95);backdrop-filter:blur(10px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    z-index:20;border-radius:18px;color:var(--ink);text-align:center;padding:26px;
+  }
+  .overlay h1{font-size:2rem;color:var(--gold);font-weight:900;}
+  .btn-start{
+    background:linear-gradient(135deg,var(--crimson),#c0392b);color:#fff;font-size:1.15rem;font-weight:800;
+    border:none;padding:13px 42px;border-radius:8px;cursor:pointer;
+    box-shadow:0 12px 30px rgba(224,70,79,0.4);transition:transform 0.2s, box-shadow 0.2s;margin-top:6px;
+  }
+  .btn-start:hover{transform:scale(1.05);box-shadow:0 16px 36px rgba(224,70,79,0.55);}
+
+  #confetti-canvas{position:absolute;inset:0;pointer-events:none;z-index:15;}
+</style>
+</head>
+<body>
+
+<div id="game-container">
+  <canvas id="confetti-canvas"></canvas>
+  <div class="camera-flash" id="camera-flash"></div>
+
+  <div style="width:100%;">
+    <div class="case-header">
+      <div class="case-badge">پرونده‌ی <b id="level-num">۱</b></div>
+      <div class="case-badge">امتیاز: <b id="score-num">۰</b></div>
+      <div class="case-badge">فرصت: <span id="lives-num">❤️❤️❤️</span></div>
+    </div>
+    <div class="timer-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+  </div>
+
+  <div class="case-tag" id="case-tag">آسان 🟢</div>
+
+  <div class="evidence-stage">
+    <div class="spotlight-cone"></div>
+    <div class="evidence-box" id="evidence-box">
+      <div class="evidence-label">مدرک</div>
+      <div id="target-svg-wrapper" style="width:100%;height:100%;"></div>
+    </div>
+  </div>
+
+  <div class="prompt-msg" id="prompt-msg">مدرک را با تمام جزئیاتش به خاطر بسپار...</div>
+
+  <div class="lineup-panel">
+    <div class="lineup-title">🕵️ ردیف مظنونین — کدوم سایه دقیقاً همون مدرکه؟</div>
+    <div class="lineup-backdrop" id="options-grid"></div>
+  </div>
+
+  <div class="overlay" id="menu-overlay">
+    <h1>🕵️ کارآگاه سایه دقیق</h1>
+    <p style="max-width:460px;line-height:1.8;color:var(--ink-dim);font-size:0.95rem;">
+      مدرک فقط چند ثانیه نشونت داده می‌شه، خوب نگاش کن! بعد باید از توی ردیف مظنونین،
+      همون سایه‌ی دقیق و بی‌نقص رو پیدا کنی. بقیه سایه‌ها یه‌کم کج، کشیده یا برعکس شدن —
+      هرچی جلوتر بری، فرق‌ها ظریف‌تر می‌شن!
+    </p>
+    <button class="btn-start" id="start-btn">شروع پرونده</button>
+  </div>
+</div>
+
+<script>
+const FIGURES = [
+  { id:'deer', name:'گوزن شاخ‌دار', svg:`<svg viewBox="0 0 100 100">
+    <ellipse cx="45" cy="65" rx="26" ry="17" fill="#c0392b"/>
+    <path d="M 60 65 L 75 35 L 68 32 L 50 55 Z" fill="#c0392b"/>
+    <circle cx="78" cy="32" r="10" fill="#e74c3c"/>
+    <polygon points="76,24 82,15 84,24" fill="#e74c3c"/>
+    <rect x="26" y="70" width="4" height="26" rx="2" fill="#962d22"/>
+    <rect x="36" y="70" width="4" height="26" rx="2" fill="#962d22"/>
+    <rect x="54" y="70" width="4" height="26" rx="2" fill="#962d22"/>
+    <rect x="64" y="70" width="4" height="26" rx="2" fill="#962d22"/>
+    <path d="M 19 62 Q 13 58 17 68 Z" fill="#e74c3c"/>
+    <path d="M 78 24 L 88 6 M 83 15 L 93 14 M 86 10 L 80 8" stroke="#f39c12" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </svg>` },
+  { id:'helicopter', name:'بالگرد امداد', svg:`<svg viewBox="0 0 100 100">
+    <ellipse cx="50" cy="55" rx="25" ry="18" fill="#2980b9"/>
+    <path d="M 28 52 L 10 46 L 10 42 L 28 48 Z" fill="#2980b9"/>
+    <line x1="10" y1="36" x2="10" y2="52" stroke="#e74c3c" stroke-width="3" stroke-linecap="round"/>
+    <rect x="47" y="30" width="6" height="10" fill="#34495e"/>
+    <line x1="15" y1="30" x2="85" y2="30" stroke="#2c3e50" stroke-width="4" stroke-linecap="round"/>
+    <line x1="30" y1="78" x2="75" y2="78" stroke="#7f8c8d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="40" y1="68" x2="35" y2="78" stroke="#7f8c8d" stroke-width="3"/>
+    <line x1="62" y1="68" x2="68" y2="78" stroke="#7f8c8d" stroke-width="3"/>
+  </svg>` },
+  { id:'rooster', name:'خروس زنگوله‌پا', svg:`<svg viewBox="0 0 100 100">
+    <ellipse cx="48" cy="58" rx="20" ry="16" fill="#f39c12"/>
+    <path d="M 58 60 Q 72 45 68 32 Q 62 25 55 35 Z" fill="#d35400"/>
+    <circle cx="68" cy="30" r="8" fill="#d35400"/>
+    <polygon points="76,30 86,34 76,38" fill="#f1c40f"/>
+    <path d="M 64 24 Q 68 14 74 24 Q 78 16 80 26 Z" fill="#e74c3c"/>
+    <path d="M 32 55 C 10 35 15 20 8 30 C 15 50 18 65 30 68 Z" fill="#27ae60"/>
+    <path d="M 30 52 C 18 25 24 15 20 22 C 26 40 28 58 35 62 Z" fill="#2980b9"/>
+    <line x1="45" y1="72" x2="42" y2="90" stroke="#7f8c8d" stroke-width="3"/>
+    <line x1="55" y1="72" x2="58" y2="90" stroke="#7f8c8d" stroke-width="3"/>
+    <line x1="38" y1="90" x2="46" y2="90" stroke="#7f8c8d" stroke-width="3"/>
+    <line x1="54" y1="90" x2="62" y2="90" stroke="#7f8c8d" stroke-width="3"/>
+  </svg>` },
+  { id:'sailboat', name:'قایق بادبانی', svg:`<svg viewBox="0 0 100 100">
+    <path d="M 15 70 L 85 70 L 72 86 L 28 86 Z" fill="#8e44ad"/>
+    <rect x="47" y="15" width="4" height="55" fill="#34495e"/>
+    <path d="M 53 18 L 88 58 L 53 58 Z" fill="#3498db"/>
+    <path d="M 45 28 L 18 60 L 45 60 Z" fill="#e67e22"/>
+    <polygon points="47,15 32,20 47,25" fill="#e74c3c"/>
+  </svg>` },
+  { id:'giraffe', name:'زرافه بلندقد', svg:`<svg viewBox="0 0 100 100">
+    <ellipse cx="38" cy="62" rx="20" ry="14" fill="#f1c40f"/>
+    <path d="M 48 60 L 68 18 L 60 16 L 38 55 Z" fill="#f1c40f"/>
+    <circle cx="68" cy="16" r="7" fill="#e67e22"/>
+    <polygon points="63,12 60,4 66,10" fill="#d35400"/>
+    <line x1="68" y1="10" x2="70" y2="4" stroke="#d35400" stroke-width="2"/>
+    <circle cx="70" cy="4" r="1.5" fill="#d35400"/>
+    <rect x="24" y="70" width="3.5" height="26" fill="#d35400"/>
+    <rect x="32" y="70" width="3.5" height="26" fill="#d35400"/>
+    <rect x="44" y="70" width="3.5" height="26" fill="#d35400"/>
+    <rect x="52" y="70" width="3.5" height="26" fill="#d35400"/>
+    <path d="M 19 62 Q 12 72 14 80" stroke="#d35400" stroke-width="2" fill="none"/>
+    <circle cx="14" cy="80" r="2.5" fill="#795548"/>
+  </svg>` },
+  { id:'owl', name:'جغد شب‌بیدار', svg:`<svg viewBox="0 0 100 100">
+    <ellipse cx="50" cy="55" rx="28" ry="30" fill="#7f8c8d"/>
+    <circle cx="38" cy="42" r="12" fill="#ecf0f1"/>
+    <circle cx="62" cy="42" r="12" fill="#ecf0f1"/>
+    <circle cx="38" cy="42" r="5" fill="#2c3e50"/>
+    <circle cx="62" cy="42" r="5" fill="#2c3e50"/>
+    <polygon points="50,48 45,58 55,58" fill="#e67e22"/>
+    <path d="M22 30 Q30 10 40 28 Z" fill="#7f8c8d"/>
+    <path d="M78 30 Q70 10 60 28 Z" fill="#7f8c8d"/>
+    <path d="M30 75 L40 90 L50 78 L60 90 L70 75 Z" fill="#95a5a6"/>
+  </svg>` },
+  { id:'whale', name:'نهنگ آبی', svg:`<svg viewBox="0 0 100 100">
+    <path d="M10 55 Q20 30 55 32 Q85 34 90 50 Q80 45 65 46 Q75 55 70 65 Q55 60 45 62 Q30 66 10 55 Z" fill="#2980b9"/>
+    <circle cx="30" cy="45" r="3" fill="#1c2331"/>
+    <path d="M55 30 L58 15 L62 30 Z" fill="#3498db"/>
+    <path d="M65 48 Q78 40 88 44 Q80 50 65 52 Z" fill="#1f618d"/>
+  </svg>` },
+  { id:'robot', name:'ربات کوچولو', svg:`<svg viewBox="0 0 100 100">
+    <rect x="30" y="35" width="40" height="35" rx="6" fill="#95a5a6"/>
+    <rect x="38" y="15" width="24" height="20" rx="4" fill="#bdc3c7"/>
+    <circle cx="46" cy="24" r="3" fill="#2c3e50"/>
+    <circle cx="58" cy="24" r="3" fill="#2c3e50"/>
+    <rect x="46" y="8" width="4" height="8" fill="#7f8c8d"/>
+    <circle cx="48" cy="6" r="3" fill="#e74c3c"/>
+    <rect x="15" y="42" width="12" height="6" fill="#7f8c8d"/>
+    <rect x="73" y="42" width="12" height="6" fill="#7f8c8d"/>
+    <rect x="35" y="72" width="10" height="20" fill="#7f8c8d"/>
+    <rect x="55" y="72" width="10" height="20" fill="#7f8c8d"/>
+  </svg>` },
+  { id:'elephant', name:'فیل کوچولو', svg:`<svg viewBox="0 0 100 100">
+    <ellipse cx="50" cy="55" rx="28" ry="22" fill="#95a5a6"/>
+    <circle cx="75" cy="45" r="14" fill="#a6acaf"/>
+    <path d="M78 52 Q82 70 74 78 Q70 72 72 60 Z" fill="#95a5a6"/>
+    <ellipse cx="70" cy="40" rx="6" ry="9" fill="#7f8c8d"/>
+    <rect x="28" y="70" width="8" height="20" fill="#7f8c8d"/>
+    <rect x="45" y="72" width="8" height="20" fill="#7f8c8d"/>
+    <rect x="62" y="72" width="8" height="20" fill="#7f8c8d"/>
+    <path d="M25 55 Q10 50 15 65 Q22 62 25 58 Z" fill="#a6acaf"/>
+  </svg>` },
+  { id:'butterfly', name:'پروانه رنگی', svg:`<svg viewBox="0 0 100 100">
+    <line x1="50" y1="20" x2="50" y2="80" stroke="#34495e" stroke-width="3"/>
+    <path d="M50 30 C20 10 5 35 20 50 C30 55 45 45 50 35 Z" fill="#e74c3c"/>
+    <path d="M50 30 C80 10 95 35 80 50 C70 55 55 45 50 35 Z" fill="#e67e22"/>
+    <path d="M50 45 C25 45 15 65 25 75 C35 78 45 65 50 55 Z" fill="#8e44ad"/>
+    <path d="M50 45 C75 45 85 65 75 75 C65 78 55 65 50 55 Z" fill="#9b59b6"/>
+    <circle cx="50" cy="20" r="3" fill="#2c3e50"/>
+  </svg>` }
+];
+
+const OBVIOUS = [
+  { key:'flip_h', css:'scaleX(-1)' },
+  { key:'big_stretch_y', css:'scale(0.8,1.3)' },
+  { key:'big_stretch_x', css:'scale(1.3,0.8)' },
+  { key:'big_tilt_cw', css:'rotate(20deg) scale(0.92)' },
+  { key:'big_tilt_ccw', css:'rotate(-20deg) scale(0.92)' }
+];
+const SUBTLE = [
+  { key:'tiny_rot_cw', css:'rotate(5deg)' },
+  { key:'tiny_rot_ccw', css:'rotate(-5deg)' },
+  { key:'tiny_scale_up', css:'scale(1.06)' },
+  { key:'tiny_scale_down', css:'scale(0.94)' },
+  { key:'tiny_skew', css:'skewX(4deg)' },
+  { key:'tiny_skew_neg', css:'skewX(-4deg)' },
+  { key:'tiny_stretch', css:'scale(0.96,1.05)' },
+  { key:'tiny_combo1', css:'rotate(4deg) scale(1.04,0.97)' },
+  { key:'tiny_combo2', css:'rotate(-4deg) skewX(3deg)' },
+  { key:'tiny_combo3', css:'scale(0.95,1.03) skewX(2deg)' }
+];
+
+function getTier(level){
+  if (level <= 2) return { name:'آسان 🟢', options:3, pool:OBVIOUS, memTime:4200 };
+  if (level <= 4) return { name:'متوسط 🟡', options:4, pool:[...OBVIOUS.slice(0,2), ...SUBTLE.slice(0,4)], memTime:3600 };
+  if (level <= 6) return { name:'سخت 🟠', options:5, pool:SUBTLE, memTime:3000 };
+  return { name:'استاد کارآگاهی 🔴', options:6, pool:SUBTLE, memTime:2500 };
+}
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playTone(freq, type='sine', duration=0.2, gainVal=0.15){
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+function soundSuccess(){
+  [523.25,659.25,783.99,1046.50].forEach((f,i)=>setTimeout(()=>playTone(f,'triangle',0.2,0.12), i*85));
+}
+function soundFail(){ playTone(220,'sawtooth',0.2,0.25); setTimeout(()=>playTone(145,'sawtooth',0.35,0.3),130); }
+function soundShutter(){ playTone(900,'square',0.05,0.08); setTimeout(()=>playTone(300,'square',0.08,0.1),50); }
+
+let level=1, score=0, lives=3, currentFigure=null, isAcceptingInput=false, roundEnded=false, timerInterval=null;
+
+const evidenceBox = document.getElementById('evidence-box');
+const targetSvgWrapper = document.getElementById('target-svg-wrapper');
+const optionsGrid = document.getElementById('options-grid');
+const promptMsg = document.getElementById('prompt-msg');
+const timerBar = document.getElementById('timer-bar');
+const caseTag = document.getElementById('case-tag');
+const cameraFlash = document.getElementById('camera-flash');
+const overlay = document.getElementById('menu-overlay');
+const startBtn = document.getElementById('start-btn');
+
+startBtn.onclick = () => { overlay.style.display='none'; initGame(); };
+
+function initGame(){ level=1; score=0; lives=3; updateHeader(); startRound(); }
+
+function updateHeader(){
+  document.getElementById('level-num').innerText = toFa(level);
+  document.getElementById('score-num').innerText = toFa(score);
+  document.getElementById('lives-num').innerText = '❤️'.repeat(lives);
+}
+function toFa(n){
+  const map={0:'۰',1:'۱',2:'۲',3:'۳',4:'۴',5:'۵',6:'۶',7:'۷',8:'۸',9:'۹'};
+  return String(n).split('').map(d=>map[d] ?? d).join('');
+}
+
+function startRound(){
+  isAcceptingInput=false; roundEnded=false;
+  optionsGrid.innerHTML='';
+  evidenceBox.classList.remove('concealed');
+
+  const tier = getTier(level);
+  caseTag.innerText = tier.name;
+
+  currentFigure = FIGURES[Math.floor(Math.random()*FIGURES.length)];
+  targetSvgWrapper.innerHTML = currentFigure.svg;
+  promptMsg.innerText = `👀 جزئیات «${currentFigure.name}» رو خوب به خاطر بسپار...`;
+  timerBar.classList.remove('danger');
+
+  animateTimer(tier.memTime, () => {
+    evidenceBox.classList.add('concealed');
+    promptMsg.innerText = '🔍 کدوم مظنون، سایه‌ی دقیق و بی‌نقص مدرکه؟';
+    renderLineup(tier);
+  });
+}
+
+function animateTimer(duration, onComplete){
+  clearInterval(timerInterval);
+  const start = Date.now();
+  timerBar.style.width='100%';
+  timerInterval = setInterval(() => {
+    const elapsed = Date.now()-start;
+    const remaining = Math.max(0, 1-(elapsed/duration));
+    timerBar.style.width = `${remaining*100}%`;
+    if (remaining < 0.25) timerBar.classList.add('danger');
+    if (remaining<=0){ clearInterval(timerInterval); onComplete(); }
+  }, 50);
+}
+
+function renderLineup(tier){
+  const pool = [...tier.pool].sort(() => 0.5-Math.random());
+  const distortions = pool.slice(0, tier.options-1);
+  const variants = [{ key:'correct', css:'none', isCorrect:true }, ...distortions.map(d => ({...d, isCorrect:false}))];
+  variants.sort(() => 0.5-Math.random());
+
+  optionsGrid.innerHTML='';
+  variants.forEach((variant, idx) => {
+    const wrap = document.createElement('div');
+    wrap.className='suspect';
+
+    const card = document.createElement('div');
+    card.className='suspect-card';
+    const shadow = document.createElement('div');
+    shadow.className='shadow-silhouette';
+    shadow.style.transform = variant.css;
+    shadow.innerHTML = currentFigure.svg;
+    card.appendChild(shadow);
+
+    const plate = document.createElement('div');
+    plate.className='suspect-plate';
+    plate.innerText = toFa(idx+1);
+
+    wrap.appendChild(card);
+    wrap.appendChild(plate);
+    wrap.onclick = () => handlePick(variant.isCorrect, wrap);
+    optionsGrid.appendChild(wrap);
+  });
+
+  isAcceptingInput=true;
+}
+
+function handlePick(isCorrect, wrapEl){
+  if (roundEnded || !isAcceptingInput) return;
+  roundEnded = true; isAcceptingInput=false;
+  clearInterval(timerInterval);
+  evidenceBox.classList.remove('concealed');
+
+  if (isCorrect){
+    wrapEl.classList.add('correct-pick');
+    soundSuccess();
+    score += 150 + level*25;
+    promptMsg.innerText = '✨ پرونده حل شد! سایه‌ی دقیق رو مو به مو پیدا کردی.';
+    triggerConfetti();
+    level++;
+    updateHeader();
+    setTimeout(startRound, 2200);
+  } else {
+    wrapEl.classList.add('wrong-pick');
+    optionsGrid.querySelectorAll('.suspect').forEach((el,i) => {
+      // مظنون درست رو هم نشون بده
+    });
+    soundFail(); soundShutter();
+    cameraFlash.classList.add('flash');
+    setTimeout(()=>cameraFlash.classList.remove('flash'), 400);
+    lives--;
+    promptMsg.innerText = '❌ این مظنون بی‌گناهه! به فرق‌های ظریف زاویه و شکل دقت کن.';
+    updateHeader();
+    if (lives<=0) setTimeout(showGameOver, 1700);
+    else setTimeout(startRound, 2400);
+  }
+}
+
+function showGameOver(){
+  overlay.style.display='flex';
+  overlay.querySelector('h1').innerText='پرونده بسته شد!';
+  overlay.querySelector('p').innerText = `امتیاز نهایی: ${toFa(score)} | تا پرونده‌ی ${toFa(level)} پیش رفتی.`;
+  startBtn.innerText='تلاش مجدد';
+}
+
+function triggerConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.parentElement.clientWidth;
+  canvas.height=canvas.parentElement.clientHeight;
+  const particles=Array.from({length:45},() => ({
+    x:canvas.width/2, y:canvas.height/2,
+    vx:(Math.random()-0.5)*13, vy:(Math.random()-0.7)*11,
+    size:Math.random()*8+4,
+    color:['#f0b93d','#e0464f','#3ddc97','#ffffff','#caa23a'][Math.floor(Math.random()*5)]
+  }));
+  let frame=0;
+  function render(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.25; ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,p.size,p.size); });
+    if(++frame<50) requestAnimationFrame(render); else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  render();
+}
+</script>
+</body>
+</html>

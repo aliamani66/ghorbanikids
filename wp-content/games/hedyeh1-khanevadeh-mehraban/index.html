@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>خانواده مهربان من</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'IRANSansXFaNum', 'IRANSansX', Tahoma, sans-serif; user-select: none; }
+        body { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 12px; }
+        .game-card { background: #ffffff; border-radius: 24px; box-shadow: 0 15px 35px rgba(16,185,129,0.15); width: 100%; max-width: 480px; padding: 20px; text-align: center; border: 3px solid #a7f3d0; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .badge { background: #ecfdf5; color: #047857; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
+        .score-box { background: #047857; color: #fff; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; }
+        .scenario-box { background: #f0fdf4; border: 3px dashed #6ee7b7; border-radius: 20px; padding: 20px; margin: 16px 0; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .scenario-icon { font-size: 4rem; margin-bottom: 8px; }
+        .scenario-text { font-size: 1.15rem; font-weight: 800; color: #065f46; line-height: 1.6; }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
+        .opt-btn { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 14px; font-size: 1rem; font-weight: 800; color: #1e293b; cursor: pointer; transition: all 0.15s; text-align: right; }
+        .opt-btn:active { transform: scale(0.96); }
+        .opt-btn.correct { background: #22c55e !important; color: #fff !important; border-color: #16a34a !important; }
+        .opt-btn.wrong { background: #ef4444 !important; color: #fff !important; border-color: #dc2626 !important; }
+        .modal { display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.96); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; z-index: 10; }
+        .btn-restart { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 14px 32px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-card">
+        <div class="header">
+            <div class="badge">🌸 هدیه‌ها: خانواده مهربان من</div>
+            <div class="score-box">⭐ امتیاز: <span id="scoreVal">۰</span></div>
+        </div>
+
+        <div class="scenario-box">
+            <div class="scenario-icon" id="scIcon">🏡</div>
+            <div class="scenario-text" id="scText">هنگام ورود به خانه چه کار می‌کنیم؟</div>
+        </div>
+
+        <div class="options-grid" id="optionsContainer">
+            <!-- Shuffled options -->
+        </div>
+
+        <div class="modal" id="endModal">
+            <div style="font-size:4rem;">🏡💖</div>
+            <h2 style="color:#047857; font-size:1.6rem; font-weight:900;">آفرین فرزند گل و مهربان!</h2>
+            <p style="color:#475569; font-weight:700;">بهترین و زیباترین رفتارها را در کنار خانواده نشان دادی!</p>
+            <div style="font-size:1.4rem; font-weight:900; color:#059669;">امتیاز نهایی: <span id="finalScoreVal">۱۰۰</span></div>
+            <button class="btn-restart" onclick="restartGame()">🔄 بازی دوباره</button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, dur) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + dur);
+            } catch(e){}
+        }
+        function sndCorrect() { playTone(523, 'sine', 0.12); setTimeout(()=>playTone(659, 'sine', 0.2), 100); }
+        function sndWrong() { playTone(220, 'triangle', 0.25); }
+
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        const pool = [
+            {
+                icon: '🚪',
+                question: 'وقتی از مدرسه وارد خانه می‌شویم چه می‌گوییم؟',
+                correct: 'سلام و خسته نباشید با لبخند 😊',
+                wrongs: ['بدون حرف به اتاق رفتن 🚶', 'داد زدن برای غذا 📢']
+            },
+            {
+                icon: '🍽️',
+                question: 'مادر در حال چیدن سفره غذا است، کار درست چیست؟',
+                correct: 'کمک به مادر در آوردن قاشق و بشقاب 🥄',
+                wrongs: ['تنها بازی کردن و بی‌توجهی 🎮', 'دویدن دور سفره 🏃']
+            },
+            {
+                icon: '🧸',
+                question: 'بعد از بازی با اسباب‌بازی‌ها چه کار می‌کنیم؟',
+                correct: 'اسباب‌بازی‌ها را سر جای خود مرتب می‌چینیم 📦',
+                wrongs: ['آنها را کف اتاق رها می‌کنیم ❌', 'زیر مبل قایم می‌کنیم 🛋️']
+            },
+            {
+                icon: '👴',
+                question: 'پدربزرگ وارد اتاق می‌شود، چه احترامی می‌گذاریم؟',
+                correct: 'به احترام او بلند می‌شویم و جا می‌دهیم 🌸',
+                wrongs: ['به بازی با موبایل ادامه می‌دهیم 📱', 'پشت به او می‌نشینیم 🚫']
+            },
+            {
+                icon: '😴',
+                question: 'پدر از سر کار آمده و در حال استراحت است، چه کنیم؟',
+                correct: 'آرام و بی‌صدا صحبت می‌کنیم تا استراحت کند 🤫',
+                wrongs: ['صدای تلویزیون را خیلی بلند می‌کنیم 🔊', 'جیغ و داد می‌زنیم 📢']
+            },
+            {
+                icon: '👶',
+                question: 'برادر یا خواهر کوچکتر گریه می‌کند، کار خوب چیست؟',
+                correct: 'با مهربانی به او اسباب‌بازی می‌دهیم و آرامش می‌کنیم 🧸',
+                wrongs: ['سر او داد می‌زنیم 😠', 'وسایلش را می‌گیریم ❌']
+            },
+            {
+                icon: '🥛',
+                question: 'لیوان آب از دستمان ریخت، رفتار درست چیست؟',
+                correct: 'عذرخواهی کرده و با دستمال تمیز می‌کنیم 🧻',
+                wrongs: ['فرار می‌کنیم و گردن دیگری می‌اندازیم 🏃', 'گریه و داد می‌زنیم 😢']
+            }
+        ];
+
+        let gameQuestions = [];
+        let currentIdx = 0;
+        let score = 0;
+        let canClick = true;
+
+        function toPersian(n) { return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+        function loadQuestion() {
+            canClick = true;
+            const q = gameQuestions[currentIdx];
+            document.getElementById('scoreVal').textContent = toPersian(score);
+            document.getElementById('scIcon').textContent = q.icon;
+            document.getElementById('scText').textContent = q.question;
+
+            const options = shuffleArray([
+                { text: q.correct, isCorrect: true },
+                ...q.wrongs.map(w => ({ text: w, isCorrect: false }))
+            ]);
+
+            const cont = document.getElementById('optionsContainer');
+            cont.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'opt-btn';
+                btn.textContent = opt.text;
+                btn.onclick = () => checkAnswer(opt.isCorrect, btn);
+                cont.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect, btn) {
+            if(!canClick) return;
+            canClick = false;
+
+            if(isCorrect) {
+                sndCorrect();
+                btn.classList.add('correct');
+                score += 15;
+            } else {
+                sndWrong();
+                btn.classList.add('wrong');
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                if(currentIdx < gameQuestions.length) {
+                    loadQuestion();
+                } else {
+                    endGame();
+                }
+            }, 600);
+        }
+
+        function endGame() {
+            document.getElementById('finalScoreVal').textContent = toPersian(score);
+            document.getElementById('endModal').style.display = 'flex';
+            if (window.parent) {
+                window.parent.postMessage({ type: 'GK_SUBMIT_SCORE', score: score }, '*');
+            }
+        }
+
+        function restartGame() {
+            score = 0;
+            currentIdx = 0;
+            gameQuestions = shuffleArray(pool).slice(0, 6);
+            document.getElementById('endModal').style.display = 'none';
+            loadQuestion();
+        }
+
+        restartGame();
+    </script>
+</body>
+</html>

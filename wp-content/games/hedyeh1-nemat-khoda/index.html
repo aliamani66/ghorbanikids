@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>باغ نعمت‌های زیبای خداوند</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'IRANSansXFaNum', 'IRANSansX', Tahoma, sans-serif; user-select: none; }
+        body { background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 12px; }
+        .game-card { background: #ffffff; border-radius: 24px; box-shadow: 0 15px 35px rgba(217,70,239,0.15); width: 100%; max-width: 480px; padding: 20px; text-align: center; border: 3px solid #f5d0fe; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .badge { background: #fdf4ff; color: #a21caf; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
+        .score-box { background: #a21caf; color: #fff; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; }
+        .prompt-box { background: #fdf2f8; border: 3px dashed #f472b6; border-radius: 20px; padding: 20px; margin: 16px 0; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .prompt-icon { font-size: 4rem; margin-bottom: 8px; animation: float 2s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        .prompt-title { font-size: 1.3rem; font-weight: 900; color: #831843; margin-bottom: 6px; }
+        .prompt-desc { font-size: 1rem; font-weight: 700; color: #be185d; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+        .opt-btn { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 14px 10px; font-size: 0.95rem; font-weight: 800; color: #1e293b; cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+        .opt-btn:active { transform: scale(0.94); }
+        .opt-btn.correct { background: #22c55e !important; color: #fff !important; border-color: #16a34a !important; }
+        .opt-btn.wrong { background: #ef4444 !important; color: #fff !important; border-color: #dc2626 !important; }
+        .modal { display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.96); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; z-index: 10; }
+        .btn-restart { background: linear-gradient(135deg, #d946ef, #c026d3); color: #fff; border: none; padding: 14px 32px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-card">
+        <div class="header">
+            <div class="badge">🌸 هدیه‌ها: نعمت‌های زیبای خدا</div>
+            <div class="score-box">⭐ امتیاز: <span id="scoreVal">۰</span></div>
+        </div>
+
+        <div class="prompt-box">
+            <div class="prompt-icon" id="promptIcon">☀️</div>
+            <div class="prompt-title" id="promptTitle">خورشید تابان</div>
+            <div class="prompt-desc" id="promptDesc">این نعمت بزرگ خدا چه فایده‌ای دارد؟</div>
+        </div>
+
+        <div class="options-grid" id="optionsContainer">
+            <!-- Shuffled options -->
+        </div>
+
+        <div class="modal" id="endModal">
+            <div style="font-size:4rem;">🌸🌟</div>
+            <h2 style="color:#a21caf; font-size:1.6rem; font-weight:900;">آفرین فرشته مهربان!</h2>
+            <p style="color:#475569; font-weight:700;">نعمت‌های زیبای پروردگار مهربان را عالی شناختی و شکرگزاری کردی!</p>
+            <div style="font-size:1.4rem; font-weight:900; color:#059669;">امتیاز نهایی: <span id="finalScoreVal">۱۰۰</span></div>
+            <button class="btn-restart" onclick="restartGame()">🔄 بازی دوباره</button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, dur) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + dur);
+            } catch(e){}
+        }
+        function sndCorrect() { playTone(523, 'sine', 0.12); setTimeout(()=>playTone(659, 'sine', 0.2), 100); }
+        function sndWrong() { playTone(220, 'triangle', 0.25); }
+
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        const pool = [
+            {
+                icon: '☀️',
+                title: 'خورشید تابان',
+                desc: 'این نعمت بزرگ خدا چه فایده‌ای دارد؟',
+                correct: 'نور و گرما برای زمین 🌞',
+                wrongs: ['تاریکی و استراحت شب 🌙', 'باریدن برف و سرما ❄️', 'وزیدن باد پاییزی 🍂']
+            },
+            {
+                icon: '🌧️',
+                title: 'باران رحمت',
+                desc: 'باران زیبای خدا چه برکتی به همراه دارد؟',
+                correct: 'سیراب شدن گل‌ها و رودها 🌱',
+                wrongs: ['خشک شدن درختان 🪵', 'گرمای تابستان 🔥', 'تاریک شدن آسمان 🌑']
+            },
+            {
+                icon: '👀',
+                title: 'چشم‌های بینا',
+                desc: 'شکرانه داشتن چشم‌های بینا و سالم چیست؟',
+                correct: 'دیدن زیبایی‌های طبیعت و خواندن کتاب 📖',
+                wrongs: ['خستگی و بی‌حوصلگی 🥱', 'بی‌توجهی به دوستان 🧍', 'بستن چشم در روشنایی 🙈']
+            },
+            {
+                icon: '👂',
+                title: 'گوش‌های شنوا',
+                desc: 'با گوش‌های خوبمان چه چیزی می‌شنویم؟',
+                correct: 'تلاوت قرآن و سخنان آموزنده 🎶',
+                wrongs: ['سکوت و تنهایی 🤫', 'نگاه کردن به تصاویر 🖼️', 'بوییدن گل‌های خوشبو 🌸']
+            },
+            {
+                icon: '🤲',
+                title: 'دست‌های توانا',
+                desc: 'دست‌های پرتوان ما برای چه کار نیکی است؟',
+                correct: 'کمک به خانواده، نقاشی و نوشتن 🎨',
+                wrongs: ['بی‌حرکت ماندن 🛋️', 'خوابیدن در اتاق 😴', 'تنها نشستن 🧘']
+            },
+            {
+                icon: '🍎',
+                title: 'میوه‌های خوشمزه',
+                desc: 'هنگام میل کردن خوراکی‌های خوشمزه چه می‌گوییم؟',
+                correct: 'نام زیبای خدا (بسم‌الله) و شکرگزاری 🌸',
+                wrongs: ['شعر خواندن به تنهایی 🎶', 'سوت زدن در اتاق 🎺', 'قدم زدن در حیاط 🚶']
+            },
+            {
+                icon: '👨‍👩‍👧‍👦',
+                title: 'خانواده مهربان',
+                desc: 'بهترین هدیه ما به پدر و مادر چیست؟',
+                correct: 'محبت، ادب و احترام به آنها ❤️',
+                wrongs: ['تنها بازی کردن 🎮', 'خاموش کردن چراغ‌ها 💡', 'رفتن به حیاط 🏡']
+            },
+            {
+                icon: '🌳',
+                title: 'درختان سرسبز',
+                desc: 'درختان چه هدیه‌ای به محیط زیست می‌دهند؟',
+                correct: 'سایه دلنشین، هوای پاک و میوه 🍃',
+                wrongs: ['شن و ماسه کنار رودخانه 🏖️', 'آب گرم در حمام 🚿', 'نور خورشید در شب ☀️']
+            }
+        ];
+
+        let gameQuestions = [];
+        let currentIdx = 0;
+        let score = 0;
+        let canClick = true;
+
+        function toPersian(n) { return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+        function loadQuestion() {
+            canClick = true;
+            const q = gameQuestions[currentIdx];
+            document.getElementById('scoreVal').textContent = toPersian(score);
+            document.getElementById('promptIcon').textContent = q.icon;
+            document.getElementById('promptTitle').textContent = q.title;
+            document.getElementById('promptDesc').textContent = q.desc;
+
+            const chosenWrongs = shuffleArray(q.wrongs).slice(0, 3);
+            const options = shuffleArray([
+                { text: q.correct, isCorrect: true },
+                ...chosenWrongs.map(w => ({ text: w, isCorrect: false }))
+            ]);
+
+            const cont = document.getElementById('optionsContainer');
+            cont.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'opt-btn';
+                btn.textContent = opt.text;
+                btn.onclick = () => checkAnswer(opt.isCorrect, btn);
+                cont.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect, btn) {
+            if(!canClick) return;
+            canClick = false;
+
+            if(isCorrect) {
+                sndCorrect();
+                btn.classList.add('correct');
+                score += 12;
+            } else {
+                sndWrong();
+                btn.classList.add('wrong');
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                if(currentIdx < gameQuestions.length) {
+                    loadQuestion();
+                } else {
+                    endGame();
+                }
+            }, 600);
+        }
+
+        function endGame() {
+            document.getElementById('finalScoreVal').textContent = toPersian(score);
+            document.getElementById('endModal').style.display = 'flex';
+            if (window.parent) {
+                window.parent.postMessage({ type: 'GK_SUBMIT_SCORE', score: score }, '*');
+            }
+        }
+
+        function restartGame() {
+            score = 0;
+            currentIdx = 0;
+            gameQuestions = shuffleArray(pool).slice(0, 8);
+            document.getElementById('endModal').style.display = 'none';
+            loadQuestion();
+        }
+
+        restartGame();
+    </script>
+</body>
+</html>

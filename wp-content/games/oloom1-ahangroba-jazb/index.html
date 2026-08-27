@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>آهن‌ربای جادویی و اجسام</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'IRANSansXFaNum', 'IRANSansX', Tahoma, sans-serif; user-select: none; }
+        body { background: linear-gradient(135deg, #fee2e2 0%, #ffedd5 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 12px; }
+        .game-card { background: #ffffff; border-radius: 24px; box-shadow: 0 15px 35px rgba(220,38,38,0.15); width: 100%; max-width: 480px; padding: 20px; text-align: center; border: 3px solid #fecaca; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .badge { background: #fee2e2; color: #991b1b; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
+        .score-box { background: #fef08a; color: #854d0e; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; }
+        .target-box { background: #fff1f2; border: 3px dashed #fda4af; border-radius: 20px; padding: 24px; margin: 16px 0; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s; }
+        .target-icon { font-size: 4rem; margin-bottom: 8px; animation: bounce 1.5s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .target-name { font-size: 1.3rem; font-weight: 900; color: #881337; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .opt-btn { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 16px; padding: 14px 10px; font-size: 1rem; font-weight: 800; color: #1e293b; cursor: pointer; transition: all 0.15s; }
+        .opt-btn:active { transform: scale(0.95); }
+        .opt-btn.correct { background: #22c55e !important; color: #fff !important; border-color: #16a34a !important; animation: pulse 0.4s; }
+        .opt-btn.wrong { background: #ef4444 !important; color: #fff !important; border-color: #dc2626 !important; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        .modal { display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.95); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; z-index: 10; }
+        .btn-restart { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border: none; padding: 14px 32px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-card">
+        <div class="header">
+            <div class="badge">🔬 علوم اول: آهن‌ربا و جذب اجسام</div>
+            <div class="score-box">⭐ امتیاز: <span id="scoreVal">۰</span></div>
+        </div>
+
+        <p style="text-align:center; color:#991b1b; font-weight:800; font-size:1.05rem;">آیا آهن‌ربا این جسم را جذب می‌کند؟ 🧲</p>
+
+        <div class="target-box">
+            <div class="target-icon" id="targetIcon">📎</div>
+            <div class="target-name" id="targetName">گیره فلزی کاغذ</div>
+        </div>
+
+        <div class="options-grid" id="optionsContainer">
+            <!-- Dynamically populated with shuffled order -->
+        </div>
+
+        <div class="modal" id="endModal">
+            <div style="font-size:4rem;">🧲✨</div>
+            <h2 style="color:#991b1b; font-size:1.6rem; font-weight:900;">آفرین دانشمند مغناطیس!</h2>
+            <p style="color:#475569; font-weight:700;">تمام اجسام آهنی و غیرآهنی را به درستی تفکیک کردی!</p>
+            <div style="font-size:1.4rem; font-weight:900; color:#059669;">امتیاز نهایی: <span id="finalScoreVal">۱۰۰</span></div>
+            <button class="btn-restart" onclick="restartGame()">🔄 بازی دوباره</button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, dur) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + dur);
+            } catch(e){}
+        }
+        function sndCorrect() { playTone(523, 'sine', 0.12); setTimeout(()=>playTone(659, 'sine', 0.2), 100); }
+        function sndWrong() { playTone(220, 'triangle', 0.25); }
+
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        const itemsPool = [
+            { icon: '📎', name: 'گیره فلزی کاغذ', isMagnetic: true },
+            { icon: '🪵', name: 'تکه چوب خشک', isMagnetic: false },
+            { icon: '🔑', name: 'کلید آهنی', isMagnetic: true },
+            { icon: '🥤', name: 'لیوان پلاستیکی', isMagnetic: false },
+            { icon: '🪡', name: 'سوزن فلزی', isMagnetic: true },
+            { icon: '🧻', name: 'دستمال کاغذی', isMagnetic: false },
+            { icon: '🪛', name: 'پیچ‌گوشتی فلزی', isMagnetic: true },
+            { icon: '🪟', name: 'شیشه پنجره', isMagnetic: false },
+            { icon: '🔩', name: 'پیچ و مهره آهنی', isMagnetic: true },
+            { icon: '✏️', name: 'مداد چوبی', isMagnetic: false },
+            { icon: '🥫', name: 'قوطی فلزی کنسرو', isMagnetic: true },
+            { icon: '🧶', name: 'کلاف کاموا', isMagnetic: false }
+        ];
+
+        let gameItems = [];
+        let currentIdx = 0;
+        let score = 0;
+        let canClick = true;
+
+        function toPersian(n) { return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+        function loadQuestion() {
+            canClick = true;
+            const itm = gameItems[currentIdx];
+            document.getElementById('scoreVal').textContent = toPersian(score);
+            document.getElementById('targetIcon').textContent = itm.icon;
+            document.getElementById('targetName').textContent = itm.name;
+
+            // Shuffled options buttons
+            const choices = shuffleArray([
+                { label: '🧲 جذب می‌کند (آهن)', val: true },
+                { label: '❌ جذب نمی‌کند', val: false }
+            ]);
+
+            const cont = document.getElementById('optionsContainer');
+            cont.innerHTML = '';
+            choices.forEach(c => {
+                const btn = document.createElement('div');
+                btn.className = 'opt-btn';
+                btn.textContent = c.label;
+                btn.onclick = () => checkAnswer(c.val, btn);
+                cont.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(chosen, btn) {
+            if(!canClick) return;
+            canClick = false;
+            const itm = gameItems[currentIdx];
+
+            if(chosen === itm.isMagnetic) {
+                sndCorrect();
+                btn.classList.add('correct');
+                score += 12;
+            } else {
+                sndWrong();
+                btn.classList.add('wrong');
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                if(currentIdx < gameItems.length) {
+                    loadQuestion();
+                } else {
+                    endGame();
+                }
+            }, 600);
+        }
+
+        function endGame() {
+            document.getElementById('finalScoreVal').textContent = toPersian(score);
+            document.getElementById('endModal').style.display = 'flex';
+            if (window.parent) {
+                window.parent.postMessage({ type: 'GK_SUBMIT_SCORE', score: score }, '*');
+            }
+        }
+
+        function restartGame() {
+            score = 0;
+            currentIdx = 0;
+            gameItems = shuffleArray(itemsPool).slice(0, 8);
+            document.getElementById('endModal').style.display = 'none';
+            loadQuestion();
+        }
+
+        restartGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>بازی بازیافت نشانه‌ها - فارسی اول دبستان</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      touch-action: manipulation;
+      height: 100%;
+      overscroll-behavior: none;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+      height: 100vh;
+      height: 100dvh;
+      background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 40%, #81c784 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 14px;
+      overflow: hidden;
+      gap: 8px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      background: #ffffff;
+      padding: 7px 16px;
+      border-radius: 30px;
+      font-size: clamp(0.8rem, 2.8vw, 1.05rem);
+      font-weight: 800;
+      color: #1b5e20;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 3px solid #66bb6a;
+      white-space: nowrap;
+    }
+
+    .banner {
+      background: #2e7d32;
+      color: #fffde7;
+      border: 3px solid #1b5e20;
+      border-radius: 20px;
+      padding: 7px 20px;
+      font-size: clamp(0.85rem, 3vw, 1.1rem);
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      z-index: 10;
+      flex-shrink: 0;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    #finale-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(27, 94, 32, 0.93);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 60;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #finale-overlay h1 {
+      color: #fff;
+      font-size: clamp(1.15rem, 5vw, 1.7rem);
+    }
+
+    #finale-overlay p {
+      color: #e8f5e9;
+      font-size: 1.05rem;
+      max-width: 420px;
+    }
+
+    #finale-overlay button {
+      background: #ffeb3b;
+      border: 4px solid #fbc02d;
+      color: #e65100;
+      font-weight: 900;
+      font-size: 1.1rem;
+      padding: 13px 32px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    #finale-overlay button:hover {
+      background: #fff59d;
+    }
+
+    .hint-line {
+      background: #fff3e0;
+      color: #e65100;
+      border: 2px dashed #fb8c00;
+      border-radius: 14px;
+      padding: 5px 16px;
+      font-size: clamp(0.78rem, 2.6vw, 0.95rem);
+      font-weight: 700;
+      text-align: center;
+      max-width: 460px;
+      width: 100%;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    .hint-line b {
+      color: #d81b60;
+      font-size: 1.2em;
+    }
+
+    .game-zone {
+      position: relative;
+      width: 100%;
+      max-width: 650px;
+      flex: 1 1 auto;
+      min-height: 90px;
+      overflow: hidden;
+    }
+
+    .falling-item {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      border: 4px solid #8d6e63;
+      border-radius: 20px;
+      padding: 8px 26px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      cursor: grab;
+      touch-action: none;
+      z-index: 5;
+      transition: opacity 0.15s;
+    }
+
+    .falling-item.dragging-source {
+      opacity: 0.3;
+    }
+
+    .falling-item:active {
+      cursor: grabbing;
+    }
+
+    .item-icon {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .item-text {
+      font-size: clamp(1.5rem, 5vw, 2.2rem);
+      font-weight: 900;
+      color: #3e2723;
+      letter-spacing: 1px;
+    }
+
+    .drag-ghost {
+      position: fixed;
+      background: #ffffff;
+      border: 4px solid #8d6e63;
+      border-radius: 20px;
+      padding: 8px 26px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      pointer-events: none;
+      z-index: 1000;
+      transform: translate(-50%, -50%) scale(1.06);
+    }
+
+    .bins-container {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 700px;
+      flex-shrink: 0;
+      flex-wrap: nowrap;
+    }
+
+    .recycle-bin {
+      flex: 1 1 0;
+      max-width: 180px;
+      min-width: 0;
+      height: clamp(110px, 22vh, 165px);
+      border-radius: 24px 24px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      border: 4px solid rgba(0,0,0,0.15);
+      padding: 4px;
+    }
+
+    .recycle-bin:hover {
+      transform: translateY(-6px);
+    }
+
+    .recycle-bin.dragover {
+      transform: scale(1.08);
+      filter: brightness(1.1);
+    }
+
+    .bin-d {
+      background: linear-gradient(180deg, #42a5f5 0%, #1e88e5 100%);
+      color: #ffffff;
+    }
+
+    .bin-r {
+      background: linear-gradient(180deg, #ef5350 0%, #e53935 100%);
+      color: #ffffff;
+    }
+
+    .bin-z {
+      background: linear-gradient(180deg, #ffa726 0%, #fb8c00 100%);
+      color: #ffffff;
+    }
+
+    .bin-symbol {
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .bin-label {
+      font-size: clamp(0.7rem, 2.4vw, 1.1rem);
+      font-weight: 800;
+      background: rgba(255,255,255,0.25);
+      padding: 3px 10px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    .bin-success {
+      animation: binPop 0.35s ease-out;
+    }
+
+    @keyframes binPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+
+    .bin-error {
+      animation: binShake 0.35s ease-in-out;
+    }
+
+    @keyframes binShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    @media (max-width: 380px) {
+      .recycle-bin { max-width: 110px; }
+      .item-text { letter-spacing: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="finale-overlay">
+    <h1>🏆 آفرین! همه‌ی کلمه‌ها را بازیافت کردی!</h1>
+    <p id="finale-score">امتیاز نهایی: ۰</p>
+    <button id="restart-btn">بازی دوباره</button>
+  </div>
+
+  <header>
+    <div class="badge">⭐ بازیافت‌های درست: <span id="score-val">۰</span></div>
+    <div class="badge">♻️ بسته شماره: <span id="round-val">۱</span></div>
+  </header>
+
+  <div class="banner">
+    نشانه اصلی کلمه چیست؟ آن را داخل سطل بازیافت درست بینداز!
+  </div>
+
+  <div class="hint-line" id="hint-line"></div>
+
+  <div class="game-zone" id="game-zone">
+    <div class="falling-item" id="falling-item">
+      <span class="item-icon" id="item-icon">📦</span>
+      <span class="item-text" id="item-text">داد</span>
+    </div>
+  </div>
+
+  <div class="bins-container">
+    <div class="recycle-bin bin-d" id="bin-d" data-target="د" onclick="handleBinSelection('د')">
+      <div class="bin-symbol">د</div>
+      <div class="bin-label">سطل نشانه د</div>
+    </div>
+
+    <div class="recycle-bin bin-r" id="bin-r" data-target="ر" onclick="handleBinSelection('ر')">
+      <div class="bin-symbol">ر</div>
+      <div class="bin-label">سطل نشانه ر</div>
+    </div>
+
+    <div class="recycle-bin bin-z" id="bin-z" data-target="ز" onclick="handleBinSelection('ز')">
+      <div class="bin-symbol">ز</div>
+      <div class="bin-label">سطل نشانه ز</div>
+    </div>
+  </div>
+
+  <script>
+    // GhorbaniKids Score Submission Protocol
+    function gkSendScore(finalScore) {
+        try {
+            var sc = parseInt(finalScore) || 0;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'GK_SUBMIT_SCORE',
+                    score: sc
+                }, '*');
+            }
+        } catch(e) { console.error('GK postMessage error:', e); }
+    }
+    
+    // بانک کلمات مرحله اول فارسی تفکیک شده بر اساس نشانه‌های د، ر، ز
+    const ITEMS_POOL = [
+      // نشانه د (۱۵ کلمه)
+      { text: 'داد', target: 'د', icon: '🎁' },
+      { text: 'دست', target: 'د', icon: '✋' },
+      { text: 'دام', target: 'د', icon: '🕸️' },
+      { text: 'باد', target: 'د', icon: '💨' },
+      { text: 'سبد', target: 'د', icon: '🧺' },
+      { text: 'دوست', target: 'د', icon: '🤝' },
+      { text: 'درخت', target: 'د', icon: '🌳' },     // شامل د و ر
+      { text: 'دفتر', target: 'د', icon: '📒' },     // شامل د و ر
+      { text: 'دیو', target: 'د', icon: '👹' },
+      { text: 'دکمه', target: 'د', icon: '🔘' },
+      { text: 'دریا', target: 'د', icon: '🌊' },     // شامل د و ر
+      { text: 'دانا', target: 'د', icon: '🦉' },
+      { text: 'دامن', target: 'د', icon: '👗' },
+      { text: 'دنیا', target: 'د', icon: '🌍' },
+      { text: 'دبستان', target: 'د', icon: '🏫' },
+
+      // نشانه ر (۱۵ کلمه)
+      { text: 'باران', target: 'ر', icon: '🌧️' },
+      { text: 'انار', target: 'ر', icon: '🍎' },
+      { text: 'مادر', target: 'ر', icon: '👩' },     // شامل ر و د
+      { text: 'ابر', target: 'ر', icon: '☁️' },
+      { text: 'برادر', target: 'ر', icon: '👦' },    // شامل ر و د
+      { text: 'تار', target: 'ر', icon: '🎸' },
+      { text: 'روباه', target: 'ر', icon: '🦊' },
+      { text: 'رادیو', target: 'ر', icon: '📻' },
+      { text: 'سرد', target: 'ر', icon: '❄️' },      // شامل ر و د
+      { text: 'دار', target: 'ر', icon: '🌿' },      // شامل ر و د
+      { text: 'رنگ', target: 'ر', icon: '🎨' },
+      { text: 'رود', target: 'ر', icon: '🏞️' },      // شامل ر و د
+      { text: 'رعد', target: 'ر', icon: '⚡' },
+      { text: 'رفیق', target: 'ر', icon: '🧑‍🤝‍🧑' },
+      { text: 'رخت', target: 'ر', icon: '👕' },
+
+      // نشانه ز (۱۵ کلمه)
+      { text: 'زرد', target: 'ز', icon: '🟡' },       // شامل هر سه نشانه د، ر، ز
+      { text: 'ساز', target: 'ز', icon: '🎵' },
+      { text: 'زمستان', target: 'ز', icon: '⛄' },
+      { text: 'سوزن', target: 'ز', icon: '🪡' },
+      { text: 'زنبور', target: 'ز', icon: '🐝' },     // شامل ز و ر
+      { text: 'زنگ', target: 'ز', icon: '🔔' },
+      { text: 'میز', target: 'ز', icon: '🪑' },
+      { text: 'روز', target: 'ز', icon: '🌅' },       // شامل ر و ز
+      { text: 'دیزی', target: 'ز', icon: '🍲' },      // شامل د و ز
+      { text: 'بز', target: 'ز', icon: '🐐' },
+      { text: 'زیبا', target: 'ز', icon: '🌟' },
+      { text: 'مزرعه', target: 'ز', icon: '🌾' },     // شامل ز و ر
+      { text: 'پاییز', target: 'ز', icon: '🍂' },
+      { text: 'زنجیر', target: 'ز', icon: '⛓️' },     // شامل ز و ر
+      { text: 'جزیره', target: 'ز', icon: '🏝️' }      // شامل ز و ر
+    ];
+
+    const TRACKED_LETTERS = ['د', 'ر', 'ز'];
+
+    function sharedLettersOf(word) {
+      return TRACKED_LETTERS.filter(ch => word.includes(ch));
+    }
+
+    let currentIndex = 0;
+    let score = 0;
+    let posY = 0;
+    let fallSpeed = 0.8;
+    let isLocked = false;
+    let isDragging = false;
+    let animationFrame = null;
+
+    let shuffled = [...ITEMS_POOL].sort(() => 0.5 - Math.random());
+    const scoreVal = document.getElementById('score-val');
+    const roundVal = document.getElementById('round-val');
+    const hintLine = document.getElementById('hint-line');
+    const finaleOverlay = document.getElementById('finale-overlay');
+    const finaleScore = document.getElementById('finale-score');
+    const restartBtn = document.getElementById('restart-btn');
+    const gameZone = document.getElementById('game-zone');
+    const fallingItem = document.getElementById('falling-item');
+    const itemText = document.getElementById('item-text');
+    const itemIcon = document.getElementById('item-icon');
+    const bins = Array.from(document.querySelectorAll('.recycle-bin'));
+
+    // سیستم صوتی - ساخت تنبل، فقط پس از اولین تعامل کاربر
+    // (ساخت زودهنگام AudioContext روی موبایل، به‌خصوص آیفون، باعث سکوت می‌شود)
+    let audioCtx = null;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'recycle') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.15);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(130, now + 0.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+    }
+
+    function toPersianDigits(num) {
+      const digits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return num.toString().replace(/\d/g, d => digits[d]);
+    }
+
+    function spawnNextItem() {
+      isLocked = false;
+      const item = shuffled[currentIndex];
+      itemText.textContent = item.text;
+      itemIcon.textContent = item.icon;
+      roundVal.textContent = toPersianDigits(currentIndex + 1);
+
+      const shared = sharedLettersOf(item.text);
+      if (shared.length >= 2) {
+        hintLine.innerHTML = `این کلمه چند نشانه (${shared.join(' ، ')}) دارد؛ نشانه‌ی مدنظر ما: <b>${item.target}</b> است`;
+        hintLine.style.display = 'block';
+      } else {
+        hintLine.style.display = 'none';
+      }
+
+      posY = 0;
+      fallingItem.style.top = `${posY}px`;
+      fallingItem.style.opacity = '1';
+      recalcMaxY();
+    }
+
+    let cachedMaxY = 200;
+
+    function recalcMaxY() {
+      cachedMaxY = Math.max(gameZone.clientHeight - fallingItem.offsetHeight - 6, 40);
+    }
+
+    function gameLoop() {
+      if (!isLocked && !isDragging) {
+        posY += fallSpeed;
+        if (posY > cachedMaxY) posY = 0;
+        fallingItem.style.top = `${posY}px`;
+      }
+      animationFrame = requestAnimationFrame(gameLoop);
+    }
+
+    window.addEventListener('resize', recalcMaxY);
+
+    function verifyRecycle(selectedTarget) {
+      if (isLocked) return;
+      ensureAudio();
+      const current = shuffled[currentIndex];
+      const binMap = { 'د': 'bin-d', 'ر': 'bin-r', 'ز': 'bin-z' };
+      const binEl = document.getElementById(binMap[selectedTarget]);
+
+      if (selectedTarget === current.target) {
+        isLocked = true;
+        playSound('recycle');
+        score += 10;
+        scoreVal.textContent = toPersianDigits(score);
+
+        binEl.classList.add('bin-success');
+        fallingItem.style.opacity = '0';
+
+        setTimeout(() => {
+          binEl.classList.remove('bin-success');
+          currentIndex += 1;
+          if (currentIndex >= shuffled.length) {
+            showFinale();
+          } else {
+            spawnNextItem();
+          }
+        }, 600);
+
+      } else {
+        playSound('wrong');
+        binEl.classList.add('bin-error');
+        setTimeout(() => binEl.classList.remove('bin-error'), 400);
+      }
+    }
+
+    function handleBinSelection(letter) {
+      verifyRecycle(letter);
+    }
+
+    // پیدا کردن سطلی که نقطه‌ی داده‌شده روی آن است (برای کشیدن با انگشت یا ماوس)
+    function binAt(x, y) {
+      for (const bin of bins) {
+        const rect = bin.getBoundingClientRect();
+        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+          return bin;
+        }
+      }
+      return null;
+    }
+
+    function clearBinHighlights() {
+      bins.forEach(b => b.classList.remove('dragover'));
+    }
+
+    // کشیدن با Pointer Events - هم روی موبایل (لمس) و هم روی کامپیوتر (ماوس) کار می‌کند
+    let ghost = null;
+
+    fallingItem.addEventListener('pointerdown', (e) => {
+      if (isLocked) return;
+      ensureAudio();
+      isDragging = true;
+      fallingItem.classList.add('dragging-source');
+      try { fallingItem.setPointerCapture(e.pointerId); } catch (err) {}
+
+      ghost = document.createElement('div');
+      ghost.className = 'drag-ghost';
+      ghost.innerHTML = `<span class="item-icon">${itemIcon.textContent}</span><span class="item-text">${itemText.textContent}</span>`;
+      document.body.appendChild(ghost);
+      ghost.style.left = `${e.clientX}px`;
+      ghost.style.top = `${e.clientY}px`;
+    });
+
+    fallingItem.addEventListener('pointermove', (e) => {
+      if (!isDragging || !ghost) return;
+      ghost.style.left = `${e.clientX}px`;
+      ghost.style.top = `${e.clientY}px`;
+
+      const hoveredBin = binAt(e.clientX, e.clientY);
+      clearBinHighlights();
+      if (hoveredBin) hoveredBin.classList.add('dragover');
+    });
+
+    function endDrag(clientX, clientY) {
+      if (!isDragging) return;
+      isDragging = false;
+      fallingItem.classList.remove('dragging-source');
+      clearBinHighlights();
+
+      if (ghost) {
+        ghost.remove();
+        ghost = null;
+      }
+
+      const droppedBin = binAt(clientX, clientY);
+      if (droppedBin) {
+        verifyRecycle(droppedBin.dataset.target);
+      }
+    }
+
+    fallingItem.addEventListener('pointerup', (e) => {
+      endDrag(e.clientX, e.clientY);
+    });
+
+    fallingItem.addEventListener('pointercancel', () => {
+      isDragging = false;
+      fallingItem.classList.remove('dragging-source');
+      clearBinHighlights();
+      if (ghost) { ghost.remove(); ghost = null; }
+    });
+
+    function showFinale() {
+      try { gkSendScore(score); } catch(e){}
+      isLocked = true;
+      fallingItem.style.opacity = '0';
+      finaleScore.textContent = 'امتیاز نهایی: ' + toPersianDigits(score);
+      finaleOverlay.style.display = 'flex';
+    }
+
+    restartBtn.addEventListener('click', () => {
+      score = 0;
+      currentIndex = 0;
+      scoreVal.textContent = toPersianDigits(score);
+      shuffled = [...ITEMS_POOL].sort(() => 0.5 - Math.random());
+      finaleOverlay.style.display = 'none';
+      spawnNextItem();
+    });
+
+    // شروع بازی
+    spawnNextItem();
+    gameLoop();
+  </script>
+</body>
+</html>

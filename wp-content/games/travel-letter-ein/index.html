@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>بازی سفر چهارگانه نشانه «ع» - فارسی اول دبستان</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: radial-gradient(circle, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 14px;
+      overflow-x: hidden;
+    }
+
+    #finale-overlay, #gameover-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 96, 100, 0.93);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 60;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #gameover-overlay {
+      background: rgba(191, 54, 12, 0.93);
+    }
+
+    #finale-overlay h1, #gameover-overlay h1 {
+      color: #fff;
+      font-size: clamp(1.15rem, 5vw, 1.7rem);
+    }
+
+    #finale-overlay p, #gameover-overlay p {
+      color: #e0f7fa;
+      font-size: 1.05rem;
+      max-width: 420px;
+    }
+
+    #finale-overlay button, #gameover-overlay button {
+      background: #ffeb3b;
+      border: 4px solid #fbc02d;
+      color: #006064;
+      font-weight: 900;
+      font-size: 1.1rem;
+      padding: 13px 32px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    #finale-overlay button:hover, #gameover-overlay button:hover {
+      background: #fff59d;
+    }
+
+    header {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      background: #ffffff;
+      padding: 7px 18px;
+      border-radius: 30px;
+      font-size: clamp(0.8rem, 2.8vw, 1.15rem);
+      font-weight: 800;
+      color: #006064;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 3px solid #4dd0e1;
+      white-space: nowrap;
+    }
+
+    .instruction-bar {
+      background: #00838f;
+      color: #fffde7;
+      border: 3px solid #006064;
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-size: clamp(0.85rem, 2.9vw, 1.15rem);
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      margin-bottom: 14px;
+      max-width: 550px;
+    }
+
+    .current-card-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 18px;
+      min-height: 120px;
+    }
+
+    .word-card {
+      background: #ffffff;
+      border: 4px solid #00acc1;
+      border-radius: 24px;
+      padding: 12px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 96, 100, 0.2);
+      animation: bounceCard 0.4s ease-out;
+    }
+
+    @keyframes bounceCard {
+      0% { transform: scale(0.7); opacity: 0; }
+      70% { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .card-icon {
+      font-size: clamp(2rem, 6vw, 2.8rem);
+      margin-bottom: 4px;
+    }
+
+    .card-word {
+      font-size: clamp(1.7rem, 6vw, 2.4rem);
+      font-weight: 900;
+      color: #006064;
+      letter-spacing: 2px;
+    }
+
+    .card-hint {
+      font-size: clamp(0.8rem, 2.6vw, 1rem);
+      color: #546e7a;
+      font-weight: bold;
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      width: 100%;
+      max-width: 750px;
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 650px) {
+      .map-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .station-slot {
+      background: #ffffff;
+      border: 4px dashed #00838f;
+      border-radius: 24px;
+      height: clamp(110px, 20vh, 155px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      padding: 6px;
+    }
+
+    .station-slot:hover {
+      transform: translateY(-4px);
+      border-color: #ff9800;
+      background: #fffde7;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+    }
+
+    .station-symbol {
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 900;
+      color: #d81b60;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .station-title {
+      font-size: clamp(0.82rem, 2.6vw, 1.05rem);
+      font-weight: 800;
+      color: #006064;
+      text-align: center;
+    }
+
+    .correct-hit {
+      animation: hitSuccess 0.4s ease;
+      background: #c8e6c9 !important;
+      border-color: #2e7d32 !important;
+    }
+
+    @keyframes hitSuccess {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .wrong-hit {
+      animation: shake 0.35s ease-in-out;
+      background: #ffcdd2 !important;
+      border-color: #c62828 !important;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="finale-overlay">
+    <h1>🏆 آفرین! همه‌ی کلمه‌ها را درست جای گذاشتی!</h1>
+    <p id="finale-score">امتیاز نهایی: ۰</p>
+    <button id="restart-btn">بازی دوباره</button>
+  </div>
+
+  <div id="gameover-overlay">
+    <h1>😅 فرصت‌هایت تمام شد!</h1>
+    <p>اشکالی نداره، دوباره از اول امتحان کن.</p>
+    <button id="gameover-restart-btn">شروع دوباره</button>
+  </div>
+
+  <header>
+    <div class="badge">⭐ امتیاز: <span id="score-val">۰</span></div>
+    <div class="badge">🗺️ کلمه: <span id="progress-val">۱ / ۱۶</span></div>
+    <div class="badge" style="color:#c62828; border-color:#ef9a9a;">❤️ فرصت: <span id="lives-val">۳</span></div>
+  </header>
+
+  <div class="instruction-bar">
+    نشانه «ع» در کلمه زیر کجای کلمه نشسته است؟ ایستگاه درست را لمس کن!
+  </div>
+
+  <div class="current-card-area">
+    <div class="word-card" id="word-card">
+      <span class="card-icon" id="card-icon">👓</span>
+      <span class="card-word" id="card-word">عینک</span>
+      <span class="card-hint" id="card-hint">برای دیدن بهتر</span>
+    </div>
+  </div>
+
+  <div class="map-grid">
+    <div class="station-slot" onclick="handleStationPick('first', this)">
+      <div class="station-symbol">عـ</div>
+      <div class="station-title">عـ اول</div>
+    </div>
+
+    <div class="station-slot" onclick="handleStationPick('mid', this)">
+      <div class="station-symbol">ـعـ</div>
+      <div class="station-title">ـعـ وسط</div>
+    </div>
+
+    <div class="station-slot" onclick="handleStationPick('last-attached', this)">
+      <div class="station-symbol">ـع</div>
+      <div class="station-title">ـع آخر چسبان</div>
+    </div>
+
+    <div class="station-slot" onclick="handleStationPick('last-alone', this)">
+      <div class="station-symbol">ع</div>
+      <div class="station-title">ع آخر تنها</div>
+    </div>
+  </div>
+
+  <script>
+    // GhorbaniKids Score Submission Protocol
+    function gkSendScore(finalScore) {
+        try {
+            var sc = parseInt(finalScore) || 0;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'GK_SUBMIT_SCORE',
+                    score: sc
+                }, '*');
+            }
+        } catch(e) { console.error('GK postMessage error:', e); }
+    }
+    
+    // بانک کلمات نشانه‌های چهارگانه‌ی «ع».
+    // نکته‌ی درست‌نویسی: وقتی حرف قبل از «ع» یکی از حروف ناتصل (ا، د، ذ، ر، ز، ژ، و) باشد،
+    // «ع» از راست به آن نمی‌چسبد و شکل «اول» یا «آخرِ تنها» می‌گیرد، حتی اگر در وسط یا
+    // انتهای کلمه نوشته شده باشد. با همین قاعده، «ساعت» و «مزرعه» در واقع «عـ» (اول) هستند
+    // (چون قبل از ع به‌ترتیب ا و ر آمده) و «موقع» در واقع «ـع» (آخرِ چسبان) است، نه «تنها»
+    // (چون قبل از ع حرف «ق» آمده که می‌چسبد).
+    const EIN_WORDS = [
+      // عـ اول
+      { word: 'عینک', form: 'first', icon: '👓', hint: 'برای دیدن بهتر' },
+      { word: 'علی', form: 'first', icon: '👦', hint: 'نام پسری خوش‌اخلاق' },
+      { word: 'عسل', form: 'first', icon: '🍯', hint: 'خوراکی شیرین زنبور' },
+      { word: 'ساعت', form: 'first', icon: '⏰', hint: 'نشان‌دهنده زمان و وقت' },
+      { word: 'مزرعه', form: 'first', icon: '🌾', hint: 'زمین کاشت گندم و جو' },
+
+      // ـعـ وسط
+      { word: 'معلّم', form: 'mid', icon: '👩‍🏫', hint: 'آموزگار مهربان کلاس' },
+      { word: 'کعبه', form: 'mid', icon: '🕋', hint: 'قبله‌گاه مسلمانان در مکه' },
+      { word: 'جعبه', form: 'mid', icon: '📦', hint: 'ظرفی برای نگه‌داری وسایل' },
+      { word: 'شعر', form: 'mid', icon: '📜', hint: 'نوشته‌ی موزون و زیبا' },
+
+      // ـع آخر چسبان
+      { word: 'مربّع', form: 'last-attached', icon: '🟨', hint: 'شکل هندسی با چهار ضلع برابر' },
+      { word: 'جمع', form: 'last-attached', icon: '➕', hint: 'علامت ریاضی به اضافه' },
+      { word: 'شمع', form: 'last-attached', icon: '🕯️', hint: 'روشنایی در شب با شعله' },
+      { word: 'موقع', form: 'last-attached', icon: '⏳', hint: 'هنگام و وقت انجام کار' },
+
+      // ع آخر تنها
+      { word: 'شروع', form: 'last-alone', icon: '🏁', hint: 'آغاز مسابقه یا کار' },
+      { word: 'دفاع', form: 'last-alone', icon: '🛡️', hint: 'محافظت در برابر خطر' },
+      { word: 'طلوع', form: 'last-alone', icon: '🌅', hint: 'بالا آمدن خورشید' }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let isLocked = false;
+    let lives = 3;
+    const MAX_LIVES = 3;
+    let shuffledList = [...EIN_WORDS].sort(() => 0.5 - Math.random());
+
+    const scoreVal = document.getElementById('score-val');
+    const progressVal = document.getElementById('progress-val');
+    const livesVal = document.getElementById('lives-val');
+    const cardIcon = document.getElementById('card-icon');
+    const cardWord = document.getElementById('card-word');
+    const cardHint = document.getElementById('card-hint');
+    const wordCard = document.getElementById('word-card');
+    const finaleOverlay = document.getElementById('finale-overlay');
+    const finaleScore = document.getElementById('finale-score');
+    const restartBtn = document.getElementById('restart-btn');
+    const gameoverOverlay = document.getElementById('gameover-overlay');
+    const gameoverRestartBtn = document.getElementById('gameover-restart-btn');
+
+    // سیستم صوتی - ساخت تنبل، فقط پس از اولین تعامل کاربر
+    // (ساخت زودهنگام AudioContext روی موبایل، به‌خصوص آیفون، باعث سکوت می‌شود)
+    let audioCtx = null;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.18);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(140, now + 0.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+    }
+
+    function toPersianDigits(num) {
+      const digits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return num.toString().replace(/\d/g, d => digits[d]);
+    }
+
+    function displayWord() {
+      isLocked = false;
+      const current = shuffledList[currentIndex];
+
+      cardIcon.textContent = current.icon;
+      cardWord.textContent = current.word;
+      cardHint.textContent = current.hint;
+      progressVal.textContent = `${toPersianDigits(currentIndex + 1)} / ${toPersianDigits(shuffledList.length)}`;
+
+      wordCard.style.animation = 'none';
+      void wordCard.offsetWidth;
+      wordCard.style.animation = 'bounceCard 0.4s ease-out';
+    }
+
+    function handleStationPick(selectedForm, slotElement) {
+      if (isLocked) return;
+      ensureAudio();
+      const current = shuffledList[currentIndex];
+
+      if (selectedForm === current.form) {
+        isLocked = true;
+        playSound('success');
+        score += 10;
+        scoreVal.textContent = toPersianDigits(score);
+
+        slotElement.classList.add('correct-hit');
+
+        setTimeout(() => {
+          slotElement.classList.remove('correct-hit');
+          currentIndex += 1;
+          if (currentIndex >= shuffledList.length) {
+            showFinale();
+          } else {
+            displayWord();
+          }
+        }, 900);
+
+      } else {
+        playSound('wrong');
+        slotElement.classList.add('wrong-hit');
+        setTimeout(() => slotElement.classList.remove('wrong-hit'), 400);
+
+        lives -= 1;
+        livesVal.textContent = toPersianDigits(Math.max(lives, 0));
+        if (lives <= 0) {
+          isLocked = true;
+          setTimeout(showGameOver, 500);
+        }
+      }
+    }
+
+    function showFinale() {
+      try { gkSendScore(score); } catch(e){}
+      finaleScore.textContent = 'امتیاز نهایی: ' + toPersianDigits(score);
+      finaleOverlay.style.display = 'flex';
+    }
+
+    function showGameOver() { 
+      try { gkSendScore(score); } catch(e){} 
+      gameoverOverlay.style.display = 'flex';
+    }
+
+    function resetGame() {
+      currentIndex = 0;
+      score = 0;
+      lives = MAX_LIVES;
+      scoreVal.textContent = toPersianDigits(score);
+      livesVal.textContent = toPersianDigits(lives);
+      shuffledList = [...EIN_WORDS].sort(() => 0.5 - Math.random());
+      displayWord();
+    }
+
+    restartBtn.addEventListener('click', () => {
+      finaleOverlay.style.display = 'none';
+      resetGame();
+    });
+
+    gameoverRestartBtn.addEventListener('click', () => {
+      gameoverOverlay.style.display = 'none';
+      resetGame();
+    });
+
+    // بارگذاری کلمه اول
+    displayWord();
+  </script>
+</body>
+</html>

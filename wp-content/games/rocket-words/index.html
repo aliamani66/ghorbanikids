@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پرتاب موشک به کلمه درست</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+      padding: 12px;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .space-station {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      width: 100%;
+      max-width: 480px;
+      height: 640px;
+      border-radius: 28px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .top-panel {
+      padding: 16px 20px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .score-badge {
+      background: #38bdf8;
+      color: #082f49;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .target-bar {
+      margin: 0 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .target-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .target-emoji {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+
+    .audio-play-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      outline: none;
+    }
+
+    .audio-play-btn:active {
+      transform: scale(0.95);
+    }
+
+    .sky-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rocket-card {
+      position: absolute;
+      width: 100px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.05s linear;
+      z-index: 5;
+      touch-action: manipulation;
+    }
+
+    .rocket-icon {
+      font-size: 3.5rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.5));
+    }
+
+    .rocket-text {
+      background: #f8fafc;
+      color: #0f172a;
+      font-size: 1.25rem;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-radius: 12px;
+      margin-top: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      border: 2px solid #38bdf8;
+      white-space: nowrap;
+    }
+
+    .rocket-card.hit {
+      animation: explode 0.4s forwards;
+      pointer-events: none;
+    }
+
+    .rocket-card.reveal-correct .rocket-text {
+      background: #4ade80;
+      border-color: #16a34a;
+      box-shadow: 0 0 16px rgba(74, 222, 128, 0.9);
+    }
+
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.8; filter: hue-rotate(90deg); }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    .status-msg {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: bold;
+      min-height: 30px;
+      z-index: 10;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .game-over {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(9, 10, 15, 0.92);
+      text-align: center;
+      padding: 24px;
+    }
+
+    .game-over-emoji {
+      font-size: 4.5rem;
+      margin-bottom: 10px;
+    }
+
+    .game-over-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #38bdf8;
+      margin-bottom: 14px;
+    }
+
+    .game-over-score {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #082f49;
+      background: #38bdf8;
+      padding: 10px 22px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .replay-btn {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      background: #10b981;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 28px;
+      box-shadow: 0 4px 0 #047857;
+      cursor: pointer;
+    }
+
+    .replay-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #047857;
+    }
+  </style>
+</head>
+<body>
+
+<div class="space-station">
+  <div class="top-panel">
+    <span>مرحله: <span id="lvl-val">۱</span> از <span id="lvl-total">۶</span></span>
+    <div class="score-badge">امتیاز: <span id="score-val">۰</span> ⭐</div>
+  </div>
+
+  <div class="target-bar">
+    <div class="target-info">
+      <span class="target-emoji" id="target-emoji">🧺</span>
+      <span>کدام موشک درسته؟</span>
+    </div>
+    <button class="audio-play-btn" id="replay-voice-btn">
+      🔊 پخش صدا
+    </button>
+  </div>
+
+  <div class="sky-area" id="sky"></div>
+
+  <div class="status-msg" id="status-msg"></div>
+
+  <div class="game-over" id="game-over">
+    <div class="game-over-emoji">🚀🏆</div>
+    <div class="game-over-title">آفرین! سفر فضایی تمام شد</div>
+    <div class="game-over-score">امتیاز نهایی: <span id="final-score">۰</span> ⭐</div>
+    <button class="replay-btn" id="replay-btn">بازی از اول 🔄</button>
+  </div>
+</div>
+
+<script>
+    // GhorbaniKids Score Submission Protocol
+    function gkSendScore(finalScore) {
+        try {
+            var sc = parseInt(finalScore) || 0;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'GK_SUBMIT_SCORE',
+                    score: sc
+                }, '*');
+            }
+        } catch(e) { console.error('GK postMessage error:', e); }
+    }
+    
+  // نکته: گزینه‌های نادرست هر مرحله عمداً شبیه املای درست هستند (حرف‌های هم‌شکل مثل س/ص/ث، ق/غ، ت/ط)
+  // تا کودک تفاوت املایی را تشخیص دهد. اعراب اضافی از گزینه‌ها حذف شده چون بخشی از رسم‌الخط کلمه نیستند
+  // و باعث سردرگمی می‌شدند.
+  const levels = [
+    { word: "سبد", emoji: "🧺", options: ["سبد", "سبت", "صبد"] },
+    { word: "صابون", emoji: "🧼", options: ["صابون", "سابون", "ثابون"] },
+    { word: "طوطی", emoji: "🦜", options: ["طوطی", "توتی", "طوتی"] },
+    { word: "ساعت", emoji: "⏰", options: ["ساعت", "صاعت", "ساات"] },
+    { word: "قطار", emoji: "🚆", options: ["قطار", "قتار", "غطار"] },
+    { word: "قورباغه", emoji: "🐸", options: ["قورباغه", "غورباغه", "قورباقه"] },
+    { word: "ذرت", emoji: "🌽", options: ["ذرت", "زرت", "ضرت"] },
+    { word: "حیاط", emoji: "🏡", options: ["حیاط", "حیاذ", "هیاط"] },
+    { word: "ظرف", emoji: "🍽️", options: ["ظرف", "ضرف", "زرف"] },
+    { word: "صندلی", emoji: "🪑", options: ["صندلی", "سندلی", "ثندلی"] },
+    { word: "تلفن", emoji: "☎️", options: ["تلفن", "طلفن", "تلفون"] },
+    { word: "مسواک", emoji: "🪥", options: ["مسواک", "مسواگ", "میسواک"] },
+    { word: "زنبور", emoji: "🐝", options: ["زنبور", "ذنبور", "زمبور"] },
+    { word: "عنکبوت", emoji: "🕷️", options: ["عنکبوت", "انکبوت", "عنکبوط"] },
+    { word: "قاشق", emoji: "🥄", options: ["قاشق", "غاشق", "قاشغ"] },
+    { word: "چاقو", emoji: "🔪", options: ["چاقو", "چاغو", "جاقو"] },
+    { word: "یخچال", emoji: "🧊", options: ["یخچال", "یغچال", "یخچار"] },
+    { word: "کیف", emoji: "👜", options: ["کیف", "کیب", "گیف"] },
+    { word: "عروسک", emoji: "🪆", options: ["عروسک", "عروسگ", "غروسک"] },
+    { word: "بادکنک", emoji: "🎈", options: ["بادکنک", "باتکنک", "بادکنگ"] }
+  ];
+
+  let currentLevelIdx = 0;
+  let score = 0;
+  let rockets = [];
+  let animFrameId = null;
+  let levelLocked = false;
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playLaserSound(hitCorrect) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    if (hitCorrect) {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.2);
+    } else {
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.25);
+    }
+
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  }
+
+  function speakWord(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fa-IR';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.1;
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  const sky = document.getElementById("sky");
+  const emojiEl = document.getElementById("target-emoji");
+  const scoreEl = document.getElementById("score-val");
+  const lvlEl = document.getElementById("lvl-val");
+  const lvlTotalEl = document.getElementById("lvl-total");
+  const statusMsg = document.getElementById("status-msg");
+  const replayBtn = document.getElementById("replay-voice-btn");
+  const gameOverEl = document.getElementById("game-over");
+  const finalScoreEl = document.getElementById("final-score");
+  const replayGameBtn = document.getElementById("replay-btn");
+
+  lvlTotalEl.textContent = levels.length.toLocaleString('fa-IR');
+
+  function goToNextLevelOrFinish(delay) {
+    setTimeout(() => {
+      if (currentLevelIdx >= levels.length - 1) {
+        showGameOver();
+      } else {
+        currentLevelIdx++;
+        startLevel();
+      }
+    }, delay);
+  }
+
+  function showGameOver() { 
+    try { gkSendScore(score); } catch(e){} 
+    cancelAnimationFrame(animFrameId);
+    finalScoreEl.textContent = score.toLocaleString('fa-IR');
+    gameOverEl.style.display = 'flex';
+  }
+
+  replayGameBtn.addEventListener('click', () => {
+    gameOverEl.style.display = 'none';
+    score = 0;
+    scoreEl.textContent = score.toLocaleString('fa-IR');
+    currentLevelIdx = 0;
+    startLevel();
+  });
+
+  function startLevel() {
+    cancelAnimationFrame(animFrameId);
+    sky.innerHTML = "";
+    rockets = [];
+    statusMsg.textContent = "";
+    levelLocked = false;
+
+    const level = levels[currentLevelIdx];
+    emojiEl.textContent = level.emoji;
+    lvlEl.textContent = (currentLevelIdx + 1).toLocaleString('fa-IR');
+
+    setTimeout(() => speakWord(level.word), 300);
+
+    const shuffledOptions = [...level.options].sort(() => Math.random() - 0.5);
+    const lanes = [20, 160, 300];
+
+    shuffledOptions.forEach((wordText, i) => {
+      const el = document.createElement("div");
+      el.className = "rocket-card";
+      el.innerHTML = `
+        <div class="rocket-icon">🚀</div>
+        <div class="rocket-text">${wordText}</div>
+      `;
+
+      const startY = 460 + Math.random() * 40;
+      const speed = 0.8 + Math.random() * 0.4;
+      const x = lanes[i];
+
+      el.style.left = `${x}px`;
+      el.style.top = `${startY}px`;
+
+      el.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        onRocketClick(wordText, el);
+      });
+
+      sky.appendChild(el);
+
+      rockets.push({
+        el,
+        x,
+        y: startY,
+        speed,
+        word: wordText,
+        isCorrect: wordText === level.word,
+        active: true
+      });
+    });
+
+    gameLoop();
+  }
+
+  function gameLoop() {
+    if (levelLocked) return;
+
+    let allGone = true;
+
+    rockets.forEach(r => {
+      if (!r.active) return;
+      r.y -= r.speed;
+      r.el.style.top = `${r.y}px`;
+
+      if (r.y > -100) {
+        allGone = false;
+      } else {
+        r.active = false;
+        r.el.remove();
+      }
+    });
+
+    if (allGone) {
+      levelLocked = true;
+      statusMsg.style.color = "#fbbf24";
+      statusMsg.textContent = "موشک‌ها رد شدند! دوباره تلاش کن.";
+      setTimeout(startLevel, 1200);
+      return;
+    }
+
+    animFrameId = requestAnimationFrame(gameLoop);
+  }
+
+  function onRocketClick(wordText, rocketEl) {
+    if (levelLocked) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const current = levels[currentLevelIdx];
+
+    if (wordText === current.word) {
+      levelLocked = true;
+      playLaserSound(true);
+      rocketEl.classList.add("hit");
+      score += 20;
+      scoreEl.textContent = score.toLocaleString('fa-IR');
+      statusMsg.style.color = "#4ade80";
+      statusMsg.textContent = "هدف دقیق! املای درست بود 🎯";
+
+      cancelAnimationFrame(animFrameId);
+
+      goToNextLevelOrFinish(1500);
+    } else {
+      // فقط ۱ فرصت در هر مرحله: اولین انتخاب اشتباه، مرحله را می‌بندد
+      levelLocked = true;
+      playLaserSound(false);
+      statusMsg.style.color = "#f87171";
+      statusMsg.textContent = "املای این موشک اشتباه بود! فرصتت تمام شد ❌";
+
+      const correctRocket = rockets.find(r => r.isCorrect && r.active);
+      if (correctRocket) correctRocket.el.classList.add("reveal-correct");
+
+      cancelAnimationFrame(animFrameId);
+
+      goToNextLevelOrFinish(1600);
+    }
+  }
+
+  replayBtn.onclick = () => {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    speakWord(levels[currentLevelIdx].word);
+  };
+
+  startLevel();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+# Temporary & scratch files
+*.zip
+*.log
+*.tmp
+*.bak
+*.pyc
+__pycache__/
+b64_deploy.*
+deploy_payload.php
+to_deploy.php
+last_code_*.php
+chunk_*.txt
+dash_chunk_*.txt
+run_chunk_*.txt
+grid_code_*.php
+grid_*.txt
+full_dash_*.php
+full_dash_*_clean.txt
+games_card_dump.json
+exact_css.txt
+exact_html.txt
+all_comments.txt
+card_css_snippet*.txt
+1216_clean.txt
+add_class_js_block.txt
+master_*.txt
+line_1457.txt
+modal_code_*.php
+part1.txt
+part2.txt
+run_part*.php
+real_class_css.txt
+code_*.php
+extracted_*.php
+f9c_*.php
+master_raw_dash.php
+found_edit_class.php
+final_master_perfect.php
+perfect_dashboard.php
+perfect_single_dashboard.php
+class-school-dashboard-final*.php
+class-school-dashboard-pristine.php
+
+# Backups
+backup-*/
+backups/
+
+# Node modules
+node_modules/
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db

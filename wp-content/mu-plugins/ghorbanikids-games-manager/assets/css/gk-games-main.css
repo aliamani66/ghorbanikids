@@ -1,0 +1,1420 @@
+?>
+        
+            /* =========================================================
+               هدر و نوار ناوبری یکپارچه تمام‌عرض بالای سایت (Top Navbar)
+               ========================================================= */
+
+            /* حذف کادرهای اشتراک‌گذاری قدیمی آوادا */
+            .fusion-sharing-box,
+            .fusion-social-sharing,
+            .sharing-box,
+            .fusion-blog-shortcode-post .fusion-meta-info .fusion-sharing-box {
+                display: none !important;
+            }
+
+            /* مخفی‌سازی کامل هدرهای قدیمی سایدبار و نوار کناری */
+            #side-header-wrapper,
+            #side-header,
+            .fusion-tb-header,
+            .fusion-header-wrapper,
+            .fusion-header,
+            .side-header-right #side-header-wrapper,
+            .side-header-left #side-header-wrapper {
+                display: none !important;
+            }
+
+            /* ریسِت کردن کامل ساختار سایت به حالت تمام‌عرض (100%) در دسکتاپ و موبایل */
+            body,
+            body.side-header-right,
+            body.side-header-left {
+                overflow-x: hidden !important;
+            }
+
+            #wrapper,
+            .side-header-right #wrapper,
+            .side-header-left #wrapper,
+            #boxed-wrapper,
+            body.side-header-right #wrapper,
+            body.side-header-left #wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                float: none !important;
+                position: relative !important;
+                left: 0 !important;
+                right: 0 !important;
+            }
+
+            #main {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .fusion-fullwidth,
+            .fusion-builder-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            /* =========================================================
+               استایل نوار هدر مدرن و شیشه‌ای (GhorbaniKids Top Navbar)
+               ========================================================= */
+            .gk-top-navbar {
+                position: sticky !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                z-index: 999999 !important;
+                background: rgba(255, 255, 255, 0.94) !important;
+                backdrop-filter: blur(20px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+                border-bottom: 1px solid rgba(226, 232, 240, 0.85) !important;
+                box-shadow: 0 4px 25px -4px rgba(15, 23, 42, 0.08) !important;
+                direction: rtl !important;
+                box-sizing: border-box !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .gk-navbar-container {
+                max-width: 1360px !important;
+                margin: 0 auto !important;
+                padding: 0 24px !important;
+                height: 74px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                box-sizing: border-box !important;
+            }
+
+            /* ۱. ستون لوگو و نام برند (راست در RTL) */
+            .gk-navbar-brand-col {
+                display: flex !important;
+                align-items: center !important;
+                flex-shrink: 0 !important;
+            }
+
+            .gk-navbar-brand {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+                text-decoration: none !important;
+                transition: transform 0.25s ease !important;
+            }
+
+            .gk-navbar-brand:hover {
+                transform: scale(1.03) !important;
+            }
+
+            .gk-navbar-logo {
+                height: 48px !important;
+                width: auto !important;
+                max-width: 56px !important;
+                object-fit: contain !important;
+                display: block !important;
+                filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.12)) !important;
+            }
+
+            .gk-navbar-brand-title {
+                font-family: 'aviny', cursive, Tahoma, sans-serif !important;
+                font-size: 1.85rem !important;
+                font-weight: 800 !important;
+                color: #1e3a8a !important;
+                letter-spacing: 0 !important;
+                line-height: 1 !important;
+                text-shadow: 0 2px 4px rgba(30, 58, 138, 0.08) !important;
+            }
+
+            /* ۲. ستون منوی ناوبری اصلی (وسط در دسکتاپ) */
+            .gk-navbar-nav-col {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex: 1 !important;
+                margin: 0 24px !important;
+            }
+
+            .gk-nav-list {
+                list-style: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+            }
+
+            .gk-nav-item {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .gk-nav-link {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 16px !important;
+                border-radius: 22px !important;
+                font-size: 1.05rem !important;
+                font-weight: 700 !important;
+                color: #334155 !important;
+                text-decoration: none !important;
+                transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                position: relative !important;
+            }
+
+            .gk-nav-link:hover {
+                color: #6c5ce7 !important;
+                background-color: #f5f3ff !important;
+                transform: translateY(-1px) !important;
+            }
+
+            .gk-nav-item.current-menu-item .gk-nav-link {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.35) !important;
+            }
+
+            .gk-nav-badge {
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%) !important;
+                color: #ffffff !important;
+                font-size: 0.72rem !important;
+                font-weight: 900 !important;
+                padding: 2px 8px !important;
+                border-radius: 12px !important;
+                line-height: 1.2 !important;
+                letter-spacing: 0 !important;
+                margin-right: 4px !important;
+            }
+
+            /* ۳. ستون ابزارهای کاربری (چپ در RTL) */
+            .gk-navbar-tools-col {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* دکمه خرید اشتراک ویژه هدر */
+            .gk-tool-btn-vip {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+                color: #ffffff !important;
+                padding: 8px 18px !important;
+                border-radius: 24px !important;
+                font-size: 0.95rem !important;
+                font-weight: 800 !important;
+                text-decoration: none !important;
+                box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+                transition: all 0.25s ease !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            }
+
+            .gk-tool-btn-vip:hover {
+                transform: translateY(-2px) scale(1.03) !important;
+                box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45) !important;
+                color: #ffffff !important;
+            }
+
+            /* آیکون‌های گرد دایره‌ای ابزارها */
+            .gk-tool-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 42px !important;
+                height: 42px !important;
+                padding: 0 !important;
+                border-radius: 50% !important;
+                text-decoration: none !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                color: #334155 !important;
+                cursor: pointer !important;
+                border: 1.5px solid #e2e8f0 !important;
+                background: #ffffff !important;
+                position: relative !important;
+                box-sizing: border-box !important;
+            }
+
+            .gk-tool-btn:hover {
+                transform: translateY(-2px) !important;
+            }
+
+            /* سبد خرید */
+            .gk-tool-cart {
+                color: #475569 !important;
+                background: #f8fafc !important;
+            }
+
+            .gk-tool-cart:hover {
+                background: #6c5ce7 !important;
+                color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.35) !important;
+            }
+
+            .gk-cart-count-badge {
+                position: absolute !important;
+                top: -5px !important;
+                right: -5px !important;
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%) !important;
+                color: #ffffff !important;
+                font-size: 0.74rem !important;
+                font-weight: 900 !important;
+                min-width: 20px !important;
+                height: 20px !important;
+                border-radius: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: 0 2px 8px rgba(232, 67, 147, 0.5) !important;
+                border: 2px solid #ffffff !important;
+                padding: 0 4px !important;
+            }
+
+            /* آدمک حساب کاربری */
+            .gk-tool-user {
+                background: #f1f5f9 !important;
+                color: #1e293b !important;
+            }
+
+            .gk-tool-user:hover {
+                background: #e2e8f0 !important;
+                color: #0f172a !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+            }
+
+            /* دکمه خروج */
+            .gk-tool-logout {
+                background: #fff1f2 !important;
+                color: #e11d48 !important;
+                border-color: #ffe4e6 !important;
+            }
+
+            .gk-tool-logout:hover {
+                background: #e11d48 !important;
+                color: #ffffff !important;
+                border-color: #e11d48 !important;
+                transform: scale(1.08) !important;
+                box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35) !important;
+            }
+
+            /* دکمه ورود / ثبت‌نام برای مهمان */
+            .gk-tool-login {
+                width: auto !important;
+                padding: 0 18px !important;
+                height: 42px !important;
+                border-radius: 24px !important;
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                border: 1.5px solid #6c5ce7 !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3) !important;
+                gap: 8px !important;
+            }
+
+            .gk-tool-login:hover {
+                transform: translateY(-2px) scale(1.03) !important;
+                box-shadow: 0 6px 18px rgba(108, 92, 231, 0.45) !important;
+                color: #ffffff !important;
+            }
+
+            .gk-login-label {
+                font-size: 0.92rem !important;
+                font-weight: 800 !important;
+                white-space: nowrap !important;
+            }
+
+            /* دکمه منوی همبرگری موبایل */
+            .gk-mobile-toggle-btn {
+                display: none !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 42px !important;
+                height: 42px !important;
+                padding: 0 !important;
+                border-radius: 14px !important;
+                background: #f8fafc !important;
+                border: 1.5px solid #e2e8f0 !important;
+                cursor: pointer !important;
+                transition: all 0.25s ease !important;
+            }
+
+            .gk-mobile-toggle-btn:hover {
+                background: #f1f5f9 !important;
+                border-color: #cbd5e1 !important;
+            }
+
+            .gk-hamburger-icon {
+                width: 20px !important;
+                height: 14px !important;
+                position: relative !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+            }
+
+            .gk-hamburger-icon span {
+                display: block !important;
+                height: 2.2px !important;
+                width: 100% !important;
+                background-color: #1e293b !important;
+                border-radius: 2px !important;
+                transition: all 0.25s ease !important;
+            }
+
+            .gk-mobile-toggle-btn.is-open .gk-hamburger-icon span:nth-child(1) {
+                transform: translateY(6px) rotate(45deg) !important;
+            }
+            .gk-mobile-toggle-btn.is-open .gk-hamburger-icon span:nth-child(2) {
+                opacity: 0 !important;
+            }
+            .gk-mobile-toggle-btn.is-open .gk-hamburger-icon span:nth-child(3) {
+                transform: translateY(-6px) rotate(-45deg) !important;
+            }
+
+            /* منوی کشویی موبایل */
+            .gk-mobile-drawer {
+                display: none !important;
+                max-height: 0 !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
+                border-bottom: 2px solid #e2e8f0 !important;
+                box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12) !important;
+                transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+
+            .gk-mobile-drawer.is-open {
+                max-height: 550px !important;
+            }
+
+            .gk-mobile-drawer-inner {
+                padding: 16px 20px 24px !important;
+            }
+
+            .gk-mobile-nav-list {
+                list-style: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 6px !important;
+            }
+
+            .gk-mobile-nav-item {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .gk-mobile-nav-link {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 12px 18px !important;
+                border-radius: 16px !important;
+                font-size: 1.1rem !important;
+                font-weight: 700 !important;
+                color: #334155 !important;
+                text-decoration: none !important;
+                background: #f8fafc !important;
+                border: 1px solid #f1f5f9 !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .gk-mobile-nav-link:hover,
+            .gk-mobile-nav-item.active .gk-mobile-nav-link {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3) !important;
+            }
+
+            .gk-mobile-drawer-footer {
+                margin-top: 16px !important;
+                padding-top: 16px !important;
+                border-top: 1px solid #e2e8f0 !important;
+                display: flex !important;
+                justify-content: center !important;
+            }
+
+            .gk-mobile-phone-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                background: #f1f5f9 !important;
+                padding: 9px 20px !important;
+                border-radius: 22px !important;
+                color: #334155 !important;
+                font-weight: 800 !important;
+                font-size: 0.92rem !important;
+                text-decoration: none !important;
+                direction: ltr !important;
+            }
+
+            /* رسپانسیو در تبلت و موبایل */
+            @media (max-width: 980px) {
+                .gk-navbar-nav-col,
+                .gk-tool-btn-vip,
+                .gk-login-label {
+                    display: none !important;
+                }
+                .gk-mobile-toggle-btn {
+                    display: inline-flex !important;
+                }
+                .gk-mobile-drawer {
+                    display: block !important;
+                }
+                .gk-navbar-container {
+                    height: 66px !important;
+                    padding: 0 16px !important;
+                }
+                .gk-navbar-brand-title {
+                    font-size: 1.55rem !important;
+                }
+                .gk-navbar-logo {
+                    height: 42px !important;
+                }
+            }
+
+            /* استایل فوتر اختصاصی */
+            #footer,
+            .fusion-footer-copyright-area {
+                background-color: #1e1e38 !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+                padding: 25px 0 20px !important;
+            }
+            .fusion-copyright-content a[href*="theme-fusion"],
+            .fusion-copyright-content a[href*="wordpress.org"],
+            .fusion-copyright-content a[href*="themeforest"] {
+                display: none !important;
+            }
+
+            .gk-footer-content-box,
+            .gk-footer-copyright-text,
+            .fusion-copyright-notice,
+            .fusion-footer-widget-area,
+            .fusion-footer-widget-area .fusion-builder-row,
+            .fusion-footer-widget-area .fusion-builder-column,
+            .fusion-footer-widget-area .fusion-column-wrapper,
+            .fusion-footer-widget-area .fusion-text,
+            .fusion-footer-copyright-area,
+            .fusion-footer-copyright-area .fusion-copyright-content {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+                width: 100% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                float: none !important;
+            }
+            .gk-footer-copyright-text,
+            .fusion-copyright-notice {
+                text-align: center !important;
+                display: block !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+            }
+
+            /* آیکون شبکه‌های اجتماعی فوتر */
+            .gk-footer-social-row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 10px;
+            }
+            .gk-s-btn {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff !important;
+                text-decoration: none !important;
+                transition: all 0.25s ease;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            }
+            .gk-s-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+            .gk-s-telegram { background: linear-gradient(135deg, #229ED9 0%, #0088cc 100%); }
+            .gk-s-bale { background: linear-gradient(135deg, #0d9488 0%, #059669 100%); }
+            .gk-s-btn:hover { transform: translateY(-3px) scale(1.1); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28); }
+
+            /* حذف پیام‌های نامرتب آوادا */
+            .avada-myaccount-user,
+            .avada-myaccount-user-column,
+            .fusion-flyout-cart-wrapper,
+            .fusion-sliding-bar-toggle,
+            .fusion-alert.alert-info,
+            .fusion-alert.alert-custom {
+                display: none !important;
+            }
+
+            /* =========================================================
+               طراحی سوپرلوکس و کاملاً تب‌بندی شده فرم ورود و عضویت (Customer Login)
+               ========================================================= */
+            .woocommerce-account:not(.logged-in) .woocommerce {
+                max-width: 520px !important;
+                margin: 35px auto 60px !important;
+                padding: 0 15px !important;
+                direction: rtl !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            /* تب‌بار سوییچ بین ورود و عضویت */
+            .gk-auth-tabs-header {
+                display: flex !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                margin: 0 auto 30px auto !important;
+                max-width: 440px !important;
+                background: #f1f5f9 !important;
+                padding: 6px !important;
+                border-radius: 40px !important;
+                box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+            }
+
+            .gk-auth-tab-btn {
+                flex: 1 !important;
+                padding: 13px 20px !important;
+                border-radius: 30px !important;
+                font-size: 1.05rem !important;
+                font-weight: 800 !important;
+                color: #64748b !important;
+                background: transparent !important;
+                border: none !important;
+                cursor: pointer !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                text-align: center !important;
+            }
+
+            .gk-auth-tab-btn.active {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                box-shadow: 0 6px 18px rgba(108, 92, 231, 0.35) !important;
+            }
+
+            /* حذف قطعی تمامی کادرهای قرمز، خطوط و کادرهای نامرتب آوادا */
+            #customer_login {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                display: block !important;
+                width: 100% !important;
+            }
+
+            #customer_login .col-1,
+            #customer_login .col-2,
+            #customer_login .u-column1,
+            #customer_login .u-column2 {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+                box-shadow: none !important;
+                float: none !important;
+                width: 100% !important;
+                max-width: 480px !important;
+            }
+
+            #customer_login h2 {
+                display: none !important;
+                border: none !important;
+            }
+
+            /* استایل کارت‌های شکیل ورود و ثبت‌نام */
+            .woocommerce form.login,
+            .woocommerce form.register {
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+                border-radius: 28px !important;
+                box-shadow: 0 16px 40px rgba(15, 23, 42, 0.07) !important;
+                padding: 40px 32px !important;
+                margin: 0 auto !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+
+            /* نمایش انحصاری فرم فعال بر اساس تب انتخابی */
+            #customer_login.show-login .col-2,
+            #customer_login.show-login .u-column2,
+            #customer_login.show-login .u-columns .col-2 {
+                display: none !important;
+            }
+            #customer_login.show-login .col-1,
+            #customer_login.show-login .u-column1,
+            #customer_login.show-login .u-columns .col-1 {
+                display: block !important;
+                animation: gkAuthFade 0.3s ease forwards !important;
+            }
+
+            #customer_login.show-register .col-1,
+            #customer_login.show-register .u-column1,
+            #customer_login.show-register .u-columns .col-1 {
+                display: none !important;
+            }
+            #customer_login.show-register .col-2,
+            #customer_login.show-register .u-column2,
+            #customer_login.show-register .u-columns .col-2 {
+                display: block !important;
+                animation: gkAuthFade 0.3s ease forwards !important;
+            }
+
+            @keyframes gkAuthFade {
+                from { opacity: 0; transform: translateY(10px) scale(0.98); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+
+            /* اصلاح المان‌های داخل فرم ورود و عضویت */
+            .woocommerce-form-login__rememberme {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                font-size: 0.95rem !important;
+                font-weight: 700 !important;
+                color: #475569 !important;
+                margin: 15px 0 !important;
+                cursor: pointer !important;
+            }
+
+            .woocommerce-form-login__rememberme input[type="checkbox"] {
+                width: 18px !important;
+                height: 18px !important;
+                cursor: pointer !important;
+                accent-color: #6c5ce7 !important;
+                margin: 0 !important;
+            }
+
+            .woocommerce-LostPassword {
+                margin-top: 15px !important;
+                text-align: center !important;
+            }
+
+            .woocommerce-LostPassword a {
+                color: #6c5ce7 !important;
+                font-weight: 700 !important;
+                font-size: 0.92rem !important;
+                text-decoration: none !important;
+            }
+            .woocommerce-LostPassword a:hover {
+                text-decoration: underline !important;
+            }
+
+            .woocommerce-privacy-policy-text {
+                font-size: 0.88rem !important;
+                color: #64748b !important;
+                line-height: 1.8 !important;
+                margin: 15px 0 20px !important;
+            }
+
+            .woocommerce-privacy-policy-text a {
+                color: #6c5ce7 !important;
+                font-weight: 700 !important;
+            }
+
+            .woocommerce form.login .woocommerce-button,
+            .woocommerce form.register .woocommerce-button,
+            .woocommerce form.login button[type="submit"],
+            .woocommerce form.register button[type="submit"] {
+                width: 100% !important;
+                margin-top: 10px !important;
+            }
+
+            /* =========================================================
+               طراحی و چیدمان لوکس دو ستونه حساب کاربری من (My Account)
+               ========================================================= */
+            .woocommerce-account.logged-in .woocommerce {
+                display: flex !important;
+                flex-direction: row-reverse !important;
+                align-items: flex-start !important;
+                gap: 28px !important;
+                width: 100% !important;
+                max-width: 1160px !important;
+                margin: 35px auto 60px !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 15px !important;
+                box-sizing: border-box !important;
+                direction: rtl !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation {
+                width: 260px !important;
+                min-width: 260px !important;
+                max-width: 270px !important;
+                float: none !important;
+                margin: 0 !important;
+                padding: 18px 14px !important;
+                background: #ffffff !important;
+                border-radius: 24px !important;
+                border: 2px solid #e2e8f0 !important;
+                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+                box-sizing: border-box !important;
+                position: sticky !important;
+                top: 90px !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation ul {
+                list-style: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li {
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                float: none !important;
+                width: 100% !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li a {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                padding: 13px 18px !important;
+                border-radius: 14px !important;
+                font-size: 1rem !important;
+                font-weight: 800 !important;
+                color: #475569 !important;
+                background: #f8fafc !important;
+                border: 1.5px solid transparent !important;
+                transition: all 0.25s ease !important;
+                text-decoration: none !important;
+                gap: 10px !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--dashboard a::before { content: "🏠 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--orders a::before { content: "📦 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--downloads a::before { content: "📥 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--edit-address a::before { content: "📍 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--edit-account a::before { content: "👤 "; }
+            .woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout a::before { content: "🚪 "; }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li a:hover {
+                background: #ede9fe !important;
+                color: #6c5ce7 !important;
+                border-color: #c4b5fd !important;
+                transform: translateX(-4px) !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-navigation li.is-active a {
+                background: linear-gradient(135deg, #6c5ce7 0%, #8075ea 100%) !important;
+                color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 6px 18px rgba(108, 92, 231, 0.35) !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-content {
+                flex: 1 !important;
+                width: calc(100% - 290px) !important;
+                float: none !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                padding: 35px 35px !important;
+                border-radius: 24px !important;
+                border: 2px solid #e2e8f0 !important;
+                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+                box-sizing: border-box !important;
+                line-height: 1.9 !important;
+                color: #334155 !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-content > h2:first-child,
+            .woocommerce-account .woocommerce-MyAccount-content .title h2,
+            .woocommerce-account .woocommerce-MyAccount-content .title h3 {
+                font-size: 1.45rem !important;
+                font-weight: 900 !important;
+                color: #1e293b !important;
+                margin-top: 0 !important;
+                margin-bottom: 20px !important;
+                padding-bottom: 12px !important;
+                border-bottom: 2px solid #f1f5f9 !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-content p {
+                font-size: 1.02rem !important;
+                color: #475569 !important;
+                margin-bottom: 18px !important;
+            }
+
+            .woocommerce-account .woocommerce-MyAccount-content p a {
+                color: #6c5ce7 !important;
+                font-weight: 700 !important;
+                text-decoration: none !important;
+                transition: color 0.2s !important;
+            }
+            .woocommerce-account .woocommerce-MyAccount-content p a:hover {
+                color: #4f46e5 !important;
+                text-decoration: underline !important;
+            }
+
+            @media (max-width: 860px) {
+                .woocommerce-account.logged-in .woocommerce {
+                    flex-direction: column !important;
+                    gap: 20px !important;
+                }
+                .woocommerce-account .woocommerce-MyAccount-navigation {
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    max-width: 100% !important;
+                    position: static !important;
+                }
+                .woocommerce-account .woocommerce-MyAccount-content {
+                    width: 100% !important;
+                    padding: 25px 20px !important;
+                }
+            }
+
+            /* =========================================================
+               طراحی سوپرلوکس و کاملاً جذاب سبد خرید خالی (GhorbaniKids Empty Cart)
+               ========================================================= */
+            .woocommerce-cart .woocommerce {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 20px auto !important;
+            }
+
+            .gk-empty-cart-card {
+                background: #ffffff;
+                max-width: 650px;
+                margin: 40px auto 60px;
+                padding: 50px 30px;
+                border-radius: 30px;
+                border: 2px solid #edf2f7;
+                box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+                text-align: center;
+                direction: rtl;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                animation: gkFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @keyframes gkFadeIn {
+                from { opacity: 0; transform: translateY(15px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .gk-empty-cart-illustration {
+                margin-bottom: 20px;
+            }
+
+            .gk-empty-cart-icon-circle {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+                box-shadow: 0 8px 24px rgba(108, 92, 231, 0.15);
+                border: 3px solid #ffffff;
+            }
+
+            .gk-empty-cart-title {
+                font-size: 1.55rem;
+                font-weight: 900;
+                color: #1e293b;
+                margin: 0 0 12px 0 !important;
+                line-height: 1.5;
+            }
+
+            .gk-empty-cart-subtitle {
+                font-size: 1.05rem;
+                color: #64748b;
+                max-width: 480px;
+                line-height: 1.8;
+                margin: 0 0 30px 0 !important;
+            }
+
+            .gk-empty-cart-actions {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+            }
+
+            .gk-empty-cart-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 14px 32px;
+                border-radius: 30px;
+                font-size: 1.05rem;
+                font-weight: 800;
+                text-decoration: none !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+            }
+
+            .gk-empty-cart-btn-primary {
+                background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+                color: #ffffff !important;
+                box-shadow: 0 8px 22px rgba(108, 92, 231, 0.38);
+            }
+
+            .gk-empty-cart-btn-primary:hover {
+                transform: translateY(-3px) scale(1.03);
+                box-shadow: 0 12px 30px rgba(108, 92, 231, 0.5);
+                color: #ffffff !important;
+            }
+
+            .gk-empty-cart-btn-secondary {
+                background: #f8fafc;
+                color: #475569 !important;
+                border: 2px solid #e2e8f0;
+            }
+
+            .gk-empty-cart-btn-secondary:hover {
+                background: #f1f5f9;
+                color: #1e293b !important;
+                border-color: #cbd5e1;
+                transform: translateY(-2px);
+            }
+
+            /* حذف قطعی تمامی آیکون‌های اضافه و نامرتب ووکامرس و آوادا در صفحه سبد خرید */
+            .woocommerce-cart .wc-empty-cart-message,
+            .woocommerce-cart .woocommerce-notices-wrapper,
+            .woocommerce-cart p.return-to-shop,
+            .woocommerce-cart .wc-backward:before,
+            .woocommerce-cart .wc-backward:after,
+            .woocommerce-cart .return-to-shop:before,
+            .woocommerce-cart .return-to-shop:after,
+            .woocommerce-cart .cart-empty:before,
+            .woocommerce-cart .cart-empty:after,
+            .woocommerce-cart .woocommerce-info:before,
+            .woocommerce-cart .woocommerce-info:after {
+                display: none !important;
+                content: none !important;
+            }
+
+            /* استایل پیام‌های اعلان بالای سایت */
+            .woocommerce-message,
+            .woocommerce-info,
+            .woocommerce-error {
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+                border-radius: 18px !important;
+                padding: 16px 22px !important;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                flex-wrap: wrap !important;
+                gap: 15px !important;
+                color: #1e293b !important;
+                font-size: 1rem !important;
+                font-weight: 700 !important;
+                line-height: 1.8 !important;
+                margin: 20px 0 30px !important;
+            }
+            .woocommerce-message { border-left: 6px solid #10b981 !important; }
+            .woocommerce-info { border-left: 6px solid #3b82f6 !important; }
+            .woocommerce-error { border-left: 6px solid #ef4444 !important; }
+
+            .woocommerce-message .button,
+            .woocommerce-info .button {
+                background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%) !important;
+                color: #ffffff !important;
+                padding: 10px 22px !important;
+                border-radius: 20px !important;
+                font-size: 0.95rem !important;
+                font-weight: 800 !important;
+                border: none !important;
+                text-decoration: none !important;
+                box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3) !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                margin: 0 !important;
+                float: none !important;
+            }
+            .woocommerce-message .button:hover { transform: scale(1.05) !important; color: #ffffff !important; }
+
+            /* استایل بومی و شیک کمبوباکس‌ها و دراپ‌داون‌ها (بدون چشمک زدن) */
+            select.country_select,
+            select.state_select,
+            .woocommerce form select {
+                background-color: #f8fafc !important;
+                border: 2px solid #cbd5e1 !important;
+                color: #0f172a !important;
+                padding: 12px 16px !important;
+                border-radius: 12px !important;
+                font-size: 1rem !important;
+                font-weight: 600 !important;
+                width: 100% !important;
+                cursor: pointer !important;
+                display: block !important;
+                appearance: auto !important;
+                -webkit-appearance: auto !important;
+            }
+            select.country_select:focus,
+            select.state_select:focus,
+            .woocommerce form select:focus {
+                border-color: #6c5ce7 !important;
+                outline: none !important;
+                background-color: #ffffff !important;
+                box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.15) !important;
+            }
+
+            /* باکس اشتراک در داشبورد کاربر */
+            .gk-myaccount-sub-box { margin-bottom: 30px; }
+            .gk-sub-card {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 22px 24px;
+                border-radius: 18px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            }
+            .gk-sub-card.active { background: #f0fdf4; border: 2px solid #bbf7d0; }
+            .gk-sub-card.inactive { background: #fef2f2; border: 2px solid #fecaca; }
+            .gk-sub-icon { font-size: 2.8rem; }
+
+            /* استایل فرم‌های تسویه‌حساب */
+            .woocommerce form.checkout {
+                background: #ffffff !important;
+                padding: 35px 30px !important;
+                border-radius: 24px !important;
+                border: 2px solid #e2e8f0 !important;
+                box-shadow: 0 12px 35px rgba(0,0,0,0.06) !important;
+                color: #1e293b !important;
+                margin-top: 20px;
+                margin-bottom: 40px;
+            }
+
+            .woocommerce form .form-row label {
+                font-weight: 700 !important;
+                color: #334155 !important;
+                margin-bottom: 8px !important;
+                display: block !important;
+                font-size: 0.95rem !important;
+            }
+            .woocommerce form .form-row input.input-text,
+            .woocommerce form .form-row textarea {
+                background-color: #f8fafc !important;
+                border: 2px solid #cbd5e1 !important;
+                color: #0f172a !important;
+                padding: 12px 16px !important;
+                border-radius: 12px !important;
+                font-size: 1rem !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+                transition: all 0.2s ease !important;
+            }
+            .woocommerce form .form-row input.input-text:focus,
+            .woocommerce form .form-row textarea:focus {
+                background-color: #ffffff !important;
+                border-color: #6c5ce7 !important;
+                box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.15) !important;
+                outline: none !important;
+            }
+            .woocommerce-checkout-review-order-table {
+                border: 2px solid #f1f5f9 !important;
+                border-radius: 16px !important;
+                overflow: hidden !important;
+                margin-bottom: 25px !important;
+                width: 100% !important;
+            }
+            .woocommerce-checkout-review-order-table th,
+            .woocommerce-checkout-review-order-table td {
+                padding: 14px 18px !important;
+                color: #1e293b !important;
+                font-size: 1rem !important;
+            }
+            .woocommerce-checkout-review-order-table th { background: #f8fafc !important; font-weight: 800 !important; }
+            .woocommerce-checkout #payment {
+                background: #f8fafc !important;
+                border-radius: 18px !important;
+                border: 2px solid #e2e8f0 !important;
+                padding: 20px !important;
+            }
+            .woocommerce-checkout #payment ul.payment_methods {
+                padding: 0 !important;
+                list-style: none !important;
+                margin-bottom: 20px !important;
+            }
+            .woocommerce-checkout #payment ul.payment_methods li {
+                padding: 10px 0 !important;
+                color: #1e293b !important;
+                font-weight: 700 !important;
+            }
+            .woocommerce-checkout #payment div.payment_box {
+                background: #e0f2fe !important;
+                color: #0369a1 !important;
+                padding: 16px !important;
+                border-radius: 12px !important;
+                border: 1px solid #bae6fd !important;
+                line-height: 1.8 !important;
+                font-weight: normal !important;
+            }
+            .woocommerce-checkout #payment div.payment_box::before { display: none !important; }
+            .woocommerce #place_order,
+            .woocommerce button.button,
+            .woocommerce input.button.alt,
+            .woocommerce .button.wc-forward {
+                background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%) !important;
+                color: #ffffff !important;
+                padding: 14px 34px !important;
+                border-radius: 30px !important;
+                font-size: 1.15rem !important;
+                font-weight: 800 !important;
+                border: none !important;
+                cursor: pointer !important;
+                transition: transform 0.2s, box-shadow 0.2s !important;
+                box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3) !important;
+                display: inline-block !important;
+                text-align: center !important;
+            }
+            .woocommerce #place_order:hover,
+            .woocommerce button.button:hover,
+            .woocommerce .button.wc-forward:hover {
+                transform: scale(1.03) !important;
+                box-shadow: 0 12px 28px rgba(108, 92, 231, 0.45) !important;
+                color: #ffffff !important;
+            }
+
+            /* استایل بخش بازی‌ها و قفل بازی */
+            .gk-game-container {
+                max-width: 1000px;
+                margin: 20px auto 40px;
+                background: #ffffff;
+                border-radius: 24px;
+                box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+                overflow: hidden;
+                border: 2px solid #f0f3f8;
+            }
+            .gk-game-header {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 22px;
+                background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+                border-bottom: 2px solid #edf2f7;
+                gap: 12px;
+            }
+            .gk-game-badges { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+            .gk-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 0.84rem;
+                font-weight: bold;
+                text-decoration: none;
+            }
+            .gk-badge-age { background: #ffeaa7; color: #d63031; }
+            .gk-badge-cat { background: #e0f2fe; color: #0284c7; }
+            .gk-badge-vip { background: #fef08a; color: #854d0e; border: 1px solid #facc15; }
+            .gk-badge-free { background: #dcfce7; color: #166534; }
+
+            .gk-game-actions { display: flex; gap: 10px; }
+            .gk-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 8px 16px;
+                border-radius: 12px;
+                font-size: 0.9rem;
+                font-weight: bold;
+                cursor: pointer;
+                border: none;
+                transition: all 0.2s ease;
+                text-decoration: none;
+            }
+            .gk-btn-fullscreen { background: #6c5ce7; color: #fff !important; }
+            .gk-btn-fullscreen:hover { background: #5b4cc4; transform: translateY(-2px); }
+            .gk-btn-back { background: #edf2f7; color: #4a5568 !important; }
+
+            .gk-player-wrapper {
+                position: relative;
+                width: 100%;
+                background: #1a1a24;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .gk-player-wrapper.aspect-16-9 { aspect-ratio: 16 / 9; min-height: 480px; }
+            .gk-player-wrapper.aspect-4-3 { aspect-ratio: 4 / 3; min-height: 480px; }
+            .gk-player-wrapper.aspect-1-1 { aspect-ratio: 1 / 1; min-height: 400px; }
+            .gk-player-wrapper.aspect-fullscreen { min-height: 720px; }
+            .gk-game-iframe { width: 100%; height: 100%; border: none; display: block; }
+            .gk-game-footer { padding: 25px 30px; line-height: 1.9; color: #4a5568; }
+
+            .gk-locked-box {
+                padding: 60px 25px;
+                text-align: center;
+                background: linear-gradient(135deg, #1e1e38 0%, #2d1a4e 100%);
+                color: #fff;
+                min-height: 440px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            .gk-lock-icon { font-size: 4.5rem; margin-bottom: 15px; animation: float-lock 2.5s ease-in-out infinite alternate; }
+            @keyframes float-lock { to { transform: translateY(-10px) scale(1.05); } }
+            .gk-lock-title { font-size: 1.8rem; font-weight: 900; color: #ffe600; margin-bottom: 12px; }
+            .gk-lock-desc { font-size: 1.1rem; color: #e2e8f0; max-width: 520px; line-height: 1.8; margin-bottom: 25px; }
+            .gk-lock-buttons { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+            .gk-btn-subscribe {
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%);
+                color: #fff !important;
+                padding: 14px 34px;
+                border-radius: 30px;
+                font-size: 1.15rem;
+                font-weight: 800;
+                box-shadow: 0 8px 25px rgba(232, 67, 147, 0.4);
+                transition: transform 0.2s;
+            }
+            .gk-btn-subscribe:hover { transform: scale(1.06); }
+            .gk-btn-login {
+                background: rgba(255,255,255,0.15);
+                color: #fff !important;
+                border: 2px solid rgba(255,255,255,0.3);
+                padding: 14px 28px;
+                border-radius: 30px;
+                font-size: 1.05rem;
+                font-weight: 700;
+            }
+
+            /* جدول پلن‌های قیمت‌گذاری */
+            .gk-pricing-container { max-width: 1100px; margin: 30px auto 50px; padding: 0 15px; }
+            .gk-pricing-header { text-align: center; margin-bottom: 40px; }
+            .gk-pricing-header h2 { font-size: 2.2rem; font-weight: 900; color: #1e293b; margin-bottom: 10px; }
+            .gk-pricing-header p { font-size: 1.15rem; color: #64748b; }
+            .gk-pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+            .gk-pricing-card {
+                background: #ffffff;
+                border-radius: 24px;
+                padding: 30px 22px;
+                text-align: center;
+                border: 2px solid #e2e8f0;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+                transition: all 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                position: relative;
+            }
+            .gk-pricing-card:hover { transform: translateY(-8px); box-shadow: 0 18px 40px rgba(108, 92, 231, 0.18); }
+            .gk-pricing-card.featured { border-color: #6c5ce7; background: linear-gradient(180deg, #faf5ff 0%, #ffffff 100%); }
+            .gk-ribbon {
+                position: absolute;
+                top: -12px;
+                right: 20px;
+                background: #ff7675;
+                color: #fff;
+                font-size: 0.8rem;
+                font-weight: 800;
+                padding: 4px 14px;
+                border-radius: 12px;
+                box-shadow: 0 4px 10px rgba(255, 118, 117, 0.4);
+            }
+            .gk-plan-icon { font-size: 3.2rem; margin-bottom: 12px; }
+            .gk-plan-name { font-size: 1.35rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+            .gk-plan-duration { font-size: 0.9rem; color: #64748b; margin-bottom: 18px; }
+            .gk-plan-price { font-size: 2rem; font-weight: 900; color: #6c5ce7; margin-bottom: 20px; }
+            .gk-plan-price span { font-size: 0.95rem; font-weight: 600; color: #64748b; }
+            .gk-plan-features { list-style: none; padding: 0; margin: 0 0 25px; text-align: right; font-size: 0.95rem; color: #475569; line-height: 2.2; }
+            .gk-plan-features li::before { content: "✨ "; }
+            .gk-btn-buy {
+                display: block;
+                width: 100%;
+                padding: 12px;
+                background: #6c5ce7;
+                color: #fff !important;
+                border-radius: 16px;
+                font-weight: 800;
+                font-size: 1.05rem;
+                text-decoration: none;
+                transition: all 0.2s;
+            }
+            .gk-btn-buy:hover { background: #5b4cc4; box-shadow: 0 6px 18px rgba(108, 92, 231, 0.35); }
+            .gk-pricing-card.featured .gk-btn-buy { background: linear-gradient(135deg, #ff7675 0%, #e84393 100%); }
+            .gk-pricing-card.featured .gk-btn-buy:hover { box-shadow: 0 6px 18px rgba(232, 67, 147, 0.35); }
+
+            /* آرشیو بازی‌ها */
+            .gk-archive-header { text-align: center; margin: 20px 0 35px; }
+            .gk-archive-title { font-size: 2.2rem; color: #2d3748; margin-bottom: 10px; font-weight: 800; }
+            .gk-archive-desc { font-size: 1.1rem; color: #718096; }
+            .gk-filters-bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 35px; }
+            .gk-filter-btn {
+                padding: 8px 18px;
+                background: #fff;
+                border: 2px solid #e2e8f0;
+                border-radius: 25px;
+                font-size: 0.92rem;
+                font-weight: bold;
+                color: #4a5568;
+                cursor: pointer;
+                transition: all 0.25s ease;
+                text-decoration: none;
+            }
+            .gk-filter-btn:hover, .gk-filter-btn.active {
+                background: #6c5ce7;
+                border-color: #6c5ce7;
+                color: #fff !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+            }
+            .gk-games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 26px; margin: 20px 0 40px; }
+            .gk-game-card {
+                background: #ffffff;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+                transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+                border: 2px solid #edf2f7;
+                display: flex;
+                flex-direction: column;
+            }
+            .gk-game-card:hover { transform: translateY(-6px); box-shadow: 0 16px 35px rgba(108, 92, 231, 0.15); border-color: #c7d2fe; }
+            .gk-card-thumb { position: relative; width: 100%; aspect-ratio: 16 / 10; background: #f1f5f9; overflow: hidden; }
+            .gk-card-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+            .gk-game-card:hover .gk-card-thumb img { transform: scale(1.06); }
+            .gk-card-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+            .gk-card-title { font-size: 1.2rem; font-weight: 700; margin: 0 0 10px; color: #1e293b; }
+            .gk-card-title a { color: inherit; text-decoration: none; }
+            .gk-card-title a:hover { color: #6c5ce7; }
+            .gk-card-excerpt { font-size: 0.9rem; color: #64748b; line-height: 1.7; margin-bottom: 16px; flex-grow: 1; }
+            .gk-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid #f1f5f9; }
+            .gk-play-btn {
+                background: linear-gradient(135deg, #ff7675 0%, #e84393 100%);
+                color: #fff !important;
+                padding: 8px 18px;
+                border-radius: 12px;
+                font-weight: bold;
+                font-size: 0.92rem;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                transition: all 0.2s;
+            }
+            .gk-play-btn:hover { transform: scale(1.05); box-shadow: 0 6px 15px rgba(232, 67, 147, 0.35); }
+            .gk-default-thumb { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 3.2rem; color: #fff; }
+        
+        <?php

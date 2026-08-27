@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تعمیرگاه قطار کلمات - تمایز ت و ط</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+      background: linear-gradient(180deg, #b3e5fc 0%, #81d4fa 45%, #a5d6a7 45%, #66bb6a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow-x: hidden;
+      padding: 16px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      background: #ffffff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #0277bd;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border: 2px solid #81d4fa;
+    }
+
+    .hint-card {
+      background: #fff9c4;
+      border: 3px dashed #fbc02d;
+      border-radius: 16px;
+      padding: 8px 24px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #f57f17;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rail-track-container {
+      position: relative;
+      width: 100%;
+      max-width: 750px;
+      height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 10px 0 20px;
+    }
+
+    .train-composition {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      z-index: 2;
+      transition: transform 0.8s ease-in-out;
+    }
+
+    .locomotive {
+      width: 130px;
+      height: 120px;
+      background: #e53935;
+      border: 4px solid #b71c1c;
+      border-radius: 20px 45px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    .loco-window {
+      width: 40px;
+      height: 30px;
+      background: #e1f5fe;
+      border: 3px solid #0288d1;
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+
+    .chimney {
+      position: absolute;
+      top: -24px;
+      left: 20px;
+      width: 24px;
+      height: 24px;
+      background: #424242;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .smoke {
+      position: absolute;
+      top: -45px;
+      left: 15px;
+      font-size: 1.6rem;
+      opacity: 0;
+    }
+
+    .wagon {
+      width: 260px;
+      height: 125px;
+      background: #ffb300;
+      border: 4px solid #ff6f00;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .word-slot {
+      display: flex;
+      align-items: center;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #3e2723;
+      direction: rtl;
+      letter-spacing: 2px;
+    }
+
+    .broken-slot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 55px;
+      height: 55px;
+      border: 3px dashed #d84315;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 12px;
+      margin: 0 4px;
+      color: #d84315;
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { background: rgba(255, 255, 255, 0.7); }
+      50% { background: rgba(255, 204, 188, 0.9); }
+    }
+
+    .wheels-bar {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      position: absolute;
+      bottom: -18px;
+    }
+
+    .wheel {
+      width: 32px;
+      height: 32px;
+      background: #424242;
+      border: 4px solid #212121;
+      border-radius: 50%;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    }
+
+    .railroad {
+      position: absolute;
+      bottom: 25px;
+      width: 100%;
+      height: 14px;
+      background: #795548;
+      border-top: 3px solid #3e2723;
+      border-bottom: 3px solid #3e2723;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .toolbox {
+      display: flex;
+      gap: 30px;
+      background: #ffffff;
+      padding: 16px 36px;
+      border-radius: 30px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      border: 3px solid #b0bec5;
+      margin-bottom: 20px;
+      z-index: 5;
+    }
+
+    .wrench-btn {
+      width: 120px;
+      height: 90px;
+      background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
+      border: 3px solid #78909c;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2px;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 6px 0 #90a4ae, 0 8px 15px rgba(0,0,0,0.15);
+    }
+
+    .wrench-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 0 #90a4ae, 0 12px 20px rgba(0,0,0,0.2);
+    }
+
+    .wrench-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #90a4ae;
+    }
+
+    .wrench-icon {
+      font-size: 1.4rem;
+    }
+
+    .wrench-letter {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #1565c0;
+    }
+
+    .train-depart {
+      transform: translateX(-1200px) !important;
+      transition: transform 1.2s ease-in !important;
+    }
+
+    .train-enter {
+      transform: translateX(1200px);
+      transition: none;
+    }
+
+    .shake-wagon {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-15px); }
+      40% { transform: translateX(15px); }
+      60% { transform: translateX(-10px); }
+      80% { transform: translateX(10px); }
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      70% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">⭐ واگن‌های تعمیرشده: <span id="score-val">۰</span></div>
+    <div class="badge">🔧 وضعیت: <span id="status-val">نیازمند تعمیر</span></div>
+  </header>
+
+  <div class="hint-card" id="hint-card">
+    <span>💡 راهنما:</span>
+    <span id="word-definition">وسیله نقلیه روی ریل</span>
+  </div>
+
+  <div class="rail-track-container">
+    <div class="train-composition" id="train-comp">
+      
+      <div class="locomotive">
+        <div class="chimney"></div>
+        <div class="smoke" id="smoke-icon">💨</div>
+        <div class="loco-window"></div>
+        <span style="font-size: 1.8rem;">🚂</span>
+        <div class="wheels-bar">
+          <div class="wheel"></div>
+          <div class="wheel"></div>
+        </div>
+      </div>
+
+      <div class="wagon" id="main-wagon">
+        <div class="word-slot" id="word-container"></div>
+        <div class="wheels-bar">
+          <div class="wheel"></div>
+          <div class="wheel"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="railroad"></div>
+  </div>
+
+  <div class="toolbox">
+    <button class="wrench-btn" onclick="repairWagon('ت')">
+      <span class="wrench-icon">🔧 آچار</span>
+      <span class="wrench-letter">تـ / ت</span>
+    </button>
+
+    <button class="wrench-btn" onclick="repairWagon('ط')">
+      <span class="wrench-icon">🔧 آچار</span>
+      <span class="wrench-letter">ط</span>
+    </button>
+  </div>
+
+  <script>
+    // GhorbaniKids Score Submission Protocol
+    function gkSendScore(finalScore) {
+        try {
+            var sc = parseInt(finalScore) || 0;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'GK_SUBMIT_SCORE',
+                    score: sc
+                }, '*');
+            }
+        } catch(e) { console.error('GK postMessage error:', e); }
+    }
+    
+    const WORDS_DATABASE = [
+      { prefix: 'قـ', correct: 'ط', suffix: 'ار', full: 'قطار', hint: 'وسیله نقلیه روی ریل' },
+      { prefix: '', correct: 'ط', suffix: 'وطی', full: 'طوطی', hint: 'پرنده‌ای زیبا و سخنگو' },
+      { prefix: '', correct: 'ت', suffix: 'وت', full: 'توت', hint: 'میوه‌ای شیرین و بهاری' },
+      { prefix: 'خیا', correct: 'ط', suffix: '', full: 'خیاط', hint: 'شخصی که لباس می‌دوزد' },
+      { prefix: 'دسـ', correct: 'ت', suffix: '', full: 'دست', hint: 'بخشی از بدن برای گرفتن اشیاء' },
+      { prefix: '', correct: 'ط', suffix: 'ناب', full: 'طناب', hint: 'وسیله‌ای محکم برای بستن وسایل' },
+      { prefix: '', correct: 'ت', suffix: 'اب', full: 'تاب', hint: 'وسیله بازی در پارک' },
+      { prefix: 'ساعـ', correct: 'ت', suffix: '', full: 'ساعت', hint: 'وسیله نشان‌دهنده زمان' },
+      { prefix: 'خـ', correct: 'ط', suffix: '', full: 'خط', hint: 'علامتی صاف روی دفتر با مداد' },
+      { prefix: 'داسـ', correct: 'ت', suffix: 'ان', full: 'داستان', hint: 'قصه‌ای جذاب در کتاب' },
+      { prefix: '', correct: 'ت', suffix: 'خته', full: 'تخته', hint: 'صفحه‌ای که در کلاس روی آن می‌نویسیم' },
+      { prefix: '', correct: 'ت', suffix: 'وپ', full: 'توپ', hint: 'وسیله‌ای گرد برای بازی' },
+      { prefix: 'دوسـ', correct: 'ت', suffix: '', full: 'دوست', hint: 'کسی که او را دوست داریم و با او بازی می‌کنیم' },
+      { prefix: 'راسـ', correct: 'ت', suffix: '', full: 'راست', hint: 'جهت مخالف چپ' },
+      { prefix: '', correct: 'ت', suffix: 'ب', full: 'تب', hint: 'وقتی مریض می‌شویم بدنمان داغ می‌شود' },
+      { prefix: 'حیا', correct: 'ط', suffix: '', full: 'حیاط', hint: 'فضای باز جلوی خانه یا مدرسه' },
+      { prefix: 'بلو', correct: 'ط', suffix: '', full: 'بلوط', hint: 'میوه کوچک درخت جنگلی که سنجاب دوست دارد' },
+      { prefix: '', correct: 'ط', suffix: 'بل', full: 'طبل', hint: 'وسیله موسیقی که با کوبیدن صدا می‌دهد' },
+      { prefix: '', correct: 'ط', suffix: 'اووس', full: 'طاووس', hint: 'پرنده‌ای زیبا با دم رنگارنگ' },
+      { prefix: '', correct: 'ط', suffix: 'وفان', full: 'طوفان', hint: 'باد خیلی شدید و قوی' },
+      { prefix: 'خا', correct: 'ط', suffix: 'ره', full: 'خاطره', hint: 'چیزی از گذشته که در ذهنمان می‌ماند' },
+      { prefix: '', correct: 'ط', suffix: 'ولانی', full: 'طولانی', hint: 'خیلی دراز؛ مخالف کوتاه' },
+      { prefix: 'و', correct: 'ط', suffix: 'ن', full: 'وطن', hint: 'جایی که در آن به دنیا آمده‌ایم و زندگی می‌کنیم' },
+      { prefix: '', correct: 'ط', suffix: 'لا', full: 'طلا', hint: 'فلزی زرد و گران‌بها برای ساخت زیورآلات' },
+      { prefix: '', correct: 'ط', suffix: 'بیعت', full: 'طبیعت', hint: 'درخت‌ها، گل‌ها، کوه‌ها و رودخانه‌ها' },
+      { prefix: '', correct: 'ت', suffix: 'شت', full: 'تشت', hint: 'ظرف بزرگ برای شستن لباس یا استحمام' },
+      { prefix: '', correct: 'ت', suffix: 'یر', full: 'تیر', hint: 'چوبی بلند و صاف؛ یا وسیله‌ای که کمانگیر پرتاب می‌کند' },
+      { prefix: '', correct: 'ت', suffix: 'ن', full: 'تن', hint: 'بدن انسان یا حیوان' },
+      { prefix: '', correct: 'ت', suffix: 'خم', full: 'تخم', hint: 'از آن جوجه بیرون می‌آید' },
+      { prefix: '', correct: 'ت', suffix: 'شک', full: 'تشک', hint: 'روی آن می‌خوابیم، نرم است' },
+      { prefix: '', correct: 'ت', suffix: 'اج', full: 'تاج', hint: 'پادشاه روی سر خود می‌گذارد' },
+      { prefix: 'کـ', correct: 'ت', suffix: 'اب', full: 'کتاب', hint: 'آن را می‌خوانیم، پر از داستان و عکس است' },
+      { prefix: 'کـ', correct: 'ت', suffix: 'ری', full: 'کتری', hint: 'آب را در آن جوش می‌آوریم' },
+      { prefix: 'رخـ', correct: 'ت', suffix: '', full: 'رخت', hint: 'لباس‌هایی که می‌پوشیم' },
+      { prefix: 'سو', correct: 'ت', suffix: '', full: 'سوت', hint: 'وسیله‌ای که با فوت‌کردن صدا می‌دهد' },
+      { prefix: 'پوسـ', correct: 'ت', suffix: '', full: 'پوست', hint: 'روی بدن ما یا میوه را می‌پوشاند' },
+      { prefix: 'انگشـ', correct: 'ت', suffix: '', full: 'انگشت', hint: 'در دست ما پنج‌تا از آن داریم' },
+      { prefix: '', correct: 'ت', suffix: 'شنه', full: 'تشنه', hint: 'وقتی آب می‌خواهیم این‌طور می‌شویم' },
+      { prefix: '', correct: 'ت', suffix: 'ند', full: 'تند', hint: 'خیلی سریع؛ مخالف آهسته' },
+      { prefix: '', correct: 'ت', suffix: 'اریک', full: 'تاریک', hint: 'جایی که نور نیست؛ مخالف روشن' },
+      { prefix: '', correct: 'ت', suffix: 'په', full: 'تپه', hint: 'زمین بلند و کوچک؛ کوچک‌تر از کوه' },
+      { prefix: '', correct: 'ت', suffix: 'ولد', full: 'تولد', hint: 'روزی که به دنیا آمده‌ایم و جشن می‌گیریم' },
+      { prefix: '', correct: 'ت', suffix: 'لفن', full: 'تلفن', hint: 'با آن با دیگران صحبت می‌کنیم' },
+      { prefix: '', correct: 'ت', suffix: 'مساح', full: 'تمساح', hint: 'حیوانی بزرگ با دندان‌های تیز که در آب زندگی می‌کند' },
+      { prefix: 'آ', correct: 'ت', suffix: 'ش', full: 'آتش', hint: 'گرم و روشن است و می‌سوزاند' },
+      { prefix: '', correct: 'ط', suffix: 'اق', full: 'طاق', hint: 'سازه‌ای خمیده بالای در یا پنجره' },
+      { prefix: 'خـ', correct: 'ط', suffix: 'ا', full: 'خطا', hint: 'کاری اشتباه' },
+      { prefix: 'خـ', correct: 'ط', suffix: 'ر', full: 'خطر', hint: 'چیزی که ممکن است آسیب برساند' },
+      { prefix: 'نقـ', correct: 'ط', suffix: 'ه', full: 'نقطه', hint: 'علامت کوچک گرد؛ پایان جمله را نشان می‌دهد' },
+      { prefix: 'خـ', correct: 'ط', suffix: '‌کش', full: 'خط‌کش', hint: 'با آن خط صاف می‌کشیم' },
+      { prefix: 'خـ', correct: 'ط', suffix: 'اط', full: 'خطاط', hint: 'کسی که خط زیبا می‌نویسد' },
+      { prefix: '', correct: 'ط', suffix: 'اقچه', full: 'طاقچه', hint: 'جای کوچک در دیوار برای گذاشتن وسایل' },
+      { prefix: '', correct: 'ط', suffix: 'بقه', full: 'طبقه', hint: 'هر بخش از ساختمان که روی هم قرار دارد' },
+      { prefix: '', correct: 'ط', suffix: 'رح', full: 'طرح', hint: 'نقشه یا شکلی که می‌کشیم' },
+      { prefix: '', correct: 'ط', suffix: 'لوع', full: 'طلوع', hint: 'وقتی خورشید صبح از افق بالا می‌آید' },
+      { prefix: 'خـ', correct: 'ط', suffix: '‌خطی', full: 'خط‌خطی', hint: 'وقتی با مداد روی کاغذ بی‌نظم خط می‌کشیم' },
+      { prefix: '', correct: 'ط', suffix: 'البی', full: 'طالبی', hint: 'میوه‌ای شیرین و زرد رنگ تابستانی' },
+      { prefix: '', correct: 'ط', suffix: 'وفانی', full: 'طوفانی', hint: 'هوایی که در آن طوفان است' },
+      { prefix: 'بلیـ', correct: 'ط', suffix: '', full: 'بلیط', hint: 'برگه‌ای که برای سوار شدن به اتوبوس یا قطار می‌خریم' },
+      { prefix: 'مـ', correct: 'ط', suffix: 'ب', full: 'مطب', hint: 'جایی که دکتر بیماران را می‌بیند' },
+      { prefix: '', correct: 'ط', suffix: 'بیعی', full: 'طبیعی', hint: 'چیزی که ساخته دست انسان نیست' },
+      { prefix: '', correct: 'ط', suffix: 'لسم', full: 'طلسم', hint: 'جادویی که در قصه‌ها اتفاق می‌افتد' },
+      { prefix: 'خیا', correct: 'ط', suffix: 'ی', full: 'خیاطی', hint: 'کاری که خیاط انجام می‌دهد؛ دوختن لباس' },
+      { prefix: 'قـ', correct: 'ط', suffix: 'عه', full: 'قطعه', hint: 'یک تکه یا بخش از چیزی' },
+      { prefix: 'قـ', correct: 'ط', suffix: 'ره', full: 'قطره', hint: 'یک چکه کوچک آب' }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let isProcessing = false;
+
+    // درهم‌ریختن آرایه به روش Fisher-Yates
+    function shuffleArray(source) {
+      const arr = [...source];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // اطمینان از اینکه دو کلمه پشت‌سرهم جواب یکسان (هر دو ت یا هر دو ط) نداشته باشند
+    function fixConsecutiveDuplicates(arr) {
+      for (let i = 1; i < arr.length; i++) {
+        if (arr[i].correct === arr[i - 1].correct) {
+          for (let j = i + 1; j < arr.length; j++) {
+            if (arr[j].correct !== arr[i - 1].correct) {
+              [arr[i], arr[j]] = [arr[j], arr[i]];
+              break;
+            }
+          }
+        }
+      }
+      return arr;
+    }
+
+    function buildNewOrder(avoidStartingWith) {
+      let order = fixConsecutiveDuplicates(shuffleArray(WORDS_DATABASE));
+      // اطمینان از عدم تکرار در مرز بین دو دور بازی
+      if (avoidStartingWith && order[0].correct === avoidStartingWith) {
+        for (let j = 1; j < order.length; j++) {
+          if (order[j].correct !== avoidStartingWith) {
+            [order[0], order[j]] = [order[j], order[0]];
+            break;
+          }
+        }
+      }
+      return order;
+    }
+
+    let playOrder = buildNewOrder(null);
+
+    const wordContainer = document.getElementById('word-container');
+    const wordDefEl = document.getElementById('word-definition');
+    const scoreVal = document.getElementById('score-val');
+    const statusVal = document.getElementById('status-val');
+    const trainComp = document.getElementById('train-comp');
+    const mainWagon = document.getElementById('main-wagon');
+    const smokeIcon = document.getElementById('smoke-icon');
+
+    let audioCtx = null;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'wrench') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.setValueAtTime(300, now + 0.05);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'whistle') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now);
+        osc.frequency.setValueAtTime(880, now + 0.2);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      }
+    }
+
+    function toPersianDigits(num) {
+      const digits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return num.toString().replace(/\d/g, d => digits[d]);
+    }
+
+    function renderCurrentWord() {
+      const item = playOrder[currentIndex];
+      wordDefEl.textContent = item.hint;
+      
+      wordContainer.innerHTML = `
+        <span>${item.prefix}</span>
+        <span class="broken-slot">؟</span>
+        <span>${item.suffix}</span>
+      `;
+
+      statusVal.textContent = 'نیازمند تعمیر';
+      statusVal.style.color = '#d84315';
+    }
+
+    function repairWagon(selectedLetter) {
+      if (isProcessing) return;
+      ensureAudio();
+
+      const currentItem = playOrder[currentIndex];
+
+      if (selectedLetter === currentItem.correct) {
+        isProcessing = true;
+        playSound('wrench');
+        score += 10;
+        try { gkSendScore(score); } catch(e){}
+        scoreVal.textContent = toPersianDigits(score);
+
+        wordContainer.innerHTML = `
+          <span style="color: #2e7d32; animation: popIn 0.3s ease;">${currentItem.full}</span>
+        `;
+
+        statusVal.textContent = 'تعمیر شد! حرکت 🚂';
+        statusVal.style.color = '#2e7d32';
+
+        setTimeout(() => {
+          playSound('whistle');
+          smokeIcon.style.opacity = '1';
+          trainComp.classList.add('train-depart');
+        }, 400);
+
+        setTimeout(() => {
+          smokeIcon.style.opacity = '0';
+          trainComp.classList.remove('train-depart');
+          trainComp.classList.add('train-enter');
+
+          currentIndex += 1;
+          if (currentIndex >= playOrder.length) {
+            const lastCorrect = playOrder[playOrder.length - 1].correct;
+            playOrder = buildNewOrder(lastCorrect);
+            currentIndex = 0;
+          }
+          renderCurrentWord();
+
+          setTimeout(() => {
+            trainComp.style.transition = 'transform 0.8s ease-out';
+            trainComp.classList.remove('train-enter');
+            isProcessing = false;
+          }, 50);
+
+        }, 1600);
+
+      } else {
+        playSound('wrong');
+        mainWagon.classList.add('shake-wagon');
+        statusVal.textContent = 'آچار اشتباه بود!';
+        statusVal.style.color = '#c62828';
+
+        setTimeout(() => {
+          mainWagon.classList.remove('shake-wagon');
+        }, 400);
+
+        setTimeout(() => {
+          if (!isProcessing) {
+            statusVal.textContent = 'نیازمند تعمیر';
+            statusVal.style.color = '#d84315';
+          }
+        }, 1200);
+      }
+    }
+
+    renderCurrentWord();
+  </script>
+</body>
+</html>

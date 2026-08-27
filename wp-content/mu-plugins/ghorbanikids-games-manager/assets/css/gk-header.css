@@ -1,0 +1,806 @@
+/* =========================================================
+   GhorbaniKids Ultra-Luxury Fluid & Adaptive Header (100% Isolated)
+   Zero Overflow on any 13-inch, 14-inch, 15-inch laptop & monitor & mobile
+   ========================================================= */
+
+#gkTopNavbar, 
+#gkTopNavbar *,
+.gk-mobile-drawer,
+.gk-mobile-drawer * {
+    box-sizing: border-box !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+
+.gk-top-navbar {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    z-index: 99990 !important;
+    background: linear-gradient(135deg, rgba(224, 242, 254, 0.96) 0%, rgba(240, 249, 255, 0.97) 55%, rgba(254, 249, 195, 0.75) 100%) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-bottom: 2px solid rgba(186, 230, 253, 0.85) !important;
+    box-shadow: 0 6px 25px -5px rgba(2, 132, 199, 0.12) !important;
+    direction: rtl !important;
+    font-family: 'IRANSansXFaNum', 'IRANSansX', 'Vazirmatn', Tahoma, sans-serif !important;
+    transition: all 0.25s ease !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+}
+
+.gk-navbar-inner {
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 1360px !important;
+    margin: 0 auto !important;
+    padding: 8px 20px !important;
+    height: 72px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+    box-sizing: border-box !important;
+}
+
+/* =========================================================
+   1. Brand & Logo Area
+   ========================================================= */
+.gk-nav-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    text-decoration: none !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-nav-logo {
+    width: auto !important;
+    height: 48px !important;
+    max-height: 52px !important;
+    border-radius: 0 !important;
+    object-fit: contain !important;
+    box-shadow: none !important;
+    border: none !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-nav-brand:hover .gk-nav-logo {
+    transform: scale(1.05) !important;
+    border: none !important;
+}
+
+.gk-nav-brand-title {
+    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+    font-size: 1.65rem !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    line-height: 1.1 !important;
+    display: block !important;
+    white-space: nowrap !important;
+}
+
+.gk-nav-brand-subtitle {
+    font-size: 0.76rem !important;
+    font-weight: 800 !important;
+    color: #0284c7 !important;
+    display: block !important;
+    margin-top: 2px !important;
+    white-space: nowrap !important;
+}
+
+/* =========================================================
+   2. Desktop Navigation Menu
+   ========================================================= */
+.gk-nav-main-menu {
+    overflow: visible !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+}
+
+.gk-nav-main-menu ul,
+.gk-nav-main-menu ol,
+.gk-nav-main-menu li,
+.gk-top-navbar ul,
+.gk-top-navbar ol,
+.gk-top-navbar li {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.gk-nav-main-menu li::before,
+.gk-nav-main-menu li::after,
+.gk-top-navbar li::before,
+.gk-top-navbar li::after {
+    display: none !important;
+    content: none !important;
+}
+
+.gk-nav-main-menu ul.gk-nav-links,
+.gk-nav-main-menu > ul {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+    background: #f8fafc !important;
+    padding: 5px 8px !important;
+    border-radius: 20px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    flex-wrap: nowrap !important;
+}
+
+.gk-nav-main-menu ul.gk-nav-links > li,
+.gk-nav-main-menu > ul > li {
+    display: inline-flex !important;
+    align-items: center !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-nav-main-menu ul.gk-nav-links > li > a,
+.gk-nav-main-menu > ul > li > a {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    padding: 8px 13px !important;
+    border-radius: 14px !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    color: #475569 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Arrow indicator for parent items */
+.gk-nav-main-menu li.menu-item-has-children > a::after,
+.gk-nav-links li.menu-item-has-children > a::after {
+    content: "" !important;
+    display: inline-block !important;
+    width: 5px !important;
+    height: 5px !important;
+    border-right: 2px solid #64748b !important;
+    border-bottom: 2px solid #64748b !important;
+    transform: rotate(45deg) translateY(-2px) !important;
+    margin-right: 3px !important;
+    transition: transform 0.25s ease, border-color 0.25s ease !important;
+}
+
+.gk-nav-main-menu li.menu-item-has-children:hover > a::after,
+.gk-nav-links li.menu-item-has-children:hover > a::after {
+    transform: rotate(-135deg) translateY(-2px) !important;
+    border-color: #0284c7 !important;
+}
+
+.gk-nav-main-menu ul.gk-nav-links > li > a:hover,
+.gk-nav-main-menu > ul > li > a:hover {
+    color: #0284c7 !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12) !important;
+    transform: translateY(-1px) !important;
+}
+
+.gk-nav-main-menu li.current-menu-item > a,
+.gk-nav-main-menu li.current-menu-parent > a {
+    color: #0284c7 !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.16) !important;
+    font-weight: 900 !important;
+}
+
+/* =========================================================
+   Luxury Floating Submenus with Invisible Hover Bridge
+   ========================================================= */
+.gk-nav-main-menu li.menu-item-has-children {
+    position: relative !important;
+}
+
+.gk-nav-main-menu ul.sub-menu,
+.gk-nav-links ul.sub-menu,
+.gk-top-navbar .sub-menu {
+    display: block !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(10px) !important;
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    min-width: 235px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 22px !important;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.02) !important;
+    padding: 10px !important;
+    margin: 8px 0 0 0 !important;
+    z-index: 999999 !important;
+    list-style: none !important;
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s ease !important;
+}
+
+.gk-nav-main-menu ul.sub-menu::before,
+.gk-nav-links ul.sub-menu::before,
+.gk-top-navbar .sub-menu::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -16px !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 18px !important;
+    background: transparent !important;
+    display: block !important;
+}
+
+.gk-nav-main-menu li:hover > ul.sub-menu,
+.gk-nav-links li:hover > ul.sub-menu,
+.gk-top-navbar li:hover > .sub-menu,
+.gk-nav-main-menu li:focus-within > ul.sub-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li,
+.gk-top-navbar .sub-menu li {
+    display: block !important;
+    margin: 0 0 4px 0 !important;
+    list-style: none !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li:last-child,
+.gk-top-navbar .sub-menu li:last-child {
+    margin-bottom: 0 !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li a,
+.gk-top-navbar .sub-menu li a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    padding: 11px 16px !important;
+    border-radius: 14px !important;
+    font-size: 0.94rem !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    white-space: nowrap !important;
+    border: 1px solid transparent !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li a::before,
+.gk-top-navbar .sub-menu li a::before {
+    content: "" !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #cbd5e1 !important;
+    display: inline-block !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li a:hover,
+.gk-top-navbar .sub-menu li a:hover,
+.gk-nav-main-menu ul.sub-menu li.current-menu-item a {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+    color: #0284c7 !important;
+    border-color: #bae6fd !important;
+    transform: translateX(-4px) !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08) !important;
+}
+
+.gk-nav-main-menu ul.sub-menu li a:hover::before,
+.gk-top-navbar .sub-menu li a:hover::before {
+    background: #0284c7 !important;
+    transform: scale(1.4) !important;
+}
+
+/* =========================================================
+   3. User Action Buttons
+   ========================================================= */
+.gk-nav-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-action-icon-btn {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1.5px solid rgba(186, 230, 253, 0.9) !important;
+    color: #0284c7 !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08) !important;
+}
+
+.gk-action-icon-btn:hover {
+    background: #ffffff !important;
+    border-color: #0284c7 !important;
+    color: #0369a1 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.2) !important;
+}
+
+.gk-cart-badge {
+    position: absolute !important;
+    top: -5px !important;
+    left: -5px !important;
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    font-size: 0.7rem !important;
+    font-weight: 900 !important;
+    width: 19px !important;
+    height: 19px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4) !important;
+}
+
+.gk-nav-btn-login {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    padding: 10px 18px !important;
+    border-radius: 16px !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.gk-nav-btn-login:hover {
+    transform: translateY(-2px) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4) !important;
+}
+
+.gk-mobile-toggle-btn {
+    display: none !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 14px !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    color: #334155 !important;
+    cursor: pointer !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+/* =========================================================
+   4. Laptop & Medium Desktop Screen Adaptations (1024px - 1400px)
+   ========================================================= */
+@media (min-width: 1024px) and (max-width: 1400px) {
+    .gk-navbar-inner {
+    overflow: visible !important;
+        padding: 8px 14px !important;
+        gap: 10px !important;
+    }
+
+    .gk-nav-brand-subtitle {
+        display: none !important;
+    }
+
+    .gk-nav-brand-title {
+        font-size: 1.45rem !important;
+    }
+
+    .gk-nav-logo { width: auto !important; height: 42px !important; max-height: 46px !important; border: none !important; box-shadow: none !important; }
+
+    .gk-nav-main-menu ul.gk-nav-links > li > a,
+    .gk-nav-main-menu > ul > li > a {
+        padding: 7px 10px !important;
+        font-size: 0.86rem !important;
+        gap: 4px !important;
+    }
+
+    .gk-nav-btn-login {
+        padding: 8px 14px !important;
+        font-size: 0.88rem !important;
+    }
+
+    .gk-action-icon-btn {
+        width: 38px !important;
+        height: 38px !important;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1200px) {
+    .gk-nav-main-menu ul.gk-nav-links > li > a,
+    .gk-nav-main-menu > ul > li > a {
+        padding: 6px 8px !important;
+        font-size: 0.82rem !important;
+    }
+}
+
+/* =========================================================
+   5. Mobile Zero-Overflow Rules (< 1024px) (Rule 9)
+   ========================================================= */
+@media (min-width: 1024px) {
+    .gk-mobile-drawer,
+    .gk-mobile-drawer-overlay,
+    #gkMobileDrawer,
+    #gkMobileDrawerOverlay,
+    .gk-mobile-toggle-btn {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+}
+
+@media (max-width: 1023px) {
+    html, body {
+        overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+        max-width: 100vw !important;
+    }
+
+    .gk-top-navbar {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    }
+
+    .gk-nav-main-menu {
+    overflow: visible !important; 
+        display: none !important; 
+    }
+    
+    .gk-mobile-toggle-btn { 
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 12px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 1.5px solid rgba(186, 230, 253, 0.9) !important;
+        color: #0284c7 !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08) !important;
+        flex-shrink: 0 !important;
+    }
+
+    .gk-navbar-inner {
+    overflow: visible !important; 
+        padding: 6px 12px !important; 
+        height: 56px !important; 
+        max-height: 56px !important;
+        gap: 8px !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+        justify-content: space-between !important;
+    }
+    
+    .gk-nav-brand {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0 !important;
+        flex-shrink: 0 !important;
+        max-width: 50% !important;
+    }
+
+    .gk-nav-brand-subtitle,
+    .gk-nav-brand-title,
+    .gk-nav-brand div { 
+        display: none !important; 
+    }
+    
+    .gk-nav-logo { 
+        width: auto !important; 
+        height: 34px !important; 
+        max-height: 36px !important; 
+        max-width: 125px !important;
+        border-radius: 0 !important; 
+        border: none !important; 
+        box-shadow: none !important;
+        object-fit: contain !important;
+        flex-shrink: 0 !important;
+    }
+
+    .gk-nav-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .gk-action-icon-btn {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 12px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .gk-nav-btn-login {
+        padding: 6px 10px !important;
+        font-size: 0.8rem !important;
+        border-radius: 12px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Overlay */
+    .gk-mobile-drawer-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(15, 23, 42, 0.6) !important;
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        z-index: 9999998 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .gk-mobile-drawer-overlay.is-open {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    /* Mobile Drawer */
+    .gk-mobile-drawer {
+        position: fixed !important;
+        top: 0 !important;
+        right: -320px !important;
+        width: 290px !important;
+        height: 100% !important;
+        background: radial-gradient(circle at 10% 15%, rgba(224, 242, 254, 0.85) 0%, transparent 45%),
+                    radial-gradient(circle at 90% 85%, rgba(254, 240, 138, 0.6) 0%, transparent 45%),
+                    #ffffff !important;
+        border-left: 2.5px solid rgba(186, 230, 253, 0.9) !important;
+        box-shadow: -10px 0 40px rgba(2, 132, 199, 0.25) !important;
+        z-index: 9999999 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        transition: right 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        direction: rtl !important;
+        font-family: 'IRANSansXFaNum', 'IRANSansX', 'Vazirmatn', Tahoma, sans-serif !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .gk-mobile-drawer.is-open {
+        right: 0 !important;
+    }
+
+    .gk-drawer-header {
+        background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%) !important;
+        padding: 16px 14px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 16px rgba(2, 132, 199, 0.22) !important;
+    }
+
+    .gk-drawer-brand {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        text-decoration: none !important;
+    }
+
+    .gk-drawer-logo { 
+        width: auto !important; 
+        height: 36px !important; 
+        max-height: 38px !important; 
+        object-fit: contain !important; 
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2)) !important;
+    }
+
+    .gk-drawer-title {
+        font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
+        font-size: 1.4rem !important;
+        font-weight: 900 !important;
+        color: #ffffff !important;
+    }
+
+    .gk-drawer-close-btn {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 10px !important;
+        background: rgba(255, 255, 255, 0.25) !important;
+        border: 1px solid rgba(255, 255, 255, 0.55) !important;
+        color: #ffffff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+    }
+
+    .gk-drawer-content {
+        flex: 1 !important;
+        padding: 14px 10px !important;
+        overflow-y: auto !important;
+    }
+
+    .gk-mobile-menu-list {
+        list-style: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .gk-mobile-menu-list li {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .gk-mobile-menu-list li a {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 10px 14px !important;
+        background: #ffffff !important;
+        border: 1.5px solid #e0f2fe !important;
+        border-radius: 18px !important;
+        color: #1e293b !important;
+        font-weight: 800 !important;
+        font-size: 0.94rem !important;
+        text-decoration: none !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03) !important;
+        min-height: 46px !important;
+    }
+
+    .gk-m-icon-badge {
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 12px !important;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+        border: 1px solid #bae6fd !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1.2rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    .gk-m-text {
+        flex: 1 !important;
+    }
+
+    .gk-mobile-menu-list li a:active,
+    .gk-mobile-menu-list li.current-menu-item > a {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        border-color: #0284c7 !important;
+    }
+
+    .gk-mobile-menu-list li.current-menu-item > a .gk-m-icon-badge {
+        background: #fef08a !important;
+        color: #854d0e !important;
+    }
+
+    /* Submenus in Mobile Drawer (Accordion) */
+    .gk-mobile-menu-list .sub-menu {
+        display: none !important;
+        list-style: none !important;
+        padding: 6px 8px !important;
+        margin: 6px 0 0 0 !important;
+        background: rgba(240, 249, 255, 0.9) !important;
+        border-radius: 14px !important;
+        border: 1px dashed #bae6fd !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+    }
+
+    .gk-mobile-menu-list .menu-item-has-children.is-open > .sub-menu {
+        display: flex !important;
+    }
+
+    .gk-mobile-menu-list .sub-menu li a {
+        font-size: 0.86rem !important;
+        padding: 8px 12px !important;
+        min-height: 38px !important;
+        border-radius: 12px !important;
+    }
+
+    .gk-drawer-footer {
+        padding: 14px 14px 20px 14px !important;
+        border-top: 1.5px solid #e0f2fe !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        background: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .gk-btn-drawer-vip {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+        color: #ffffff !important;
+        padding: 12px !important;
+        border-radius: 18px !important;
+        text-align: center !important;
+        font-weight: 900 !important;
+        font-size: 0.92rem !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35) !important;
+    }
+
+    .gk-btn-drawer-account {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        padding: 11px !important;
+        border-radius: 18px !important;
+        text-align: center !important;
+        font-weight: 800 !important;
+        font-size: 0.92rem !important;
+        text-decoration: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .gk-navbar-inner {
+    overflow: visible !important;
+        padding: 4px 8px !important;
+        height: 50px !important;
+        max-height: 50px !important;
+        gap: 6px !important;
+    }
+
+    .gk-nav-logo {
+        height: 30px !important;
+        max-height: 32px !important;
+        max-width: 105px !important;
+    }
+
+    .gk-nav-btn-login span {
+        display: none !important;
+    }
+
+    .gk-nav-btn-login {
+        padding: 0 !important;
+        width: 36px !important;
+        height: 36px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 12px !important;
+    }
+
+    .gk-nav-btn-login::before {
+        content: "🔑";
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>چترهای بارانی | Rainy Umbrellas</title>
+<style>
+  :root{
+    --bg-color:#0b1e33;
+    --accent:#00d2ff;
+    --accent2:#ff2e88;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;font-family:'Segoe UI',Tahoma,sans-serif;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg-color);color:#fff;display:flex;justify-content:center;align-items:center;
+    min-height:100vh;min-height:100dvh;overflow:hidden;
+  }
+  #game-container{
+    width:100vw;max-width:460px;height:100vh;height:100dvh;max-height:860px;
+    position:relative;display:flex;flex-direction:column;align-items:center;
+    border-radius:26px;box-shadow:0 10px 60px rgba(0,0,0,0.6);overflow:hidden;
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  #rain-canvas{position:absolute;inset:0;z-index:0;}
+  #fx-canvas{position:absolute;inset:0;z-index:60;pointer-events:none;}
+
+  .sky{position:absolute;inset:0;background:linear-gradient(180deg,#0b1e33 0%,#132a45 45%,#1b3a5c 100%);z-index:0;}
+  .cloud{position:absolute;background:rgba(255,255,255,0.06);border-radius:50%;filter:blur(2px);z-index:0;}
+
+  .header{
+    position:relative;z-index:5;width:100%;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(0,0,0,0.25);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;
+  }
+  .badge{
+    background:rgba(255,255,255,0.1);padding:6px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);
+    font-size:0.85rem;font-weight:bold;display:flex;align-items:center;gap:5px;box-shadow:0 4px 10px rgba(0,0,0,0.25);
+  }
+  .badge .val{color:#ffe066;}
+
+  .timer-track{position:relative;z-index:5;width:100%;height:6px;background:rgba(255,255,255,0.08);flex-shrink:0;}
+  .timer-fill{height:100%;width:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width 0.1s linear;}
+
+  .game-area{position:relative;z-index:5;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:space-around;width:100%;padding:8px 10px;}
+
+  .target-zone{display:flex;flex-direction:column;align-items:center;}
+  .target-label{font-size:0.85rem;color:#9be7ff;margin-bottom:2px;text-shadow:0 2px 6px rgba(0,210,255,0.4);}
+  #target-umbrella-wrap{animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-4deg);}50%{transform:rotate(4deg);}}
+
+  .options-wrap{width:100%;max-height:54%;overflow:auto;}
+  .closed-options{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;padding:2px;}
+  .option{
+    cursor:pointer;padding:3px;border-radius:12px;background:rgba(255,255,255,0.05);
+    border:2px solid rgba(255,255,255,0.1);transition:transform 0.15s ease,border-color .2s,background-color .2s,box-shadow .2s;
+    display:flex;justify-content:center;align-items:center;box-shadow:0 6px 16px rgba(0,0,0,0.3);
+  }
+  .option:active{transform:scale(0.92);}
+  .option.correct{border-color:#00ff88;background:rgba(0,255,136,0.18);box-shadow:0 0 22px rgba(0,255,136,0.55);}
+  .option.wrong{border-color:#ff3b5c;background:rgba(255,59,92,0.18);box-shadow:0 0 22px rgba(255,59,92,0.55);animation:shakeCard .4s ease;}
+  @keyframes shakeCard{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
+
+  .overlay{position:absolute;inset:0;background:radial-gradient(circle,rgba(15,30,50,0.96),rgba(5,12,22,0.98));display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:100;text-align:center;padding:24px;backdrop-filter:blur(8px);}
+  .overlay.hidden{display:none;}
+  .logo{font-size:2rem;font-weight:900;background:linear-gradient(45deg,var(--accent2),#ffcc00,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;filter:drop-shadow(0 4px 10px rgba(0,210,255,0.4));}
+  .desc{font-size:0.95rem;line-height:1.7;color:#cfe8ff;margin-bottom:26px;max-width:320px;}
+  .btn{background:linear-gradient(135deg,var(--accent2),#9b00e8);color:#fff;border:none;padding:14px 44px;font-size:1.1rem;font-weight:bold;border-radius:50px;cursor:pointer;box-shadow:0 8px 24px rgba(255,46,136,0.5);transition:transform .15s ease;}
+  .btn:active{transform:scale(0.95);}
+
+  #game-container.shake{animation:screenShake 0.4s ease;}
+  @keyframes screenShake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
+</style>
+</head>
+<body>
+
+<div id="game-container">
+  <canvas id="rain-canvas"></canvas>
+  <canvas id="fx-canvas"></canvas>
+
+  <div id="start-screen" class="overlay">
+    <div class="logo">☔ چترهای بارانی</div>
+    <p class="desc">چتر هدف را با دقت نگاه کن — رنگ، طرح و حاشیه‌اش را به‌خاطر بسپار، سپس چتر بسته‌ی هم‌شکل را از میان گزینه‌ها پیدا کن!</p>
+    <button class="btn" id="start-btn">شروع بازی</button>
+  </div>
+
+  <div id="gameover-screen" class="overlay hidden">
+    <div class="logo" style="font-size:1.7rem;">پایان بازی!</div>
+    <p class="desc" id="final-stats">امتیاز: ۰</p>
+    <button class="btn" id="retry-btn">تلاش مجدد 🔄</button>
+  </div>
+
+  <div class="header">
+    <div class="badge">مرحله: <span class="val" id="level">۱</span></div>
+    <div class="badge">امتیاز: <span class="val" id="score">۰</span></div>
+    <div class="badge">❤️ <span class="val" id="lives">۳</span></div>
+  </div>
+  <div class="timer-track"><div id="timer-fill" class="timer-fill"></div></div>
+
+  <div class="game-area">
+    <div class="target-zone">
+      <div class="target-label">🎯 چتر هدف</div>
+      <div id="target-umbrella-wrap"></div>
+    </div>
+    <div class="options-wrap">
+      <div id="options-container" class="closed-options"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------------- تنظیمات پایه ---------------- */
+const COLORS = ['#FF4757','#2ED573','#1E90FF','#FFA502','#A55EEA','#00D2D3','#FF6B9D'];
+const PATTERNS = ['solid','stripes','dots','grid'];
+const TRIMS = ['#FFFFFF','#FFD700','#FF1493','#00FFCC'];
+
+let uidCounter = 0;
+function uid(){ return 'u'+(uidCounter++)+Math.random().toString(36).slice(2,7); }
+
+let state = {
+  level:1, score:0, lives:3, combo:0,
+  target:null, timer:100, timerMax:10, timerId:null, isActive:false
+};
+
+/* ---------------- صدا ---------------- */
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } if(audioCtx.state==='suspended') audioCtx.resume(); }
+function tone(freq, type, dur, startGain){
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type; osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(startGain, t);
+  gain.gain.exponentialRampToValueAtTime(0.01, t+dur);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t+dur);
+}
+function playCorrect(combo){
+  tone(520+combo*30,'triangle',0.18,0.25);
+  setTimeout(()=>tone(780+combo*30,'triangle',0.2,0.2),90);
+}
+function playWrong(){ tone(180,'sawtooth',0.3,0.22); }
+function playGameOver(){
+  [300,260,220,180].forEach((f,i)=>setTimeout(()=>tone(f,'sine',0.22,0.2), i*130));
+}
+
+/* ---------------- SVG چتر پیشرفته ---------------- */
+function patternDefs(id, color, pattern, size){
+  if(pattern==='solid') return `<pattern id="${id}" width="1" height="1"><rect width="100%" height="100%" fill="${color}"/></pattern>`;
+  if(pattern==='stripes') return `
+    <pattern id="${id}" width="${size*0.22}" height="${size*0.22}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="100%" height="100%" fill="${color}"/>
+      <rect width="${size*0.11}" height="${size*0.22}" fill="rgba(255,255,255,0.32)"/>
+    </pattern>`;
+  if(pattern==='dots') return `
+    <pattern id="${id}" width="${size*0.26}" height="${size*0.26}" patternUnits="userSpaceOnUse">
+      <rect width="100%" height="100%" fill="${color}"/>
+      <circle cx="${size*0.13}" cy="${size*0.13}" r="${size*0.07}" fill="rgba(255,255,255,0.35)"/>
+    </pattern>`;
+  if(pattern==='grid') return `
+    <pattern id="${id}" width="${size*0.24}" height="${size*0.24}" patternUnits="userSpaceOnUse">
+      <rect width="100%" height="100%" fill="${color}"/>
+      <rect x="0" y="0" width="${size*0.12}" height="${size*0.12}" fill="rgba(255,255,255,0.28)"/>
+      <rect x="${size*0.12}" y="${size*0.12}" width="${size*0.12}" height="${size*0.12}" fill="rgba(255,255,255,0.28)"/>
+    </pattern>`;
+  return `<pattern id="${id}" width="1" height="1"><rect width="100%" height="100%" fill="${color}"/></pattern>`;
+}
+
+function domePath(cx, cy, r, scallops){
+  let d = `M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy} `;
+  const segW = (2*r)/scallops;
+  for(let i=scallops;i>=1;i--){
+    const x1 = cx - r + i*segW;
+    const x0 = cx - r + (i-1)*segW;
+    const midX = (x0+x1)/2;
+    const bulge = r*0.11;
+    d += `Q ${midX} ${cy+bulge} ${x0} ${cy} `;
+  }
+  d += 'Z';
+  return { d, segW };
+}
+
+function openUmbrellaSVG(color, pattern, trim, size){
+  const id = uid();
+  const patId = 'pat-'+id;
+  const trimId = 'trim-'+id;
+  const w = size, h = size*0.98;
+  const cx = w/2, cy = h*0.5, r = w*0.44;
+  const scallops = 8;
+  const {d, segW} = domePath(cx, cy, r, scallops);
+
+  let ribs = '';
+  const apex = {x:cx, y:cy-r*0.92};
+  for(let i=0;i<=scallops;i++){
+    const x = cx - r + i*segW;
+    ribs += `<line x1="${apex.x}" y1="${apex.y}" x2="${x}" y2="${cy}" stroke="rgba(0,0,0,0.18)" stroke-width="${size*0.008}"/>`;
+  }
+
+  let poms = '';
+  if(trim){
+    for(let i=0;i<=scallops;i++){
+      const x = cx - r + i*segW;
+      poms += `<circle cx="${x}" cy="${cy+r*0.05}" r="${size*0.018}" fill="${trim}"/>`;
+    }
+  }
+
+  const poleLen = h*0.34;
+  const poleBottom = cy + poleLen;
+  const hook = `M ${cx} ${poleBottom} C ${cx-size*0.11} ${poleBottom+size*0.02}, ${cx-size*0.11} ${poleBottom+size*0.11}, ${cx-size*0.02} ${poleBottom+size*0.1}`;
+
+  return `
+  <svg width="${w}" height="${h+poleLen+size*0.12}" viewBox="0 0 ${w} ${h+poleLen+size*0.12}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;">
+    <defs>
+      ${patternDefs(patId, color, pattern, size)}
+      <radialGradient id="gloss-${id}" cx="35%" cy="25%" r="75%">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.55)"/>
+        <stop offset="35%" stop-color="rgba(255,255,255,0.12)"/>
+        <stop offset="100%" stop-color="rgba(0,0,0,0.28)"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="${cx+size*0.03}" cy="${cy+size*0.06}" rx="${r*0.92}" ry="${r*0.22}" fill="rgba(0,0,0,0.28)" filter="blur(3px)"/>
+    <path d="${d}" fill="url(#${patId})" stroke="rgba(0,0,0,0.35)" stroke-width="${size*0.01}"/>
+    <path d="${d}" fill="url(#gloss-${id})"/>
+    ${ribs}
+    ${poms}
+    <circle cx="${apex.x}" cy="${apex.y}" r="${size*0.025}" fill="#d8d8d8"/>
+    <rect x="${cx-size*0.012}" y="${cy}" width="${size*0.024}" height="${poleLen}" rx="${size*0.01}" fill="#e6e6e6"/>
+    <path d="${hook}" stroke="#e6e6e6" stroke-width="${size*0.03}" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function closedUmbrellaSVG(color, pattern, trim, size){
+  const id = uid();
+  const patId = 'pat-'+id;
+  const w = size*0.62, h = size;
+  const cx = w/2;
+  const bodyTop = h*0.06, bodyBottom = h*0.66;
+  const bw = w*0.5;
+
+  const bodyPath = `
+    M ${cx} ${bodyTop}
+    C ${cx+bw*0.75} ${h*0.18}, ${cx+bw*0.55} ${h*0.5}, ${cx+bw*0.28} ${bodyBottom}
+    L ${cx-bw*0.28} ${bodyBottom}
+    C ${cx-bw*0.55} ${h*0.5}, ${cx-bw*0.75} ${h*0.18}, ${cx} ${bodyTop}
+    Z`;
+
+  const poleBottom = h*0.94;
+  const hook = `M ${cx} ${bodyBottom} L ${cx} ${poleBottom} C ${cx-w*0.32} ${poleBottom+h*0.01}, ${cx-w*0.32} ${poleBottom+h*0.07}, ${cx-w*0.08} ${poleBottom+h*0.06}`;
+
+  const bandY = h*0.34;
+  const band = trim ? `<rect x="${cx-bw*0.5}" y="${bandY}" width="${bw}" height="${h*0.07}" fill="${trim}" opacity="0.92"/>` : '';
+
+  return `
+  <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+    <defs>${patternDefs(patId, color, pattern, size)}</defs>
+    <ellipse cx="${cx}" cy="${poleBottom+h*0.08}" rx="${w*0.3}" ry="${h*0.02}" fill="rgba(0,0,0,0.25)"/>
+    <path d="${bodyPath}" fill="url(#${patId})" stroke="rgba(0,0,0,0.35)" stroke-width="${size*0.012}"/>
+    ${band}
+    <line x1="${cx}" y1="${bodyTop}" x2="${cx}" y2="${bodyBottom}" stroke="rgba(0,0,0,0.2)" stroke-width="${size*0.008}"/>
+    <rect x="${cx-size*0.012}" y="${bodyBottom}" width="${size*0.024}" height="${poleBottom-bodyBottom}" fill="#e6e6e6"/>
+    <path d="${hook}" stroke="#e6e6e6" stroke-width="${size*0.026}" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ---------------- منطق بازی ---------------- */
+function trimUnlocked(){ return state.level >= 3; }
+function maxOptions(){ return Math.min(3 + Math.floor(state.level/2), 9); }
+
+function randomUmbrella(){
+  return {
+    color: COLORS[Math.floor(Math.random()*COLORS.length)],
+    pattern: PATTERNS[Math.floor(Math.random()*PATTERNS.length)],
+    trim: trimUnlocked() ? TRIMS[Math.floor(Math.random()*TRIMS.length)] : null
+  };
+}
+function sameUmbrella(a,b){ return a.color===b.color && a.pattern===b.pattern && a.trim===b.trim; }
+
+function generateLevel(){
+  state.target = randomUmbrella();
+
+  const targetWrap = document.getElementById('target-umbrella-wrap');
+  targetWrap.innerHTML = openUmbrellaSVG(state.target.color, state.target.pattern, state.target.trim, 150);
+  targetWrap.style.transform = 'scale(0.4)';
+  targetWrap.style.opacity = '0';
+  requestAnimationFrame(()=>{
+    targetWrap.style.transition = 'transform 0.45s cubic-bezier(.34,1.56,.64,1), opacity 0.3s ease';
+    targetWrap.style.transform = 'scale(1)';
+    targetWrap.style.opacity = '1';
+  });
+
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+
+  const n = maxOptions();
+  let options = [ {...state.target} ];
+  let guard = 0;
+  while(options.length < n && guard < 500){
+    guard++;
+    const cand = randomUmbrella();
+    if(!options.find(o=>sameUmbrella(o,cand))) options.push(cand);
+  }
+  options.sort(()=>Math.random()-0.5);
+
+  const cols = n <= 4 ? 2 : 3;
+  container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  const wrapWidth = container.parentElement.clientWidth - 10;
+  const gap = 6;
+  const cardSize = Math.floor((wrapWidth - gap*(cols-1)) / cols) - 6;
+  const iconSize = Math.max(46, Math.min(80, cardSize));
+
+  options.forEach(opt=>{
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = closedUmbrellaSVG(opt.color, opt.pattern, opt.trim, iconSize);
+    div.onclick = () => handleChoice(div, opt);
+    container.appendChild(div);
+  });
+
+  state.timerMax = Math.max(4.5, 10 - state.level*0.35);
+  state.timer = state.timerMax;
+}
+
+function updateUI(){
+  document.getElementById('score').innerText = toFa(state.score);
+  document.getElementById('level').innerText = toFa(state.level);
+  document.getElementById('lives').innerText = toFa(state.lives);
+}
+function toFa(n){
+  const map = {'0':'۰','1':'۱','2':'۲','3':'۳','4':'۴','5':'۵','6':'۶','7':'۷','8':'۸','9':'۹'};
+  return String(n).split('').map(c=>map[c]!==undefined?map[c]:c).join('');
+}
+
+function startTimer(){
+  if(state.timerId) clearInterval(state.timerId);
+  const step = 50;
+  state.timerId = setInterval(()=>{
+    if(!state.isActive) return;
+    state.timer -= step/1000;
+    const pct = Math.max(0,(state.timer/state.timerMax)*100);
+    document.getElementById('timer-fill').style.width = pct+'%';
+    if(state.timer <= 0){
+      registerMistake(null);
+    }
+  }, step);
+}
+
+function handleChoice(el, opt){
+  if(!state.isActive) return;
+  if(sameUmbrella(opt, state.target)){
+    state.isActive = false;
+    el.classList.add('correct');
+    state.combo++;
+    playCorrect(state.combo);
+    const rect = el.getBoundingClientRect();
+    const cRect = document.getElementById('game-container').getBoundingClientRect();
+    burstConfetti(rect.left-cRect.left+rect.width/2, rect.top-cRect.top+rect.height/2);
+    state.score += 50 + Math.floor(state.timer*12) + state.combo*8;
+    state.level++;
+    updateUI();
+    setTimeout(()=>{ generateLevel(); state.isActive = true; }, 650);
+  } else {
+    registerMistake(el);
+  }
+}
+
+function registerMistake(el){
+  state.isActive = false;
+  state.combo = 0;
+  playWrong();
+  if(el) el.classList.add('wrong');
+  const gc = document.getElementById('game-container');
+  gc.classList.add('shake');
+  setTimeout(()=>gc.classList.remove('shake'), 400);
+
+  state.lives--;
+  updateUI();
+
+  if(state.lives <= 0){
+    setTimeout(gameOver, 550);
+  } else {
+    setTimeout(()=>{ generateLevel(); state.isActive = true; }, 750);
+  }
+}
+
+function gameOver(){
+  state.isActive = false;
+  clearInterval(state.timerId);
+  playGameOver();
+  document.getElementById('final-stats').innerHTML = `امتیاز نهایی: <b>${toFa(state.score)}</b><br>رسیدن به مرحله: <b>${toFa(state.level)}</b>`;
+  document.getElementById('gameover-screen').classList.remove('hidden');
+}
+
+function startGame(){
+  ensureAudio();
+  state.level=1; state.score=0; state.lives=3; state.combo=0;
+  updateUI();
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('gameover-screen').classList.add('hidden');
+  generateLevel();
+  state.isActive = true;
+  startTimer();
+}
+
+document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('retry-btn').addEventListener('click', startGame);
+
+window.addEventListener('resize', ()=>{
+  if(state.target && state.isActive) generateLevel();
+});
+
+/* ---------------- باران پس‌زمینه ---------------- */
+const rainCanvas = document.getElementById('rain-canvas');
+const rCtx = rainCanvas.getContext('2d');
+let drops = [];
+function resizeRain(){
+  rainCanvas.width = rainCanvas.parentElement.clientWidth;
+  rainCanvas.height = rainCanvas.parentElement.clientHeight;
+}
+function initDrops(){
+  drops = [];
+  const count = Math.floor((rainCanvas.width*rainCanvas.height)/9000);
+  for(let i=0;i<count;i++){
+    drops.push({
+      x: Math.random()*rainCanvas.width,
+      y: Math.random()*rainCanvas.height,
+      len: Math.random()*14+8,
+      speed: Math.random()*4+3,
+      opacity: Math.random()*0.35+0.15
+    });
+  }
+}
+function drawRain(){
+  rCtx.clearRect(0,0,rainCanvas.width,rainCanvas.height);
+  rCtx.strokeStyle = 'rgba(180,220,255,0.5)';
+  rCtx.lineWidth = 1.4;
+  drops.forEach(d=>{
+    rCtx.globalAlpha = d.opacity;
+    rCtx.beginPath();
+    rCtx.moveTo(d.x, d.y);
+    rCtx.lineTo(d.x-2, d.y+d.len);
+    rCtx.stroke();
+    d.y += d.speed; d.x -= 0.6;
+    if(d.y > rainCanvas.height){ d.y = -d.len; d.x = Math.random()*rainCanvas.width; }
+  });
+  rCtx.globalAlpha = 1;
+  requestAnimationFrame(drawRain);
+}
+
+/* ---------------- افکت ذرات (تایید) ---------------- */
+const fxCanvas = document.getElementById('fx-canvas');
+const fCtx = fxCanvas.getContext('2d');
+let particles = [];
+function resizeFx(){
+  fxCanvas.width = fxCanvas.parentElement.clientWidth;
+  fxCanvas.height = fxCanvas.parentElement.clientHeight;
+}
+function burstConfetti(x,y){
+  const colors = ['#00d2ff','#ff2e88','#ffe066','#00ff88','#ffffff'];
+  for(let i=0;i<32;i++){
+    particles.push({
+      x,y, vx:(Math.random()-0.5)*7, vy:(Math.random()-0.5)*7-2,
+      r: Math.random()*4+2, color: colors[Math.floor(Math.random()*colors.length)],
+      alpha:1, decay: Math.random()*0.025+0.015
+    });
+  }
+}
+function drawFx(){
+  fCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.15; p.alpha-=p.decay;
+    if(p.alpha<=0){ particles.splice(i,1); continue; }
+    fCtx.save();
+    fCtx.globalAlpha = p.alpha;
+    fCtx.fillStyle = p.color;
+    fCtx.beginPath();
+    fCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    fCtx.fill();
+    fCtx.restore();
+  }
+  requestAnimationFrame(drawFx);
+}
+
+function resizeAll(){
+  resizeRain(); resizeFx(); initDrops();
+}
+window.addEventListener('resize', resizeAll);
+resizeAll();
+requestAnimationFrame(drawRain);
+requestAnimationFrame(drawFx);
+</script>
+</body>
+</html>

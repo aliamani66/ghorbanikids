@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پایگاه تمرکز</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0B0B2E;
+    --bg-mid:#171257;
+    --bg-glow:#2A1F7A;
+    --panel:rgba(255,255,255,0.055);
+    --panel-border:rgba(255,255,255,0.14);
+    --panel-border-hi:rgba(255,255,255,0.32);
+    --text:#F3F1FF;
+    --text-dim:#ADA6D9;
+    --coral:#FF6F59;
+    --coral-dim:#7a3a32;
+    --mint:#3FDDC8;
+    --mint-dim:#1c5a52;
+    --yellow:#FFC93C;
+    --yellow-dim:#7a5f1c;
+    --danger:#FF4D6D;
+    --good:#5CE87A;
+    --radius:22px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Vazirmatn',sans-serif;
+    background:
+      radial-gradient(circle at 20% -10%, var(--bg-glow) 0%, transparent 45%),
+      radial-gradient(circle at 100% 10%, #3a1f6b 0%, transparent 40%),
+      linear-gradient(180deg, var(--bg-deep), var(--bg-mid) 60%, var(--bg-deep));
+    color:var(--text);
+    min-height:100%;
+    overflow-x:hidden;
+  }
+  #stars{position:fixed; inset:0; z-index:0; pointer-events:none;}
+  #stars span{
+    position:absolute; width:2px; height:2px; background:#fff; border-radius:50%;
+    opacity:.5; animation:twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.8}}
+
+  #app{position:relative; z-index:1; max-width:640px; margin:0 auto; padding:18px 16px 60px; min-height:100vh;}
+
+  header.topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 4px 18px;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand .mark{
+    width:38px; height:38px; border-radius:12px;
+    background:conic-gradient(from 220deg, var(--coral), var(--yellow), var(--mint), var(--coral));
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+    box-shadow:0 0 18px rgba(255,201,60,.35);
+  }
+  .brand h1{font-size:17px; font-weight:800; margin:0; letter-spacing:.2px;}
+  .brand p{margin:0; font-size:11px; color:var(--text-dim); font-weight:500;}
+  .stat-pill{
+    display:flex; align-items:center; gap:6px;
+    background:var(--panel); border:1px solid var(--panel-border);
+    padding:7px 12px; border-radius:999px; font-weight:700; font-size:13px;
+  }
+
+  section.screen{display:none;}
+  section.screen.active{display:block; animation:fadeUp .35s ease;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:translateY(0)}}
+
+  h2.page-title{font-size:15px; color:var(--text-dim); font-weight:600; margin:2px 0 14px;}
+
+  /* HOME */
+  .hud{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius);
+    padding:18px; margin-bottom:18px; display:flex; align-items:center; gap:16px;
+    position:relative; overflow:hidden;
+  }
+  .hud::after{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 90% 10%, rgba(63,221,200,.15), transparent 60%);
+    pointer-events:none;
+  }
+  .ring{
+    width:74px; height:74px; border-radius:50%; flex-shrink:0;
+    background: conic-gradient(var(--mint) calc(var(--pct,30)*1%), rgba(255,255,255,.08) 0);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 22px rgba(63,221,200,.25);
+  }
+  .ring .inner{
+    width:56px; height:56px; border-radius:50%; background:var(--bg-mid);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .ring .inner b{font-size:15px;}
+  .ring .inner small{font-size:9px; color:var(--text-dim);}
+  .hud-text b{font-size:14px;}
+  .hud-text p{margin:4px 0 0; font-size:12px; color:var(--text-dim); line-height:1.7;}
+
+  .missions{display:grid; gap:14px;}
+  .mission-card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius);
+    padding:16px; display:flex; align-items:center; gap:14px; cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .mission-card:hover{transform:translateY(-2px); border-color:var(--panel-border-hi);}
+  .mission-card:active{transform:translateY(0px) scale(.99);}
+  .mc-icon{
+    width:52px; height:52px; border-radius:16px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+  }
+  .mc-body{flex:1;}
+  .mc-body b{font-size:15px; display:block;}
+  .mc-body span{font-size:12px; color:var(--text-dim); line-height:1.6; display:block; margin-top:3px;}
+  .mc-tag{
+    font-size:10px; font-weight:700; padding:4px 8px; border-radius:8px; white-space:nowrap;
+  }
+  .mc-arrow{font-size:18px; color:var(--text-dim);}
+
+  .m-reaction .mc-icon{background:rgba(255,111,89,.18); color:var(--coral);}
+  .m-reaction .mc-tag{background:rgba(255,111,89,.18); color:var(--coral);}
+  .m-sequence .mc-icon{background:rgba(63,221,200,.18); color:var(--mint);}
+  .m-sequence .mc-tag{background:rgba(63,221,200,.18); color:var(--mint);}
+  .m-odd .mc-icon{background:rgba(255,201,60,.18); color:var(--yellow);}
+  .m-odd .mc-tag{background:rgba(255,201,60,.18); color:var(--yellow);}
+
+  /* GAME HEADER (shared) */
+  .game-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .back-btn{
+    background:var(--panel); border:1px solid var(--panel-border); color:var(--text);
+    border-radius:12px; padding:8px 14px; font-family:inherit; font-size:12px; font-weight:700;
+    cursor:pointer; display:flex; align-items:center; gap:6px;
+  }
+  .game-stats{display:flex; gap:8px;}
+  .g-stat{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:6px 10px; font-size:12px; font-weight:700; text-align:center; min-width:52px;
+  }
+  .g-stat small{display:block; font-size:9px; font-weight:500; color:var(--text-dim);}
+
+  .instructions{
+    background:var(--panel); border:1px dashed var(--panel-border-hi); border-radius:16px;
+    padding:14px 16px; font-size:13px; line-height:1.9; color:var(--text-dim); margin-bottom:14px;
+  }
+  .instructions b{color:var(--text);}
+  .start-big-btn{
+    width:100%; padding:14px; border:none; border-radius:16px; font-family:inherit;
+    font-size:15px; font-weight:800; cursor:pointer; color:#0B0B2E; margin-top:4px;
+  }
+
+  /* REACTION GAME */
+  .r-target-banner{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:16px;
+    padding:12px; margin-bottom:14px; font-size:13px; font-weight:700;
+  }
+  .r-target-dot{width:22px; height:22px; border-radius:50%; box-shadow:0 0 14px currentColor;}
+  .r-field{
+    position:relative; width:100%; aspect-ratio:1/1; max-height:380px;
+    background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.05), transparent 70%);
+    border:1px solid var(--panel-border); border-radius:var(--radius); overflow:hidden;
+  }
+  .r-dot{
+    position:absolute; border-radius:50%; cursor:pointer; transform:scale(0);
+    animation:pop .18s ease forwards;
+    box-shadow:0 0 16px currentColor;
+  }
+  @keyframes pop{to{transform:scale(1)}}
+
+  /* SEQUENCE GAME */
+  .seq-pad{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:320px; margin:0 auto;
+  }
+  .seq-tile{
+    aspect-ratio:1/1; border-radius:20px; border:1px solid var(--panel-border);
+    display:flex; align-items:center; justify-content:center; font-size:26px; cursor:pointer;
+    opacity:.55; transition:opacity .1s, transform .1s;
+  }
+  .seq-tile.lit{opacity:1; transform:scale(1.04); box-shadow:0 0 26px currentColor;}
+  .seq-tile:active{transform:scale(.96);}
+  .seq-status{
+    text-align:center; font-size:13px; color:var(--text-dim); margin:16px 0 6px; min-height:18px;
+  }
+
+  /* ODD ONE OUT */
+  .odd-grid{
+    display:grid; gap:10px; margin-top:6px;
+  }
+  .odd-tile{
+    aspect-ratio:1/1; border-radius:14px; cursor:pointer; border:1px solid rgba(255,255,255,.08);
+    transition:transform .1s;
+  }
+  .odd-tile:active{transform:scale(.92);}
+  .odd-timerbar{
+    height:8px; border-radius:6px; background:var(--panel); border:1px solid var(--panel-border);
+    overflow:hidden; margin-bottom:14px;
+  }
+  .odd-timerbar > div{height:100%; background:linear-gradient(90deg, var(--yellow), var(--coral));}
+
+  /* RESULT */
+  .result-card{
+    text-align:center; background:var(--panel); border:1px solid var(--panel-border);
+    border-radius:var(--radius); padding:32px 20px;
+  }
+  .result-emoji{font-size:52px; margin-bottom:6px;}
+  .result-card h3{margin:6px 0 2px; font-size:19px;}
+  .result-card p{color:var(--text-dim); font-size:13px; margin:0 0 18px;}
+  .result-stats{display:flex; gap:10px; justify-content:center; margin-bottom:22px; flex-wrap:wrap;}
+  .rs-item{
+    background:rgba(255,255,255,.05); border:1px solid var(--panel-border); border-radius:14px;
+    padding:12px 16px; min-width:88px;
+  }
+  .rs-item b{display:block; font-size:18px;}
+  .rs-item small{font-size:10px; color:var(--text-dim);}
+  .result-actions{display:flex; gap:10px;}
+  .btn{
+    flex:1; padding:13px; border-radius:14px; border:none; font-family:inherit;
+    font-weight:800; font-size:13px; cursor:pointer;
+  }
+  .btn.primary{background:var(--mint); color:#08211d;}
+  .btn.ghost{background:var(--panel); color:var(--text); border:1px solid var(--panel-border);}
+
+  /* COMMANDER (advanced multi-skill game) */
+  .m-commander .mc-icon{background:rgba(155,140,255,.18); color:#B7A9FF;}
+  .m-commander .mc-tag{background:rgba(155,140,255,.18); color:#B7A9FF;}
+
+  .cmd-hud{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; gap:8px;}
+  .cmd-lives{display:flex; gap:4px; font-size:16px;}
+  .cmd-lives span.lost{opacity:.25; filter:grayscale(1);}
+  .cmd-combo{
+    font-size:12px; font-weight:800; background:var(--panel); border:1px solid var(--panel-border);
+    border-radius:10px; padding:6px 10px;
+  }
+  .cmd-combo b{color:var(--yellow);}
+  .cmd-score{font-size:12px; font-weight:800; background:var(--panel); border:1px solid var(--panel-border);
+    border-radius:10px; padding:6px 10px;}
+
+  .cmd-mode-banner{
+    display:flex; align-items:center; gap:10px; justify-content:center;
+    background:linear-gradient(90deg, rgba(155,140,255,.16), rgba(155,140,255,.04));
+    border:1px solid rgba(183,169,255,.4); border-radius:14px; padding:10px; margin-bottom:12px;
+    font-size:13px; font-weight:800; color:#D9D2FF;
+  }
+
+  .cmd-timerbar{height:7px; border-radius:5px; background:var(--panel); border:1px solid var(--panel-border);
+    overflow:hidden; margin-bottom:16px;}
+  .cmd-timerbar > div{height:100%; background:linear-gradient(90deg, #B7A9FF, var(--coral)); width:100%;}
+
+  .cmd-stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius);
+    padding:30px 16px; min-height:180px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; margin-bottom:16px;
+  }
+  .cmd-stage-label{font-size:11px; color:var(--text-dim); margin-bottom:14px; font-weight:700;}
+  .cmd-stroop-word{font-size:40px; font-weight:900;}
+  .cmd-shape{font-size:56px;}
+  .cmd-dotgrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(34px,1fr)); gap:10px; max-width:260px;}
+  .cmd-dotgrid span{font-size:26px; text-align:center;}
+
+  .cmd-answers{display:flex; gap:10px;}
+  .cmd-answers button{
+    flex:1; padding:15px 8px; border-radius:16px; border:1px solid var(--panel-border);
+    background:var(--panel); color:var(--text); font-family:inherit; font-size:15px; font-weight:800;
+    cursor:pointer; transition:transform .1s;
+  }
+  .cmd-answers button:active{transform:scale(.95);}
+  .cmd-answers button.yes{border-color:rgba(92,232,122,.5);}
+  .cmd-answers button.no{border-color:rgba(255,77,109,.5);}
+
+  .flash-msg{
+    position:fixed; top:18px; left:50%; transform:translateX(-50%);
+    background:#101033; border:1px solid var(--panel-border-hi); padding:10px 18px;
+    border-radius:12px; font-size:13px; font-weight:700; z-index:50; opacity:0; pointer-events:none;
+    transition:opacity .2s, top .2s;
+  }
+  .flash-msg.show{opacity:1; top:28px;}
+  .flash-msg.good{color:var(--good);}
+  .flash-msg.bad{color:var(--danger);}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">🛰️</div>
+      <div>
+        <h1>پایگاه تمرکز</h1>
+        <p>مأموریت‌های کوچک برای مغزی قوی‌تر</p>
+      </div>
+    </div>
+    <div class="stat-pill">⭐ <span id="totalStars">0</span></div>
+  </header>
+
+  <!-- HOME -->
+  <section class="screen active" id="screen-home">
+    <div class="hud">
+      <div class="ring" id="homeRing" style="--pct:0">
+        <div class="inner">
+          <b id="homeMissions">0</b>
+          <small>مأموریت</small>
+        </div>
+      </div>
+      <div class="hud-text">
+        <b>سلام فضانورد 👋</b>
+        <p>هر روز چند دقیقه تمرین کن. سه مأموریت داری، هرکدوم یه بخش از تمرکزتو تقویت می‌کنه.</p>
+      </div>
+    </div>
+
+    <div class="missions">
+      <div class="mission-card m-reaction" onclick="goTo('reaction-intro')">
+        <div class="mc-icon">⚡</div>
+        <div class="mc-body">
+          <b>رادار واکنش</b>
+          <span>فقط رنگ هدف رو لمس کن، تند و دقیق</span>
+        </div>
+        <div class="mc-tag">توجه پایدار</div>
+        <div class="mc-arrow">‹</div>
+      </div>
+
+      <div class="mission-card m-sequence" onclick="goTo('sequence-intro')">
+        <div class="mc-icon">🧠</div>
+        <div class="mc-body">
+          <b>دنباله فضایی</b>
+          <span>الگوی چراغ‌ها رو به یاد بسپار و تکرار کن</span>
+        </div>
+        <div class="mc-tag">حافظه کاری</div>
+        <div class="mc-arrow">‹</div>
+      </div>
+
+      <div class="mission-card m-odd" onclick="goTo('odd-intro')">
+        <div class="mc-icon">🔍</div>
+        <div class="mc-body">
+          <b>نقطه‌ی متفاوت</b>
+          <span>کاشی‌ای که رنگش فرق داره رو پیدا کن</span>
+        </div>
+        <div class="mc-tag">دقت بصری</div>
+        <div class="mc-arrow">‹</div>
+      </div>
+
+      <div class="mission-card m-commander" onclick="goTo('commander-intro')">
+        <div class="mc-icon">🧭</div>
+        <div class="mc-body">
+          <b>فرمانده توجه</b>
+          <span>سه مهارت با هم؛ قانون بازی وسط کار عوض می‌شه</span>
+        </div>
+        <div class="mc-tag">سطح پیشرفته</div>
+        <div class="mc-arrow">‹</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REACTION INTRO -->
+  <section class="screen" id="screen-reaction-intro">
+    <div class="game-top">
+      <button class="back-btn" onclick="goTo('home')">→ بازگشت</button>
+    </div>
+    <h2 class="page-title">مأموریت ۱ · رادار واکنش</h2>
+    <div class="instructions">
+      یه <b>رنگ هدف</b> بالای صفحه نشون داده می‌شه. حباب‌های رنگی روی رادار ظاهر می‌شن.
+      فقط وقتی حباب <b>هم‌رنگ هدف</b> بود لمسش کن. اگه رنگ اشتباه رو بزنی یا رنگ درست رو از دست بدی، امتیاز کم می‌شه.
+      ۲۰ دور داری و هرچی جلوتر بری، حباب‌ها سریع‌تر میان!
+    </div>
+    <button class="start-big-btn" style="background:var(--coral)" onclick="Reaction.start()">شروع مأموریت ⚡</button>
+  </section>
+
+  <!-- REACTION GAME -->
+  <section class="screen" id="screen-reaction-game">
+    <div class="game-top">
+      <button class="back-btn" onclick="Reaction.quit()">→ خروج</button>
+      <div class="game-stats">
+        <div class="g-stat"><span id="rScore">0</span><small>امتیاز</small></div>
+        <div class="g-stat"><span id="rRound">1/20</span><small>دور</small></div>
+        <div class="g-stat"><span id="rStreak">0</span><small>پشت‌سرهم</small></div>
+      </div>
+    </div>
+    <div class="r-target-banner">
+      رنگ هدف: <div class="r-target-dot" id="rTargetDot"></div> <span id="rTargetName"></span>
+    </div>
+    <div class="r-field" id="rField"></div>
+  </section>
+
+  <!-- SEQUENCE INTRO -->
+  <section class="screen" id="screen-sequence-intro">
+    <div class="game-top">
+      <button class="back-btn" onclick="goTo('home')">→ بازگشت</button>
+    </div>
+    <h2 class="page-title">مأموریت ۲ · دنباله فضایی</h2>
+    <div class="instructions">
+      ۴ تا کاشی رنگی می‌بینی. کاشی‌ها به ترتیب روشن می‌شن، تو باید همون ترتیب رو با لمس کردن تکرار کنی.
+      هر دور یه کاشی به دنباله اضافه می‌شه. ببین چند مرحله می‌تونی پیش بری!
+    </div>
+    <button class="start-big-btn" style="background:var(--mint)" onclick="Sequence.start()">شروع مأموریت 🧠</button>
+  </section>
+
+  <!-- SEQUENCE GAME -->
+  <section class="screen" id="screen-sequence-game">
+    <div class="game-top">
+      <button class="back-btn" onclick="Sequence.quit()">→ خروج</button>
+      <div class="game-stats">
+        <div class="g-stat"><span id="sLevel">1</span><small>مرحله</small></div>
+        <div class="g-stat"><span id="sBest">0</span><small>رکورد</small></div>
+      </div>
+    </div>
+    <div class="seq-status" id="sStatus">به دنباله نگاه کن...</div>
+    <div class="seq-pad" id="seqPad"></div>
+  </section>
+
+  <!-- ODD INTRO -->
+  <section class="screen" id="screen-odd-intro">
+    <div class="game-top">
+      <button class="back-btn" onclick="goTo('home')">→ بازگشت</button>
+    </div>
+    <h2 class="page-title">مأموریت ۳ · نقطه‌ی متفاوت</h2>
+    <div class="instructions">
+      یه شبکه از کاشی‌های هم‌رنگ می‌بینی، ولی یکیشون یه‌کم رنگش فرق داره.
+      قبل از تموم شدن زمان، اون کاشی فرق‌دار رو پیدا کن و لمسش کن.
+      هرچی جلوتر بری، شبکه بزرگ‌تر و فرق رنگ‌ها ریزتر می‌شه!
+    </div>
+    <button class="start-big-btn" style="background:var(--yellow)" onclick="OddOne.start()">شروع مأموریت 🔍</button>
+  </section>
+
+  <!-- ODD GAME -->
+  <section class="screen" id="screen-odd-game">
+    <div class="game-top">
+      <button class="back-btn" onclick="OddOne.quit()">→ خروج</button>
+      <div class="game-stats">
+        <div class="g-stat"><span id="oLevel">1</span><small>مرحله</small></div>
+        <div class="g-stat"><span id="oScore">0</span><small>امتیاز</small></div>
+      </div>
+    </div>
+    <div class="odd-timerbar"><div id="oTimerFill" style="width:100%"></div></div>
+    <div class="odd-grid" id="oddGrid"></div>
+  </section>
+
+  <!-- COMMANDER INTRO -->
+  <section class="screen" id="screen-commander-intro">
+    <div class="game-top">
+      <button class="back-btn" onclick="goTo('home')">→ بازگشت</button>
+    </div>
+    <h2 class="page-title">مأموریت ۴ · فرمانده توجه</h2>
+    <div class="instructions">
+      این مأموریت سخت‌تره چون <b>قانون بازی عوض می‌شه</b>. بالای صفحه می‌فهمی الان کدوم قانونه:<br><br>
+      <b>🎨 رنگ‌شناسی:</b> یه کلمه‌ی رنگ می‌بینی که با یه رنگ دیگه نوشته شده. باید بگی «یکیه» یا «فرق داره».<br>
+      <b>🔁 یک‌قدم‌قبل:</b> یه شکل می‌بینی، باید بگی همون شکل قبلیه یا نه.<br>
+      <b>🔢 چند تا؟:</b> چند تا شکل می‌بینی، باید عدد درست رو بزنی.<br><br>
+      ۳ جون داری ❤️❤️❤️ و هر جواب درست پشت‌سرهم امتیازت رو بیشتر می‌کنه. مراقب باش، قانون هر چند دور یهو عوض می‌شه!
+    </div>
+    <button class="start-big-btn" style="background:#B7A9FF" onclick="Commander.start()">شروع مأموریت 🧭</button>
+  </section>
+
+  <!-- COMMANDER GAME -->
+  <section class="screen" id="screen-commander-game">
+    <div class="game-top">
+      <button class="back-btn" onclick="Commander.quit()">→ خروج</button>
+      <div class="cmd-lives" id="cmdLives">❤️❤️❤️</div>
+    </div>
+    <div class="cmd-hud">
+      <div class="cmd-score">امتیاز: <span id="cmdScore">0</span></div>
+      <div class="cmd-combo">پشت‌سرهم: <b id="cmdCombo">0</b></div>
+    </div>
+    <div class="cmd-mode-banner" id="cmdModeBanner">🎨 رنگ‌شناسی</div>
+    <div class="cmd-timerbar"><div id="cmdTimerFill"></div></div>
+    <div class="cmd-stage" id="cmdStage"></div>
+    <div class="cmd-answers" id="cmdAnswers"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="screen-result">
+    <div class="result-card">
+      <div class="result-emoji" id="resEmoji">🎉</div>
+      <h3 id="resTitle">مأموریت تموم شد!</h3>
+      <p id="resSub">عملکردت رو ببین</p>
+      <div class="result-stats" id="resStats"></div>
+      <div class="result-actions">
+        <button class="btn ghost" onclick="goTo('home')">بازگشت به پایگاه</button>
+        <button class="btn primary" id="resReplay">دوباره تلاش کن</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="flash-msg" id="flashMsg"></div>
+
+<script>
+/* ---------- shared helpers ---------- */
+const $ = id => document.getElementById(id);
+let totalStars = 0;
+let missionsDone = 0;
+
+function updateHomeStats(){
+  $('totalStars').textContent = totalStars;
+  $('homeMissions').textContent = missionsDone;
+  $('homeRing').style.setProperty('--pct', Math.min(100, missionsDone*10));
+}
+
+function goTo(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('screen-'+name).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function flash(msg, kind){
+  const el = $('flashMsg');
+  el.textContent = msg;
+  el.className = 'flash-msg show ' + kind;
+  clearTimeout(flash._t);
+  flash._t = setTimeout(()=> el.classList.remove('show'), 700);
+}
+
+function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pick(arr){ return arr[rand(0,arr.length-1)]; }
+
+function showResult({emoji, title, sub, stats, stars, onReplay}){
+  $('resEmoji').textContent = emoji;
+  $('resTitle').textContent = title;
+  $('resSub').textContent = sub;
+  const statsEl = $('resStats');
+  statsEl.innerHTML = '';
+  stats.forEach(s=>{
+    const d = document.createElement('div');
+    d.className = 'rs-item';
+    d.innerHTML = `<b>${s.value}</b><small>${s.label}</small>`;
+    statsEl.appendChild(d);
+  });
+  totalStars += stars;
+  missionsDone += 1;
+  updateHomeStats();
+  $('resReplay').onclick = onReplay;
+  goTo('result');
+}
+
+/* background twinkle stars */
+(function initStars(){
+  const wrap = $('stars');
+  for(let i=0;i<60;i++){
+    const s = document.createElement('span');
+    s.style.left = rand(0,100)+'%';
+    s.style.top = rand(0,100)+'%';
+    s.style.animationDelay = (Math.random()*3).toFixed(2)+'s';
+    wrap.appendChild(s);
+  }
+})();
+
+/* ================= REACTION GAME ================= */
+const REACTION_COLORS = [
+  {name:'قرمز‌مرجانی', css:'var(--coral)'},
+  {name:'فیروزه‌ای', css:'var(--mint)'},
+  {name:'زرد', css:'var(--yellow)'},
+];
+
+const Reaction = (()=>{
+  let round, score, streak, target, active, timer, spawnDelay, resolved, fieldEl;
+  const TOTAL_ROUNDS = 20;
+
+  function start(){
+    round = 0; score = 0; streak = 0; active = true;
+    spawnDelay = 1100;
+    fieldEl = $('rField');
+    goTo('reaction-game');
+    nextRound();
+  }
+
+  function pickTarget(){
+    target = pick(REACTION_COLORS);
+    $('rTargetDot').style.background = target.css;
+    $('rTargetDot').style.color = target.css;
+    $('rTargetName').textContent = target.name;
+  }
+
+  function nextRound(){
+    if(!active) return;
+    round++;
+    if(round > TOTAL_ROUNDS){ return finish(); }
+    $('rRound').textContent = round+'/'+TOTAL_ROUNDS;
+    if(round===1 || rand(0,2)===0) pickTarget();
+    resolved = false;
+    spawnDot();
+  }
+
+  function spawnDot(){
+    fieldEl.innerHTML = '';
+    const color = Math.random() < 0.45 ? target : pick(REACTION_COLORS);
+    const size = rand(46,64);
+    const dot = document.createElement('div');
+    dot.className = 'r-dot';
+    dot.style.width = dot.style.height = size+'px';
+    dot.style.background = color.css;
+    dot.style.color = color.css;
+    const maxX = fieldEl.clientWidth - size - 10;
+    const maxY = fieldEl.clientHeight - size - 10;
+    dot.style.left = rand(6, Math.max(6,maxX)) + 'px';
+    dot.style.top = rand(6, Math.max(6,maxY)) + 'px';
+    const isTarget = color.name === target.name;
+
+    dot.onclick = ()=>{
+      if(resolved) return;
+      resolved = true;
+      if(isTarget){
+        score += 10 + streak; streak++;
+        flash('+'+(10+streak-1)+' آفرین!', 'good');
+      } else {
+        score = Math.max(0, score-8); streak = 0;
+        flash('رنگ اشتباه بود!', 'bad');
+      }
+      updateReactionStats();
+      clearTimeout(timer);
+      fieldEl.innerHTML = '';
+      setTimeout(nextRound, 180);
+    };
+
+    fieldEl.appendChild(dot);
+
+    const life = Math.max(500, spawnDelay);
+    timer = setTimeout(()=>{
+      if(resolved) return;
+      resolved = true;
+      if(isTarget){
+        streak = 0;
+        flash('از دستش دادی!', 'bad');
+        updateReactionStats();
+      }
+      fieldEl.innerHTML = '';
+      nextRound();
+    }, life);
+
+    spawnDelay = Math.max(560, spawnDelay - 26);
+  }
+
+  function updateReactionStats(){
+    $('rScore').textContent = score;
+    $('rStreak').textContent = streak;
+  }
+
+  function finish(){
+    active = false;
+    clearTimeout(timer);
+    const stars = score > 220 ? 3 : score > 130 ? 2 : 1;
+    showResult({
+      emoji: stars===3 ? '🏆' : stars===2 ? '⚡' : '🙂',
+      title: 'رادار واکنش تموم شد!',
+      sub: 'دقت و سرعتت رو ثبت کردیم',
+      stats: [
+        {value:score, label:'امتیاز'},
+        {value:'⭐'.repeat(stars), label:'ستاره'},
+      ],
+      stars,
+      onReplay: start
+    });
+  }
+
+  function quit(){
+    active = false;
+    clearTimeout(timer);
+    goTo('home');
+  }
+
+  return {start, quit};
+})();
+
+/* ================= SEQUENCE GAME (Simon-style) ================= */
+const Sequence = (()=>{
+  const TILES = [
+    {id:0, icon:'🚀', color:'var(--coral)'},
+    {id:1, icon:'🪐', color:'var(--mint)'},
+    {id:2, icon:'☄️', color:'var(--yellow)'},
+    {id:3, icon:'🌙', color:'#9b8cff'},
+  ];
+  let sequence, userStep, best, level, locked;
+
+  function start(){
+    sequence = []; userStep = 0; level = 0; locked = true;
+    if(best === undefined) best = 0;
+    buildPad();
+    $('sBest').textContent = best;
+    goTo('sequence-game');
+    setTimeout(nextLevel, 500);
+  }
+
+  function buildPad(){
+    const pad = $('seqPad');
+    pad.innerHTML = '';
+    TILES.forEach(t=>{
+      const el = document.createElement('div');
+      el.className = 'seq-tile';
+      el.style.background = 'color-mix(in srgb, ' + t.color + ' 22%, transparent)';
+      el.style.border = '1px solid ' + t.color;
+      el.style.color = t.color;
+      el.textContent = t.icon;
+      el.dataset.id = t.id;
+      el.onclick = ()=> handleTap(t.id, el);
+      pad.appendChild(el);
+    });
+  }
+
+  function nextLevel(){
+    level++;
+    $('sLevel').textContent = level;
+    sequence.push(rand(0,3));
+    userStep = 0;
+    locked = true;
+    $('sStatus').textContent = 'به دنباله نگاه کن...';
+    playSequence();
+  }
+
+  async function playSequence(){
+    await sleep(500);
+    for(const id of sequence){
+      await lightUp(id, 480);
+      await sleep(220);
+    }
+    locked = false;
+    $('sStatus').textContent = 'حالا نوبت توئه، تکرارش کن';
+  }
+
+  function lightUp(id, dur){
+    return new Promise(res=>{
+      const tile = $('seqPad').children[id];
+      tile.classList.add('lit');
+      setTimeout(()=>{ tile.classList.remove('lit'); res(); }, dur);
+    });
+  }
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  function handleTap(id, el){
+    if(locked) return;
+    el.classList.add('lit');
+    setTimeout(()=>el.classList.remove('lit'), 180);
+
+    if(id === sequence[userStep]){
+      userStep++;
+      if(userStep === sequence.length){
+        locked = true;
+        best = Math.max(best, level);
+        $('sBest').textContent = best;
+        $('sStatus').textContent = 'عالی بود! ✅';
+        flash('مرحله '+level+' تموم شد!','good');
+        setTimeout(nextLevel, 750);
+      }
+    } else {
+      locked = true;
+      flash('ترتیب اشتباه بود!','bad');
+      finish();
+    }
+  }
+
+  function finish(){
+    const reached = level - 1;
+    const stars = reached >= 8 ? 3 : reached >= 4 ? 2 : 1;
+    showResult({
+      emoji: stars===3 ? '🏆' : stars===2 ? '🧠' : '🙂',
+      title: 'دنباله فضایی تموم شد!',
+      sub: 'حافظه کاری‌ت رو محک زدیم',
+      stats: [
+        {value:reached, label:'مرحله طی‌شده'},
+        {value:best, label:'رکورد'},
+      ],
+      stars,
+      onReplay: start
+    });
+  }
+
+  function quit(){
+    goTo('home');
+  }
+
+  return {start, quit};
+})();
+
+/* ================= ODD ONE OUT ================= */
+const OddOne = (()=>{
+  let level, score, timerInterval, timeLeft, totalTime, active;
+
+  function start(){
+    level = 1; score = 0; active = true;
+    goTo('odd-game');
+    nextRound();
+  }
+
+  function baseHue(){
+    return rand(0,360);
+  }
+
+  function nextRound(){
+    if(!active) return;
+    $('oLevel').textContent = level;
+    $('oScore').textContent = score;
+
+    const gridSize = Math.min(6, 3 + Math.floor((level-1)/2)); // 3..6
+    const diff = Math.max(6, 34 - level*3); // lightness diff shrinks
+    const hue = baseHue();
+    const sat = 65;
+    const light = rand(40,55);
+    const baseColor = `hsl(${hue} ${sat}% ${light}%)`;
+    const oddColor = `hsl(${hue} ${sat}% ${light+diff}%)`;
+
+    const grid = $('oddGrid');
+    grid.innerHTML = '';
+    grid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+    const total = gridSize*gridSize;
+    const oddIndex = rand(0, total-1);
+    let resolved = false;
+
+    for(let i=0;i<total;i++){
+      const tile = document.createElement('div');
+      tile.className = 'odd-tile';
+      tile.style.background = (i===oddIndex) ? oddColor : baseColor;
+      tile.onclick = ()=>{
+        if(resolved) return;
+        resolved = true;
+        clearInterval(timerInterval);
+        if(i===oddIndex){
+          score += 10 + level;
+          flash('پیدا کردی! ✅','good');
+          level++;
+          setTimeout(nextRound, 400);
+        } else {
+          flash('این که فرق نداشت 😅','bad');
+          finish();
+        }
+      };
+      grid.appendChild(tile);
+    }
+
+    totalTime = Math.max(2200, 5200 - level*160);
+    timeLeft = totalTime;
+    $('oTimerFill').style.width = '100%';
+    clearInterval(timerInterval);
+    timerInterval = setInterval(()=>{
+      timeLeft -= 60;
+      $('oTimerFill').style.width = Math.max(0,(timeLeft/totalTime*100))+'%';
+      if(timeLeft <= 0){
+        clearInterval(timerInterval);
+        if(!resolved){
+          resolved = true;
+          flash('زمان تموم شد!','bad');
+          finish();
+        }
+      }
+    }, 60);
+  }
+
+  function finish(){
+    active = false;
+    clearInterval(timerInterval);
+    const stars = level >= 9 ? 3 : level >= 5 ? 2 : 1;
+    showResult({
+      emoji: stars===3 ? '🏆' : stars===2 ? '🔍' : '🙂',
+      title: 'نقطه‌ی متفاوت تموم شد!',
+      sub: 'دقت بصری‌ت رو محک زدیم',
+      stats: [
+        {value:score, label:'امتیاز'},
+        {value:(level-1), label:'مرحله طی‌شده'},
+      ],
+      stars,
+      onReplay: start
+    });
+  }
+
+  function quit(){
+    active = false;
+    clearInterval(timerInterval);
+    goTo('home');
+  }
+
+  return {start, quit};
+})();
+
+/* ================= COMMANDER (advanced, task-switching) ================= */
+const Commander = (()=>{
+  const COLOR_WORDS = [
+    {name:'قرمز', css:'#FF4D6D'},
+    {name:'آبی', css:'#4D9CFF'},
+    {name:'سبز', css:'#5CE87A'},
+    {name:'زرد', css:'#FFC93C'},
+    {name:'بنفش', css:'#B78CFF'},
+    {name:'نارنجی', css:'#FF9F45'},
+  ];
+  const SHAPES = ['⭐','🔷','🔺','🟢','🟣','⬛','🔶','🌙'];
+  const MODES = ['stroop','oneback','count'];
+  const MODE_LABEL = {
+    stroop: '🎨 رنگ‌شناسی',
+    oneback: '🔁 یک‌قدم‌قبل',
+    count: '🔢 چند تا؟'
+  };
+
+  const TOTAL_TRIALS = 24;
+  let trial, lives, score, combo, mode, modeLeft, lastShape, active, timer, resolved, level;
+
+  function start(){
+    trial = 0; lives = 3; score = 0; combo = 0; active = true; level = 1;
+    lastShape = pick(SHAPES);
+    mode = pick(MODES);
+    modeLeft = rand(3,5);
+    renderLives();
+    updateHud();
+    goTo('commander-game');
+    nextTrial();
+  }
+
+  function updateHud(){
+    $('cmdScore').textContent = score;
+    $('cmdCombo').textContent = combo;
+  }
+
+  function renderLives(){
+    let html = '';
+    for(let i=0;i<3;i++) html += `<span class="${i<lives?'':'lost'}">❤️</span>`;
+    $('cmdLives').innerHTML = html;
+  }
+
+  function maybeSwitchMode(){
+    modeLeft--;
+    if(modeLeft <= 0){
+      let next = pick(MODES.filter(m=>m!==mode));
+      mode = next;
+      modeLeft = rand(3,5);
+    }
+    $('cmdModeBanner').textContent = MODE_LABEL[mode];
+  }
+
+  function nextTrial(){
+    if(!active) return;
+    trial++;
+    if(trial > TOTAL_TRIALS || lives <= 0){ return finish(); }
+    level = 1 + Math.floor((trial-1)/6);
+    maybeSwitchMode();
+    resolved = false;
+
+    const stage = $('cmdStage');
+    const answers = $('cmdAnswers');
+    stage.innerHTML = '';
+    answers.innerHTML = '';
+
+    if(mode === 'stroop') renderStroop(stage, answers);
+    else if(mode === 'oneback') renderOneBack(stage, answers);
+    else renderCount(stage, answers);
+
+    const totalTime = Math.max(2200, 4800 - level*220);
+    startTimer(totalTime);
+  }
+
+  function startTimer(totalTime){
+    let timeLeft = totalTime;
+    const fill = $('cmdTimerFill');
+    fill.style.width = '100%';
+    clearInterval(timer);
+    timer = setInterval(()=>{
+      timeLeft -= 60;
+      fill.style.width = Math.max(0, timeLeft/totalTime*100)+'%';
+      if(timeLeft <= 0){
+        clearInterval(timer);
+        if(!resolved){ resolved = true; handleResult(false); }
+      }
+    }, 60);
+  }
+
+  function renderStroop(stage, answers){
+    const wordObj = pick(COLOR_WORDS);
+    const match = Math.random() < 0.5;
+    let fontColorObj = wordObj;
+    if(!match){
+      fontColorObj = pick(COLOR_WORDS.filter(c=>c.name!==wordObj.name));
+    }
+    stage.innerHTML = `
+      <div class="cmd-stage-label">این کلمه با رنگش یکیه؟</div>
+      <div class="cmd-stroop-word" style="color:${fontColorObj.css}">${wordObj.name}</div>
+    `;
+    buildYesNo(answers, match);
+  }
+
+  function renderOneBack(stage, answers){
+    const match = Math.random() < 0.5;
+    const shape = match ? lastShape : pick(SHAPES.filter(s=>s!==lastShape));
+    stage.innerHTML = `
+      <div class="cmd-stage-label">این شکل با شکل قبلی یکیه؟</div>
+      <div class="cmd-shape">${shape}</div>
+    `;
+    buildYesNo(answers, match, ()=>{ lastShape = shape; });
+  }
+
+  function renderCount(stage, answers){
+    const n = rand(3, Math.min(9, 4+level));
+    const icon = pick(['⭐','🔵','🔺','🟩']);
+    let dots = '';
+    for(let i=0;i<n;i++) dots += `<span>${icon}</span>`;
+    stage.innerHTML = `
+      <div class="cmd-stage-label">چند تا شکل می‌بینی؟</div>
+      <div class="cmd-dotgrid">${dots}</div>
+    `;
+    let options = new Set([n]);
+    while(options.size < 3){
+      const d = n + pick([-2,-1,1,2]);
+      if(d >= 1 && d <= 12) options.add(d);
+    }
+    const arr = Array.from(options).sort(()=>Math.random()-0.5);
+    answers.innerHTML = '';
+    arr.forEach(val=>{
+      const btn = document.createElement('button');
+      btn.textContent = val;
+      btn.onclick = ()=>{
+        if(resolved) return;
+        resolved = true;
+        clearInterval(timer);
+        handleResult(val === n);
+      };
+      answers.appendChild(btn);
+    });
+  }
+
+  function buildYesNo(answers, correctIsYes, onAnswered){
+    answers.innerHTML = '';
+    const yes = document.createElement('button');
+    yes.className = 'yes'; yes.textContent = 'یکیه ✅';
+    const no = document.createElement('button');
+    no.className = 'no'; no.textContent = 'فرق داره ❌';
+    [[yes,true],[no,false]].forEach(([btn,val])=>{
+      btn.onclick = ()=>{
+        if(resolved) return;
+        resolved = true;
+        clearInterval(timer);
+        if(onAnswered) onAnswered();
+        handleResult(val === correctIsYes);
+      };
+    });
+    answers.appendChild(yes);
+    answers.appendChild(no);
+  }
+
+  function handleResult(correct){
+    if(correct){
+      combo++;
+      score += 10 + combo*2;
+      flash('+'+(10+combo*2)+' درسته!', 'good');
+    } else {
+      combo = 0;
+      lives--;
+      renderLives();
+      flash(lives>0 ? 'اشتباه بود! یه جون رفت' : 'جون‌هات تموم شد!', 'bad');
+    }
+    updateHud();
+    setTimeout(nextTrial, 450);
+  }
+
+  function finish(){
+    active = false;
+    clearInterval(timer);
+    const stars = score > 320 ? 3 : score > 170 ? 2 : 1;
+    showResult({
+      emoji: stars===3 ? '🏆' : stars===2 ? '🧭' : '🙂',
+      title: 'فرمانده توجه تموم شد!',
+      sub: 'انعطاف ذهنی، حافظه و توجهت رو با هم محک زدیم',
+      stats: [
+        {value:score, label:'امتیاز'},
+        {value:trial-1, label:'دور طی‌شده'},
+      ],
+      stars,
+      onReplay: start
+    });
+  }
+
+  function quit(){
+    active = false;
+    clearInterval(timer);
+    goTo('home');
+  }
+
+  return {start, quit};
+})();
+
+updateHomeStats();
+</script>
+</body>
+</html>

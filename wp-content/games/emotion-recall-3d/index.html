@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>صورت‌های خندان | Emotion Recall 3D</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0b0f19;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Tahoma, sans-serif;
+        }
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            padding: 10px 22px;
+            color: #f8fafc;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        #instruction {
+            position: absolute;
+            bottom: 125px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 10px 28px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            white-space: nowrap;
+        }
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.98) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+            transition: opacity 0.4s ease;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 28px;
+            padding: 36px 44px;
+            text-align: center;
+            color: #fff;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        }
+        .card h1 {
+            font-size: 2.2rem;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card p {
+            color: #cbd5e1;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: #fff;
+            border: none;
+            outline: none;
+            padding: 14px 42px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 14px 30px rgba(14, 165, 233, 0.6);
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        #selection-panel {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            z-index: 10;
+            width: 90%;
+            max-width: 460px;
+        }
+        .choice-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .choice-btn:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.22);
+            border-color: #38bdf8;
+        }
+        .emoji-icon {
+            font-size: 1.5rem;
+        }
+        .hidden {
+            display: none !important;
+        }
+        #stage-badge {
+            position: absolute;
+            bottom: 178px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            color: #93c5fd;
+            font-size: 0.9rem;
+            font-weight: 600;
+            pointer-events: none;
+            text-align: center;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    // GhorbaniKids Score Submission Protocol
+    function gkSendScore(finalScore) {
+        try {
+            var sc = parseInt(finalScore) || 0;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'GK_SUBMIT_SCORE',
+                    score: sc
+                }, '*');
+            }
+        } catch(e) { console.error('GK postMessage error:', e); }
+    }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+</head>
+<body>
+
+    <div id="hud">
+        <div class="glass-panel">مرحله: <span id="level-display">۱</span></div>
+        <div class="glass-panel">امتیاز: <span id="score-display">۰</span></div>
+    </div>
+
+    <div id="stage-badge"></div>
+    <div id="instruction">احساسات چهره‌ها را خوب به خاطر بسپارید!</div>
+
+    <div id="start-screen" class="overlay-screen">
+        <div class="card">
+            <h1>صورت‌های خندان</h1>
+            <p>چند کارت سه‌بعدی با حالت‌های مختلف چهره نمایش داده می‌شوند. پس از چرخش و پنهان شدن کارت‌ها، حالت هر کارت را از راست به چپ حدس بزنید! از مرحله ۶ به بعد هم حالت‌های جدید و هم تعداد کارت‌ها بیشتر می‌شود.</p>
+            <button class="btn" id="start-btn">شروع بازی</button>
+        </div>
+    </div>
+
+    <div id="game-over-screen" class="overlay-screen hidden">
+        <div class="card">
+            <h1>پایان بازی!</h1>
+            <p>امتیاز کسب شده: <span id="final-score" style="font-weight:bold; color:#38bdf8;">0</span></p>
+            <button class="btn" id="restart-btn">بازی مجدد</button>
+        </div>
+    </div>
+
+    <div id="selection-panel" class="hidden"></div>
+
+    <div id="canvas-container">
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <script>
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playFlip() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(500, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+            playCorrect() {
+                if (!this.ctx) return;
+                const notes = [440, 554.37, 659.25, 880];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.07);
+                    gain.gain.setValueAtTime(0.25, this.ctx.currentTime + idx * 0.07);
+                    gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.07 + 0.22);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.07);
+                    osc.stop(this.ctx.currentTime + idx * 0.07 + 0.22);
+                });
+            }
+            playWrong() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(70, this.ctx.currentTime + 0.35);
+                gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.35);
+            }
+        }
+
+        const sound = new SoundFX();
+
+        let scene, camera, renderer;
+        let cardMeshes = [];
+        let particles;
+        let level = 1;
+        let score = 0;
+        let currentSequence = [];
+        let currentEmotionSet = [];
+        let selectionIndex = 0;
+        let selectedAnswers = [];
+
+        // اندازه کارت‌ها کوچک‌تر شده - این ضریب روی مقیاس نهایی کارت اعمال می‌شود
+        const CARD_SCALE = 0.62;
+
+        // --- تعریف حالت‌های مختلف چهره ---
+        const EMOTION_META = {
+            happy:     { icon: '😊', label: 'شاد',     color: 0xfacc15 },
+            sad:       { icon: '😢', label: 'غمگین',   color: 0x60a5fa },
+            angry:     { icon: '😡', label: 'عصبانی',  color: 0xf87171 },
+            surprised: { icon: '😲', label: 'متعجب',   color: 0xfb923c },
+            neutral:   { icon: '😐', label: 'خنثی',    color: 0xa78bfa }
+        };
+
+        // حالت‌های در دسترس بر اساس مرحله - از مرحله ۶ به بعد سخت‌تر می‌شود
+        function getEmotionsForLevel(lvl) {
+            const set = ['happy', 'sad'];
+            if (lvl >= 6) set.push('angry');
+            if (lvl >= 10) set.push('surprised');
+            if (lvl >= 14) set.push('neutral');
+            return set;
+        }
+
+        // تعداد کارت‌ها بر اساس مرحله - از مرحله ۶ به بعد تعداد کارت‌ها هم زیاد می‌شود
+        function getCardCountForLevel(lvl) {
+            if (lvl < 6) return 2;
+            if (lvl < 10) return 3;
+            if (lvl < 14) return 4;
+            return 5;
+        }
+
+        function init3D() {
+            const canvas = document.getElementById('game-canvas');
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x0b0f19, 0.035);
+
+            camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 0, 8.5);
+
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambient);
+
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
+            keyLight.position.set(5, 8, 8);
+            keyLight.castShadow = true;
+            scene.add(keyLight);
+
+            const fillLight = new THREE.PointLight(0x38bdf8, 1, 15);
+            fillLight.position.set(-5, -2, 4);
+            scene.add(fillLight);
+
+            createDustParticles();
+            window.addEventListener('resize', onResize);
+        }
+
+        function createDustParticles() {
+            const geo = new THREE.BufferGeometry();
+            const count = 120;
+            const positions = new Float32Array(count * 3);
+            for (let i = 0; i < count * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 16;
+                positions[i+1] = (Math.random() - 0.5) * 10;
+                positions[i+2] = (Math.random() - 0.5) * 8;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const mat = new THREE.PointsMaterial({ size: 0.04, color: 0x60a5fa, transparent: true, opacity: 0.5 });
+            particles = new THREE.Points(geo, mat);
+            scene.add(particles);
+        }
+
+        // --- ساخت مدل سه‌بعدی کارت و چهره (با پشتیبانی از حالت‌های مختلف) ---
+        function createCard(emotion) {
+            const group = new THREE.Group();
+            const meta = EMOTION_META[emotion];
+
+            const cardMat = new THREE.MeshStandardMaterial({
+                color: 0x1e293b,
+                roughness: 0.3,
+                metalness: 0.2
+            });
+            const borderMat = new THREE.MeshStandardMaterial({
+                color: 0x38bdf8,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+
+            const cardBase = new THREE.Mesh(new THREE.BoxGeometry(2.1, 2.9, 0.12), cardMat);
+            cardBase.castShadow = true;
+            group.add(cardBase);
+
+            const border = new THREE.Mesh(new THREE.BoxGeometry(2.18, 2.98, 0.08), borderMat);
+            group.add(border);
+
+            // صورت - رنگ مخصوص هر احساس برای تشخیص واضح‌تر
+            const faceMat = new THREE.MeshStandardMaterial({
+                color: meta.color,
+                roughness: 0.3,
+                metalness: 0.1,
+                emissive: meta.color,
+                emissiveIntensity: 0.12
+            });
+            const face = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.72, 0.05, 40), faceMat);
+            face.rotation.x = Math.PI / 2;
+            face.position.z = 0.08;
+            group.add(face);
+
+            // چشم‌ها
+            const darkMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+            [-0.24, 0.24].forEach(x => {
+                const eye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), darkMat);
+                eye.position.set(x, 0.2, 0.12);
+                group.add(eye);
+            });
+
+            // ابروها - برای تفکیک واضح‌تر احساسات
+            const browMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+            [-0.24, 0.24].forEach((x, idx) => {
+                const brow = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.05), browMat);
+                if (emotion === 'angry') {
+                    brow.position.set(x, 0.42, 0.12);
+                    brow.rotation.z = idx === 0 ? -0.5 : 0.5;
+                } else if (emotion === 'surprised') {
+                    brow.position.set(x, 0.48, 0.12);
+                    brow.rotation.z = 0;
+                } else {
+                    brow.position.set(x, 0.4, 0.12);
+                    brow.rotation.z = 0;
+                }
+                group.add(brow);
+            });
+
+            // دهان - شکل متفاوت برای هر احساس
+            const mouthMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+            let mouth;
+            if (emotion === 'happy') {
+                mouth = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.045, 8, 24, Math.PI), mouthMat);
+                mouth.rotation.z = Math.PI;
+                mouth.position.set(0, -0.14, 0.12);
+            } else if (emotion === 'sad') {
+                mouth = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.045, 8, 24, Math.PI), mouthMat);
+                mouth.rotation.z = 0;
+                mouth.position.set(0, -0.3, 0.12);
+            } else if (emotion === 'angry') {
+                mouth = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.05, 8, 24, Math.PI), mouthMat);
+                mouth.rotation.z = 0;
+                mouth.rotation.x = 0.3;
+                mouth.position.set(0, -0.24, 0.12);
+            } else if (emotion === 'surprised') {
+                mouth = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.055, 12, 24), mouthMat);
+                mouth.position.set(0, -0.22, 0.12);
+            } else {
+                mouth = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.045, 0.04), mouthMat);
+                mouth.position.set(0, -0.22, 0.12);
+            }
+            group.add(mouth);
+
+            // طرح پشت کارت (طرح هندسی نئونی)
+            const backMat = new THREE.MeshStandardMaterial({ color: 0x4f46e5, metalness: 0.5, roughness: 0.4 });
+            const backPattern = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.3, 0.02), backMat);
+            backPattern.position.z = -0.07;
+            group.add(backPattern);
+
+            const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.35), new THREE.MeshStandardMaterial({ color: 0x38bdf8 }));
+            star.position.z = -0.1;
+            group.add(star);
+
+            group.userData = { emotion: emotion };
+            return group;
+        }
+
+        function cardLabel(index, total) {
+            if (total === 2) return index === 0 ? 'راست' : 'چپ';
+            if (index === 0) return 'راست‌ترین';
+            if (index === total - 1) return 'چپ‌ترین';
+            return `شماره ${index + 1} (از راست)`;
+        }
+
+        // --- جریان اجرای مرحله ---
+        function startLevel() {
+            cardMeshes.forEach(c => scene.remove(c));
+            cardMeshes = [];
+            document.getElementById('selection-panel').classList.add('hidden');
+
+            currentEmotionSet = getEmotionsForLevel(level);
+            const cardCount = getCardCountForLevel(level);
+
+            const badge = document.getElementById('stage-badge');
+            const labels = currentEmotionSet.map(e => EMOTION_META[e].icon).join(' ');
+            badge.innerText = `تعداد کارت‌ها: ${cardCount}  |  حالت‌ها: ${labels}`;
+
+            currentSequence = [];
+            for (let i = 0; i < cardCount; i++) {
+                currentSequence.push(currentEmotionSet[Math.floor(Math.random() * currentEmotionSet.length)]);
+            }
+
+            // فاصله و موقعیت کارت‌ها بر اساس تعدادشان تنظیم می‌شود
+            const spacing = cardCount <= 2 ? 1.5 : cardCount === 3 ? 1.25 : cardCount === 4 ? 1.05 : 0.9;
+            const positions = [];
+            for (let i = 0; i < cardCount; i++) {
+                const x = ((cardCount - 1) / 2 - i) * spacing;
+                positions.push(new THREE.Vector3(x, 0, 0));
+            }
+
+            // دوربین کمی عقب می‌رود تا کارت‌های بیشتر و کوچک‌تر در قاب جا شوند
+            const targetZ = 8.5 + Math.max(0, cardCount - 2) * 1.6;
+            new TWEEN.Tween(camera.position)
+                .to({ z: targetZ }, 500)
+                .easing(TWEEN.Easing.Quadratic.Out)
+                .start();
+
+            currentSequence.forEach((emo, i) => {
+                const card = createCard(emo);
+                card.position.set(positions[i].x, positions[i].y, positions[i].z);
+                card.rotation.y = 0;
+                card.scale.set(0.001, 0.001, 0.001);
+                scene.add(card);
+                cardMeshes.push(card);
+
+                new TWEEN.Tween(card.scale)
+                    .to({ x: CARD_SCALE, y: CARD_SCALE, z: CARD_SCALE }, 700)
+                    .easing(TWEEN.Easing.Back.Out)
+                    .delay(i * 120)
+                    .start();
+            });
+
+            // زمان نمایش: از مرحله ۶ به بعد سریع‌تر و سخت‌تر کاهش می‌یابد
+            let displayTime;
+            if (level < 6) {
+                displayTime = Math.max(1800, 3200 - level * 200);
+            } else {
+                displayTime = Math.max(1100, 2800 - level * 120) + (cardCount - 2) * 250;
+            }
+            document.getElementById('instruction').innerText = `حالت چهره‌ها را به خاطر بسپارید! (${(displayTime/1000).toFixed(1)}s)`;
+
+            setTimeout(() => {
+                sound.playFlip();
+                cardMeshes.forEach((card, idx) => {
+                    new TWEEN.Tween(card.rotation)
+                        .to({ y: Math.PI }, 650)
+                        .easing(TWEEN.Easing.Cubic.InOut)
+                        .delay(idx * 90)
+                        .start();
+                });
+
+                setTimeout(() => {
+                    showSelectionUI();
+                }, 750);
+
+            }, displayTime);
+        }
+
+        // --- انتخاب گام به گام: از کارت راست‌ترین تا چپ‌ترین ---
+        function showSelectionUI() {
+            selectionIndex = 0;
+            selectedAnswers = [];
+            renderEmotionChoices();
+        }
+
+        function renderEmotionChoices() {
+            const total = currentSequence.length;
+            const label = cardLabel(selectionIndex, total);
+            document.getElementById('instruction').innerText = `حالت کارت ${label} چه بود؟ (${selectionIndex + 1}/${total})`;
+            document.getElementById('stage-badge').innerText = '';
+
+            const panel = document.getElementById('selection-panel');
+            panel.innerHTML = '';
+
+            currentEmotionSet.forEach(emotion => {
+                const meta = EMOTION_META[emotion];
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerHTML = `<span class="emoji-icon">${meta.icon}</span> <span>${meta.label}</span>`;
+                btn.onclick = () => handleEmotionPick(emotion);
+                panel.appendChild(btn);
+            });
+
+            panel.classList.remove('hidden');
+        }
+
+        function handleEmotionPick(emotion) {
+            selectedAnswers.push(emotion);
+            selectionIndex++;
+
+            if (selectionIndex < currentSequence.length) {
+                renderEmotionChoices();
+            } else {
+                document.getElementById('selection-panel').classList.add('hidden');
+                finalizeChoice();
+            }
+        }
+
+        function finalizeChoice() {
+            const isCorrect = selectedAnswers.every((e, i) => e === currentSequence[i]);
+
+            sound.playFlip();
+            cardMeshes.forEach((card, idx) => {
+                new TWEEN.Tween(card.rotation)
+                    .to({ y: 0 }, 550)
+                    .easing(TWEEN.Easing.Back.Out)
+                    .delay(idx * 70)
+                    .start();
+            });
+
+            setTimeout(() => {
+                if (isCorrect) {
+                    sound.playCorrect();
+                    score += 100 + (level * 25);
+                    level++;
+                    document.getElementById('score-display').innerText = score;
+                    document.getElementById('level-display').innerText = level;
+                    document.getElementById('instruction').innerText = "کاملاً درست بود! 🎉";
+
+                    cardMeshes.forEach(c => {
+                        new TWEEN.Tween(c.position)
+                            .to({ y: 0.4 }, 250)
+                            .yoyo(true)
+                            .repeat(1)
+                            .start();
+                    });
+
+                    setTimeout(startLevel, 1400);
+                } else {
+                    sound.playWrong();
+                    document.getElementById('instruction').innerText = "اشتباه بود! ❌";
+
+                    setTimeout(() => {
+                        try { gkSendScore(score); } catch(e){}
+                        document.getElementById('final-score').innerText = score;
+                        document.getElementById('game-over-screen').classList.remove('hidden');
+                    }, 1200);
+                }
+            }, 600);
+        }
+
+        // --- حلقه رندر و چرخش ملایم کارت‌ها ---
+        let clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            TWEEN.update();
+            const time = clock.getElapsedTime();
+
+            if (particles) {
+                particles.rotation.y = time * 0.04;
+            }
+
+            cardMeshes.forEach((card, i) => {
+                card.position.y += Math.sin(time * 2 + i) * 0.0015;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            sound.init();
+            document.getElementById('start-screen').classList.add('hidden');
+            score = 0;
+            level = 1;
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('level-display').innerText = level;
+            startLevel();
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            document.getElementById('game-over-screen').classList.add('hidden');
+            score = 0;
+            level = 1;
+            camera.position.z = 8.5;
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('level-display').innerText = level;
+            startLevel();
+        });
+
+        window.onload = () => {
+            init3D();
+            animate();
+        };
+    </script>
+</body>
+</html>
