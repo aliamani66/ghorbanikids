@@ -1017,78 +1017,80 @@ class GK_Teacher_Portal {
                     border-radius: 12px !important;
                 }
 
-                /* تبدیل ردیف‌های جدول کارنامه به کارت‌های چندسطری شیک در موبایل */
+                /* تایل کاملاً جمع‌وجور، تک‌سطحی و شیک کارنامه در موبایل */
+                .gk-table-reportcards thead {
+                    display: none !important;
+                }
+                .gk-table-reportcards .gk-t-rc-mobile-meta {
+                    display: flex !important;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 11.5px;
+                    color: #64748b;
+                    margin-top: 3px;
+                }
+                .gk-t-rc-age-tag {
+                    background: #f1f5f9;
+                    color: #475569;
+                    padding: 1px 7px;
+                    border-radius: 6px;
+                    font-weight: 800;
+                    font-size: 11px;
+                }
+                .gk-t-rc-phone-tag {
+                    color: #64748b;
+                    font-weight: 600;
+                    font-size: 11.5px;
+                }
+                .gk-t-rc-cell-age-desktop,
+                .gk-t-rc-cell-phone-desktop {
+                    display: none !important;
+                }
                 .gk-t-rc-row {
                     background: #ffffff !important;
-                    border: 2px solid #e2e8f0 !important;
-                    border-radius: 18px !important;
-                    padding: 14px !important;
-                    margin-bottom: 14px !important;
-                    box-shadow: 0 3px 12px rgba(0,0,0,0.03) !important;
+                    border: 1.5px solid #e2e8f0 !important;
+                    border-radius: 14px !important;
+                    padding: 10px 12px !important;
+                    margin-bottom: 8px !important;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
                     position: relative !important;
-                    display: block !important;
-                    width: 100% !important;
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    gap: 10px !important;
                     box-sizing: border-box !important;
+                    width: 100% !important;
                 }
                 .gk-t-rc-row td {
                     background: transparent !important;
                     border: none !important;
-                    padding: 3px 0 !important;
-                    border-radius: 0 !important;
+                    padding: 0 !important;
                     text-align: right !important;
                     display: block !important;
-                    width: 100% !important;
                     box-sizing: border-box !important;
                 }
-                .gk-t-rc-row td:nth-child(1) { /* رتبه */
-                    position: absolute;
-                    top: 14px;
-                    left: 14px;
+                .gk-t-rc-cell-num {
+                    display: none !important;
+                }
+                .gk-t-rc-cell-info {
+                    flex: 1 1 auto !important;
+                    min-width: 0 !important;
+                }
+                .gk-t-rc-cell-btn {
+                    flex-shrink: 0 !important;
                     width: auto !important;
-                    font-size: 11.5px;
-                    color: #64748b;
-                    background: #f1f5f9;
-                    padding: 3px 8px;
-                    border-radius: 8px;
-                    font-weight: 900;
-                }
-                .gk-t-rc-row td:nth-child(2) { /* نام */
-                    font-size: 15px !important;
-                    padding-left: 55px !important;
-                    margin-bottom: 4px;
-                }
-                .gk-t-rc-row td:nth-child(3) { /* سن */
-                    display: inline-block !important;
-                    width: auto !important;
-                    color: #475569;
-                    font-size: 11.5px;
-                    background: #f8fafc;
-                    padding: 2px 8px;
-                    border-radius: 6px;
-                    border: 1px solid #e2e8f0;
-                    margin-left: 6px;
-                    font-weight: bold;
-                }
-                .gk-t-rc-row td:nth-child(4) { /* تلفن */
-                    display: inline-block !important;
-                    width: auto !important;
-                    font-size: 12px;
-                }
-                .gk-t-rc-row td:nth-child(5) { /* امتیاز کل */
-                    margin: 8px 0 !important;
-                }
-                .gk-t-rc-row td:nth-child(6) { /* دکمه کارنامه */
-                    border-top: 1.5px dashed #e2e8f0 !important;
-                    padding-top: 12px !important;
-                    margin-top: 6px !important;
                 }
                 .gk-t-rc-row .gk-btn-view-rc {
-                    width: 100% !important;
-                    justify-content: center !important;
-                    height: 42px !important;
-                    border-radius: 12px !important;
-                    font-size: 13px !important;
-                    box-sizing: border-box !important;
+                    width: auto !important;
+                    padding: 7px 12px !important;
+                    height: auto !important;
+                    border-radius: 10px !important;
+                    font-size: 12px !important;
+                    font-weight: 800 !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 4px !important;
+                    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2) !important;
                 }
 
                 #gk-teacher-search-rc {
@@ -2121,43 +2123,46 @@ class GK_Teacher_Portal {
                     </div>
 
                     <div style="overflow-x:auto;">
-                        <table class="gk-table-st">
+                        <table class="gk-table-st gk-table-reportcards">
                             <thead>
                                 <tr>
-                                    <th>رتبه</th>
-                                    <th>نام و نام خانوادگی</th>
-                                    <th>سن</th>
-                                    <th>شماره والد</th>
-                                    <th>مجموع امتیاز بازی‌ها</th>
-                                    <th style="text-align:center;">کارنامه و گزارش پیشرفت</th>
+                                    <th style="width:60px;">ردیف</th>
+                                    <th>نام و مشخصات نوآموز</th>
+                                    <th class="gk-t-rc-cell-age-desktop" style="width:110px;">سن</th>
+                                    <th class="gk-t-rc-cell-phone-desktop">شماره والد</th>
+                                    <th style="text-align:center; width:170px;">کارنامه و پرونده</th>
                                 </tr>
                             </thead>
                             <tbody id="gk-t-reportcards-tbody">
                                 <?php if (empty($students)): ?>
                                     <tr>
-                                        <td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">
+                                        <td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">
                                             هنوز دانـش‌آموزی در این کلاس ثبت نشده است.
                                         </td>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($students as $idx => $st): ?>
                                         <tr class="gk-t-rc-row">
-                                            <td><strong>#<?php echo $idx + 1; ?></strong></td>
-                                            <td><strong style="font-size:14px; color:#1e293b;">👶 <?php echo esc_html($st->name); ?></strong></td>
-                                            <td><?php echo esc_html($st->age); ?> ساله</td>
-                                            <td>
+                                            <td class="gk-t-rc-cell-num"><strong>#<?php echo $idx + 1; ?></strong></td>
+                                            <td class="gk-t-rc-cell-info">
+                                                <div style="font-size:14.5px; font-weight:900; color:#1e293b; margin-bottom:2px;">
+                                                    👶 <?php echo esc_html($st->name); ?>
+                                                </div>
+                                                <div class="gk-t-rc-mobile-meta">
+                                                    <span class="gk-t-rc-age-tag"><?php echo esc_html($st->age); ?> ساله</span>
+                                                    <span style="color:#cbd5e1;">•</span>
+                                                    <span class="gk-t-rc-phone-tag">📞 <?php echo esc_html($st->parent_phone ?: 'ثبت نشده'); ?></span>
+                                                </div>
+                                            </td>
+                                            <td class="gk-t-rc-cell-age-desktop"><?php echo esc_html($st->age); ?> ساله</td>
+                                            <td class="gk-t-rc-cell-phone-desktop">
                                                 <span style="font-size:12px; font-weight:bold; color:#475569;">
                                                     📞 <?php echo esc_html($st->parent_phone ?: 'ثبت نشده'); ?>
                                                 </span>
                                             </td>
-                                            <td>
-                                                <span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:3px 8px; border-radius:8px; font-weight:900; font-size:12px;">
-                                                    🏆 <?php echo number_format($st->total_game_score); ?> امتیاز
-                                                </span>
-                                            </td>
-                                            <td style="text-align:center;">
+                                            <td class="gk-t-rc-cell-btn" style="text-align:center;">
                                                 <button type="button" class="gk-btn-view-rc" onclick="gkOpenStudentReportCard(<?php echo $st->id; ?>)">
-                                                    <span>📊 مشاهده کارنامه جامع</span>
+                                                    <span>📊 مشاهده کارنامه</span>
                                                 </button>
                                             </td>
                                         </tr>
