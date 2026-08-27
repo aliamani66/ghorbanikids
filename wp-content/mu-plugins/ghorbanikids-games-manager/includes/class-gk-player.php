@@ -63,14 +63,14 @@ class GK_Player {
 
             $is_curriculum = (!empty($grade_terms) && !is_wp_error($grade_terms));
             $back_url      = home_url('/games/');
-            $back_label    = '⬅️ همه بازی‌ها';
+            $back_label    = '⬅️ بازگشت';
 
             if ($is_curriculum) {
                 $first_grade = reset($grade_terms);
                 $grade_slug  = $first_grade->slug;
                 $grade_name  = $first_grade->name;
                 $back_url    = home_url('/curriculum/?grade=' . $grade_slug);
-                $back_label  = '⬅️ بازی‌های درسی ' . esc_html($grade_name);
+                $back_label  = '⬅️ بازگشت';
             }
 
             if (isset($_GET['st_token']) && !empty($_GET['st_token'])) {
