@@ -791,23 +791,43 @@ class GK_Teacher_Portal {
                 .gk-tab-lbl-short { display: inline !important; }
                 .gk-tab-lbl-full { display: none !important; }
                 .gk-tabs-nav-bar {
-                    display: flex !important;
-                    flex-wrap: nowrap !important;
-                    overflow-x: auto !important;
-                    -webkit-overflow-scrolling: touch !important;
-                    scrollbar-width: none !important;
-                    gap: 6px !important;
-                    padding: 4px 2px 8px 2px !important;
-                    margin-bottom: 16px !important;
-                    border-bottom: 2px solid #e2e8f0 !important;
+                    display: grid !important;
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 8px !important;
+                    padding: 0 !important;
+                    margin-bottom: 18px !important;
+                    border-bottom: none !important;
+                    overflow: visible !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
                 }
                 .gk-tabs-nav-bar::-webkit-scrollbar { display: none; }
                 .gk-tab-btn {
-                    flex: 1 0 auto !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    padding: 12px 14px !important;
+                    font-size: 13px !important;
+                    border-radius: 14px !important;
+                    border: 2px solid #e2e8f0 !important;
+                    border-bottom: 2px solid #e2e8f0 !important;
+                    bottom: 0 !important;
+                    background: #f8fafc !important;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
                     white-space: nowrap !important;
-                    padding: 10px 12px !important;
-                    font-size: 12px !important;
-                    border-radius: 12px 12px 0 0 !important;
+                }
+                .gk-tab-btn.active {
+                    background: #ffffff !important;
+                    border: 2.5px solid #4f46e5 !important;
+                    color: #4f46e5 !important;
+                    font-weight: 900 !important;
+                    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.15) !important;
+                }
+                .gk-tab-btn.active .gk-tab-badge {
+                    background: #4f46e5 !important;
+                    color: #ffffff !important;
                 }
                 .gk-card-box {
                     padding: 16px 12px !important;
