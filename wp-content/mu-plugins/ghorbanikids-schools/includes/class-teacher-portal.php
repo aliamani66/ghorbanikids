@@ -511,6 +511,15 @@ class GK_Teacher_Portal {
                 box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
             }
 
+            /* پنهان‌سازی پیش‌فرض کارت‌های موبایل در صفحات دسکتاپ */
+            .gk-st-mobile-cards,
+            .gk-rc-mobile-cards {
+                display: none !important;
+            }
+            .gk-desktop-table-wrap {
+                display: block !important;
+            }
+
             .gk-rc-letterhead {
                 background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
                 border: 2px solid #e2e8f0;
@@ -938,18 +947,18 @@ class GK_Teacher_Portal {
                 .gk-rc-mobile-cards {
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 8px !important;
+                    gap: 10px !important;
                 }
                 .gk-st-card-item,
                 .gk-rc-card-item {
                     background: #ffffff !important;
                     border: 1.5px solid #e2e8f0 !important;
                     border-radius: 16px !important;
-                    padding: 12px 14px !important;
+                    padding: 14px 14px 12px 14px !important;
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 10px !important;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+                    gap: 8px !important;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
                     box-sizing: border-box !important;
                     width: 100% !important;
                 }
@@ -968,7 +977,7 @@ class GK_Teacher_Portal {
                 }
                 .gk-st-card-name,
                 .gk-rc-card-name {
-                    font-size: 15px !important;
+                    font-size: 15.5px !important;
                     font-weight: 900 !important;
                     color: #1e293b !important;
                 }
@@ -978,53 +987,72 @@ class GK_Teacher_Portal {
                     color: #64748b !important;
                     font-weight: 900 !important;
                     background: #f1f5f9 !important;
-                    padding: 2px 7px !important;
+                    padding: 2px 8px !important;
                     border-radius: 6px !important;
                 }
                 .gk-st-tag-age,
                 .gk-rc-tag-age {
                     background: #eff6ff !important;
                     color: #1e40af !important;
-                    padding: 2px 8px !important;
-                    border-radius: 6px !important;
+                    padding: 3px 9px !important;
+                    border-radius: 8px !important;
                     font-weight: 800 !important;
                     font-size: 11.5px !important;
                 }
-                .gk-st-card-phone,
-                .gk-rc-card-phone {
+                .gk-st-card-phone-row,
+                .gk-rc-card-phone-row {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    gap: 6px !important;
                     font-size: 12px !important;
                     color: #64748b !important;
-                    font-weight: 700 !important;
+                    background: #f8fafc !important;
+                    padding: 6px 10px !important;
+                    border-radius: 8px !important;
+                }
+                .gk-st-phone-val,
+                .gk-rc-phone-val {
+                    font-weight: 800 !important;
+                    color: #334155 !important;
                     direction: ltr !important;
+                    font-family: inherit !important;
                 }
                 .gk-st-card-bottom-actions {
                     display: grid !important;
                     grid-template-columns: repeat(4, 1fr) !important;
-                    gap: 8px !important;
+                    gap: 6px !important;
                     border-top: 1px dashed #e2e8f0 !important;
                     padding-top: 10px !important;
+                    margin-top: 2px !important;
                     width: 100% !important;
                 }
                 .gk-st-card-bottom-actions .gk-icon-btn {
                     width: 100% !important;
-                    height: 38px !important;
+                    height: 42px !important;
                     border-radius: 10px !important;
                     display: flex !important;
+                    flex-direction: column !important;
                     align-items: center !important;
                     justify-content: center !important;
+                    gap: 2px !important;
+                    font-size: 10px !important;
+                    font-weight: 800 !important;
+                    padding: 4px 2px !important;
                 }
                 .gk-rc-card-bottom-actions {
                     border-top: 1px dashed #e2e8f0 !important;
                     padding-top: 10px !important;
+                    margin-top: 2px !important;
                     width: 100% !important;
                 }
                 .gk-rc-card-bottom-actions .gk-btn-view-rc {
                     width: 100% !important;
                     justify-content: center !important;
-                    height: 38px !important;
+                    height: 42px !important;
                     border-radius: 10px !important;
-                    font-size: 13px !important;
-                    font-weight: 800 !important;
+                    font-size: 13.5px !important;
+                    font-weight: 900 !important;
                 }
 
                 #gk-teacher-search-st,
@@ -1603,24 +1631,29 @@ class GK_Teacher_Portal {
                                         <div class="gk-st-card-user">
                                             <span class="gk-st-card-index">#<?php echo $idx + 1; ?></span>
                                             <span class="gk-st-card-name">👶 <?php echo esc_html($st->name); ?></span>
-                                            <span class="gk-st-tag-age"><?php echo esc_html($st->age); ?> ساله</span>
                                         </div>
-                                        <div class="gk-st-card-phone">
-                                            📞 <?php echo esc_html($phone_display); ?>
-                                        </div>
+                                        <span class="gk-st-tag-age"><?php echo esc_html($st->age); ?> ساله</span>
+                                    </div>
+                                    <div class="gk-st-card-phone-row">
+                                        <span>📞 شماره همراه والد:</span>
+                                        <span class="gk-st-phone-val"><?php echo esc_html($phone_display); ?></span>
                                     </div>
                                     <div class="gk-st-card-bottom-actions">
                                         <a href="<?php echo esc_url($bale_url); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال به بله مادر">
-                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                            <span>بله</span>
                                         </a>
                                         <a href="<?php echo esc_url($game_link); ?>" target="_blank" class="gk-icon-btn gk-btn-play-link" title="ورود به بازی‌ها">
-                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                            <span>بازی‌ها</span>
                                         </a>
                                         <a href="<?php echo esc_url($test_link); ?>" target="_blank" class="gk-icon-btn gk-btn-test-link" title="ورود به آزمون‌ها">
-                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            <span>آزمون‌ها</span>
                                         </a>
                                         <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک" onclick="gkCopyText('<?php echo esc_js($curr_tests_link); ?>', this);">
-                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                            <span>کپی</span>
                                         </button>
                                     </div>
                                 </div>
@@ -2149,11 +2182,12 @@ class GK_Teacher_Portal {
                                         <div class="gk-rc-card-user">
                                             <span class="gk-rc-card-index">#<?php echo $idx + 1; ?></span>
                                             <span class="gk-rc-card-name">👶 <?php echo esc_html($st->name); ?></span>
-                                            <span class="gk-rc-tag-age"><?php echo esc_html($st->age); ?> ساله</span>
                                         </div>
-                                        <div class="gk-rc-card-phone">
-                                            📞 <?php echo esc_html($phone_display); ?>
-                                        </div>
+                                        <span class="gk-rc-tag-age"><?php echo esc_html($st->age); ?> ساله</span>
+                                    </div>
+                                    <div class="gk-rc-card-phone-row">
+                                        <span>📞 شماره همراه والد:</span>
+                                        <span class="gk-rc-phone-val"><?php echo esc_html($phone_display); ?></span>
                                     </div>
                                     <div class="gk-rc-card-bottom-actions">
                                         <button type="button" class="gk-btn-view-rc" onclick="gkOpenStudentReportCard(<?php echo $st->id; ?>)">
