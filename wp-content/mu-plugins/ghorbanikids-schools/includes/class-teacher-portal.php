@@ -1187,56 +1187,72 @@ class GK_Teacher_Portal {
                     padding-top: 6px !important;
                 }
 
-                /* کارت‌های لینک‌های اختصاصی آزمون نوآموزان در موبایل */
+                /* لیست لینک‌های اختصاصی آزمون نوآموزان در موبایل */
                 .gk-table-exam-links tbody tr {
                     background: #ffffff !important;
                     border: 1.5px solid #e2e8f0 !important;
-                    border-radius: 16px !important;
-                    padding: 12px 14px !important;
-                    margin-bottom: 12px !important;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+                    border-radius: 14px !important;
+                    padding: 8px 12px !important;
+                    margin-bottom: 8px !important;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
                     position: relative !important;
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    flex-wrap: nowrap !important;
+                    gap: 8px !important;
                 }
                 .gk-table-exam-links td {
                     border: none !important;
                     background: transparent !important;
-                    padding: 3px 0 !important;
+                    padding: 0 !important;
                     text-align: right !important;
                 }
                 .gk-table-exam-links td:nth-child(1) { /* ردیف */
-                    position: absolute;
-                    top: 12px;
-                    left: 12px;
+                    position: static !important;
                     width: auto !important;
-                    font-size: 11.5px;
-                    color: #64748b;
-                    background: #f1f5f9;
-                    padding: 2px 7px;
-                    border-radius: 6px;
+                    font-size: 11.5px !important;
+                    color: #94a3b8 !important;
+                    font-weight: 800 !important;
+                    display: inline-block !important;
+                    margin-left: 6px !important;
+                    flex-shrink: 0 !important;
                 }
                 .gk-table-exam-links td:nth-child(2) { /* نام نوآموز */
-                    font-size: 14.5px !important;
-                    padding-left: 45px !important;
-                    margin-bottom: 6px;
+                    font-size: 14px !important;
+                    font-weight: 900 !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    flex: 1 1 auto !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+                    white-space: nowrap !important;
                 }
-                .gk-table-exam-links td:nth-child(3) { /* اینپوت لینک مستقیم در موبایل مخفی تا دکمه‌ها جا شوند */
+                .gk-table-exam-links td:nth-child(3) { /* اینپوت لینک مستقیم در موبایل مخفی */
                     display: none !important;
                 }
-                .gk-table-exam-links td:nth-child(4) { /* اکشن بار */
-                    border-top: 1px dashed #e2e8f0 !important;
-                    padding-top: 10px !important;
-                    margin-top: 6px !important;
+                .gk-table-exam-links td:nth-child(4) { /* اکشن بار با ۳ دکمه کوچک */
+                    border-top: none !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    flex-shrink: 0 !important;
+                    width: auto !important;
                 }
                 .gk-table-exam-links .gk-action-icons-group {
                     display: flex !important;
-                    justify-content: space-between !important;
-                    width: 100% !important;
-                    gap: 8px !important;
+                    justify-content: flex-end !important;
+                    align-items: center !important;
+                    width: auto !important;
+                    gap: 6px !important;
                 }
                 .gk-table-exam-links .gk-icon-btn {
-                    flex: 1 !important;
-                    height: 40px !important;
-                    border-radius: 10px !important;
+                    flex: 0 0 34px !important;
+                    width: 34px !important;
+                    height: 34px !important;
+                    border-radius: 9px !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
                 }
 
                 /* کارت‌های رتبه‌بندی مسابقات کلاسی در موبایل */
