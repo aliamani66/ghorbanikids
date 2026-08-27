@@ -930,81 +930,88 @@ class GK_Teacher_Portal {
                     padding: 16px 12px !important;
                     border-radius: 18px !important;
                 }
-                /* تبدیل ردیف‌های جدول نوآموزان به کارت‌های چندسطری شیک در موبایل */
-                /* تایل کاملاً جمع‌وجور، تک‌سطحی و شیک لیست نوآموزان در موبایل */
-                .gk-table-students-main thead {
+                /* استایل‌های کارت‌های موبایل برای تب نوآموزان و تب کارنامه‌ها */
+                .gk-desktop-table-wrap {
                     display: none !important;
                 }
-                .gk-table-students-main .gk-t-st-mobile-meta {
+                .gk-st-mobile-cards,
+                .gk-rc-mobile-cards {
                     display: flex !important;
-                    align-items: center;
-                    gap: 6px;
-                    font-size: 11.5px;
-                    color: #64748b;
-                    margin-top: 3px;
+                    flex-direction: column !important;
+                    gap: 8px !important;
                 }
-                .gk-t-st-age-tag {
-                    background: #f1f5f9;
-                    color: #475569;
-                    padding: 1px 7px;
-                    border-radius: 6px;
-                    font-weight: 800;
-                    font-size: 11px;
-                }
-                .gk-t-st-phone-tag {
-                    color: #64748b;
-                    font-weight: 600;
-                    font-size: 11.5px;
-                }
-                .gk-t-st-cell-age-desktop,
-                .gk-t-st-cell-phone-desktop {
-                    display: none !important;
-                }
-                .gk-t-st-row {
+                .gk-st-card-item,
+                .gk-rc-card-item {
                     background: #ffffff !important;
                     border: 1.5px solid #e2e8f0 !important;
                     border-radius: 14px !important;
                     padding: 10px 12px !important;
-                    margin-bottom: 8px !important;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
-                    position: relative !important;
                     display: flex !important;
                     justify-content: space-between !important;
                     align-items: center !important;
-                    gap: 10px !important;
+                    gap: 8px !important;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
                     box-sizing: border-box !important;
                     width: 100% !important;
                 }
-                .gk-t-st-row td {
-                    background: transparent !important;
-                    border: none !important;
-                    padding: 0 !important;
-                    text-align: right !important;
-                    display: block !important;
-                    box-sizing: border-box !important;
-                }
-                .gk-t-st-cell-num {
-                    display: none !important;
-                }
-                .gk-t-st-cell-info {
+                .gk-st-card-info,
+                .gk-rc-card-info {
                     flex: 1 1 auto !important;
                     min-width: 0 !important;
                 }
-                .gk-t-st-cell-actions {
-                    border-top: none !important;
-                    padding: 0 !important;
-                    margin: 0 !important;
-                    flex-shrink: 0 !important;
-                    width: auto !important;
-                }
-                .gk-t-st-row .gk-action-icons-group {
+                .gk-st-card-name,
+                .gk-rc-card-name {
+                    font-size: 14.5px !important;
+                    font-weight: 900 !important;
+                    color: #1e293b !important;
                     display: flex !important;
-                    justify-content: flex-end !important;
                     align-items: center !important;
-                    width: auto !important;
+                    gap: 6px !important;
+                    margin-bottom: 2px !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+                }
+                .gk-st-card-index,
+                .gk-rc-card-index {
+                    font-size: 11.5px !important;
+                    color: #94a3b8 !important;
+                    font-weight: 800 !important;
+                }
+                .gk-st-card-meta,
+                .gk-rc-card-meta {
+                    font-size: 11.5px !important;
+                    color: #64748b !important;
+                    display: flex !important;
+                    align-items: center !important;
                     gap: 6px !important;
                 }
-                .gk-t-st-row .gk-icon-btn {
+                .gk-st-tag-age,
+                .gk-rc-tag-age {
+                    background: #f1f5f9 !important;
+                    color: #475569 !important;
+                    padding: 1px 6px !important;
+                    border-radius: 5px !important;
+                    font-weight: 700 !important;
+                    font-size: 11px !important;
+                }
+                .gk-st-meta-dot,
+                .gk-rc-meta-dot {
+                    color: #cbd5e1 !important;
+                }
+                .gk-st-meta-phone,
+                .gk-rc-meta-phone {
+                    color: #64748b !important;
+                    font-weight: 600 !important;
+                    font-size: 11px !important;
+                }
+                .gk-st-card-actions {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 6px !important;
+                    flex-shrink: 0 !important;
+                }
+                .gk-st-card-actions .gk-icon-btn {
                     flex: 0 0 34px !important;
                     width: 34px !important;
                     height: 34px !important;
@@ -1013,87 +1020,22 @@ class GK_Teacher_Portal {
                     align-items: center !important;
                     justify-content: center !important;
                 }
-
-                /* تایل کاملاً جمع‌وجور، تک‌سطحی و شیک کارنامه در موبایل */
-                .gk-table-reportcards thead {
-                    display: none !important;
-                }
-                .gk-table-reportcards .gk-t-rc-mobile-meta {
-                    display: flex !important;
-                    align-items: center;
-                    gap: 6px;
-                    font-size: 11.5px;
-                    color: #64748b;
-                    margin-top: 3px;
-                }
-                .gk-t-rc-age-tag {
-                    background: #f1f5f9;
-                    color: #475569;
-                    padding: 1px 7px;
-                    border-radius: 6px;
-                    font-weight: 800;
-                    font-size: 11px;
-                }
-                .gk-t-rc-phone-tag {
-                    color: #64748b;
-                    font-weight: 600;
-                    font-size: 11.5px;
-                }
-                .gk-t-rc-cell-age-desktop,
-                .gk-t-rc-cell-phone-desktop {
-                    display: none !important;
-                }
-                .gk-t-rc-row {
-                    background: #ffffff !important;
-                    border: 1.5px solid #e2e8f0 !important;
-                    border-radius: 14px !important;
-                    padding: 10px 12px !important;
-                    margin-bottom: 8px !important;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
-                    position: relative !important;
-                    display: flex !important;
-                    justify-content: space-between !important;
-                    align-items: center !important;
-                    gap: 10px !important;
-                    box-sizing: border-box !important;
-                    width: 100% !important;
-                }
-                .gk-t-rc-row td {
-                    background: transparent !important;
-                    border: none !important;
-                    padding: 0 !important;
-                    text-align: right !important;
-                    display: block !important;
-                    box-sizing: border-box !important;
-                }
-                .gk-t-rc-cell-num {
-                    display: none !important;
-                }
-                .gk-t-rc-cell-info {
-                    flex: 1 1 auto !important;
-                    min-width: 0 !important;
-                }
-                .gk-t-rc-cell-btn {
+                .gk-rc-card-action {
                     flex-shrink: 0 !important;
-                    width: auto !important;
                 }
-                .gk-t-rc-row .gk-btn-view-rc {
-                    width: auto !important;
+                .gk-rc-card-action .gk-btn-view-rc {
                     padding: 7px 12px !important;
-                    height: auto !important;
-                    border-radius: 10px !important;
                     font-size: 12px !important;
-                    font-weight: 800 !important;
-                    display: inline-flex !important;
-                    align-items: center !important;
-                    gap: 4px !important;
-                    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2) !important;
+                    border-radius: 10px !important;
+                    height: auto !important;
+                    width: auto !important;
                 }
 
+                #gk-teacher-search-st,
                 #gk-teacher-search-rc {
                     width: 100% !important;
                     box-sizing: border-box !important;
-                    margin-top: 8px;
+                    margin-top: 6px;
                 }
 
                 /* تبدیل جدول‌های آزمون‌ها و لیگ‌ها به کارت‌های چندسطری شیک در موبایل */
@@ -1587,14 +1529,15 @@ class GK_Teacher_Portal {
                         </div>
                     </div>
 
-                    <div style="overflow-x:auto;">
-                        <table class="gk-table-st gk-table-students-main">
+                    <!-- ۱. نسخه دسکتاپ: جدول مرتب -->
+                    <div class="gk-desktop-table-wrap" style="overflow-x:auto;">
+                        <table class="gk-table-st">
                             <thead>
                                 <tr>
                                     <th style="width:60px;">ردیف</th>
-                                    <th>نام و مشخصات نوآموز</th>
-                                    <th class="gk-t-st-cell-age-desktop" style="width:110px;">سن</th>
-                                    <th class="gk-t-st-cell-phone-desktop">شماره همراه والد</th>
+                                    <th>نام نوآموز</th>
+                                    <th style="width:110px;">سن</th>
+                                    <th>شماره همراه والد</th>
                                     <th style="text-align:center; width:200px;">دسترسی و ارسال اختصاصی</th>
                                 </tr>
                             </thead>
@@ -1610,41 +1553,31 @@ class GK_Teacher_Portal {
                                         $test_link = home_url('/tests/?st_token=' . $st->student_token);
                                         $game_link = home_url('/games/?st_token=' . $st->student_token);
                                         $curr_tests_link = home_url('/curriculum-tests/?st_token=' . $st->student_token);
-                                        
                                         $bale_msg = "سلام و احترام، اولیا گرامی نوآموز «" . $st->name . "»\nلینک‌های اختصاصی در " . $org_name . " (کلاس " . $class->name . "):\n🎮 سالن بازی‌ها: " . $game_link . "\n📝 آزمون‌های درسی دبستان: " . $curr_tests_link . "\n🧠 تست‌های روان‌شناختی: " . $test_link;
                                         $bale_url = "https://ble.ir/share/url?url=" . urlencode($curr_tests_link) . "&text=" . urlencode($bale_msg);
                                         $phone_display = !empty($st->parent_phone) ? $st->parent_phone : 'ثبت نشده';
                                     ?>
                                         <tr class="gk-t-st-row">
-                                            <td class="gk-t-st-cell-num"><strong>#<?php echo $idx + 1; ?></strong></td>
-                                            <td class="gk-t-st-cell-info">
-                                                <div style="font-size:14.5px; font-weight:900; color:#1e293b; margin-bottom:2px;">
-                                                    👶 <?php echo esc_html($st->name); ?>
-                                                </div>
-                                                <div class="gk-t-st-mobile-meta">
-                                                    <span class="gk-t-st-age-tag"><?php echo esc_html($st->age); ?> ساله</span>
-                                                    <span style="color:#cbd5e1;">•</span>
-                                                    <span class="gk-t-st-phone-tag">📞 <?php echo esc_html($phone_display); ?></span>
-                                                </div>
-                                            </td>
-                                            <td class="gk-t-st-cell-age-desktop"><?php echo esc_html($st->age); ?> ساله</td>
-                                            <td class="gk-t-st-cell-phone-desktop">
+                                            <td><strong>#<?php echo $idx + 1; ?></strong></td>
+                                            <td><strong style="font-size:14px; color:#1e293b;">👶 <?php echo esc_html($st->name); ?></strong></td>
+                                            <td><?php echo esc_html($st->age); ?> ساله</td>
+                                            <td>
                                                 <span style="font-size:12px; font-weight:bold; color:#475569;">
                                                     📞 <?php echo esc_html($phone_display); ?>
                                                 </span>
                                             </td>
-                                            <td class="gk-t-st-cell-actions" style="text-align:center;">
+                                            <td style="text-align:center;">
                                                 <div class="gk-action-icons-group">
-                                                    <a href="<?php echo esc_url($bale_url); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال لینک بازی و آزمون‌ها به بله مادر">
+                                                    <a href="<?php echo esc_url($bale_url); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال به بله مادر">
                                                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                                     </a>
-                                                    <a href="<?php echo esc_url($game_link); ?>" target="_blank" class="gk-icon-btn gk-btn-play-link" title="ورود مستقیم به بازی‌ها به عنوان <?php echo esc_attr($st->name); ?>">
+                                                    <a href="<?php echo esc_url($game_link); ?>" target="_blank" class="gk-icon-btn gk-btn-play-link" title="ورود به بازی‌ها">
                                                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                                     </a>
-                                                    <a href="<?php echo esc_url($test_link); ?>" target="_blank" class="gk-icon-btn gk-btn-test-link" title="ورود مستقیم به آزمون‌های <?php echo esc_attr($st->name); ?>">
+                                                    <a href="<?php echo esc_url($test_link); ?>" target="_blank" class="gk-icon-btn gk-btn-test-link" title="ورود به آزمون‌ها">
                                                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                                     </a>
-                                                    <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک آزمون‌ها و بازی‌های <?php echo esc_attr($st->name); ?>" onclick="gkCopyText('<?php echo esc_js($curr_tests_link); ?>', this);">
+                                                    <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک" onclick="gkCopyText('<?php echo esc_js($curr_tests_link); ?>', this);">
                                                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                                     </button>
                                                 </div>
@@ -1654,6 +1587,50 @@ class GK_Teacher_Portal {
                                 <?php endif; ?>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- ۲. نسخه موبایل: کارت‌های شیک تک‌خطی -->
+                    <div class="gk-st-mobile-cards">
+                        <?php if (empty($students)): ?>
+                            <div style="text-align:center; padding:20px; color:#94a3b8; font-size:13px;">هنوز دانـش‌آموزی در این کلاس ثبت نشده است.</div>
+                        <?php else: ?>
+                            <?php foreach ($students as $idx => $st): 
+                                $test_link = home_url('/tests/?st_token=' . $st->student_token);
+                                $game_link = home_url('/games/?st_token=' . $st->student_token);
+                                $curr_tests_link = home_url('/curriculum-tests/?st_token=' . $st->student_token);
+                                $bale_msg = "سلام و احترام، اولیا گرامی نوآموز «" . $st->name . "»\nلینک‌های اختصاصی در " . $org_name . " (کلاس " . $class->name . "):\n🎮 سالن بازی‌ها: " . $game_link . "\n📝 آزمون‌های درسی دبستان: " . $curr_tests_link . "\n🧠 تست‌های روان‌شناختی: " . $test_link;
+                                $bale_url = "https://ble.ir/share/url?url=" . urlencode($curr_tests_link) . "&text=" . urlencode($bale_msg);
+                                $phone_display = !empty($st->parent_phone) ? $st->parent_phone : 'ثبت نشده';
+                            ?>
+                                <div class="gk-st-card-item gk-searchable-student">
+                                    <div class="gk-st-card-info">
+                                        <div class="gk-st-card-name">
+                                            <span class="gk-st-card-index">#<?php echo $idx + 1; ?></span>
+                                            <strong>👶 <?php echo esc_html($st->name); ?></strong>
+                                        </div>
+                                        <div class="gk-st-card-meta">
+                                            <span class="gk-st-tag-age"><?php echo esc_html($st->age); ?> ساله</span>
+                                            <span class="gk-st-meta-dot">•</span>
+                                            <span class="gk-st-meta-phone">📞 <?php echo esc_html($phone_display); ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="gk-st-card-actions">
+                                        <a href="<?php echo esc_url($bale_url); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال به بله مادر">
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                        </a>
+                                        <a href="<?php echo esc_url($game_link); ?>" target="_blank" class="gk-icon-btn gk-btn-play-link" title="ورود به بازی‌ها">
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                        </a>
+                                        <a href="<?php echo esc_url($test_link); ?>" target="_blank" class="gk-icon-btn gk-btn-test-link" title="ورود به آزمون‌ها">
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                        </a>
+                                        <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک" onclick="gkCopyText('<?php echo esc_js($curr_tests_link); ?>', this);">
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -2122,14 +2099,15 @@ class GK_Teacher_Portal {
                         </div>
                     </div>
 
-                    <div style="overflow-x:auto;">
-                        <table class="gk-table-st gk-table-reportcards">
+                    <!-- ۱. نسخه دسکتاپ: جدول مرتب کارنامه -->
+                    <div class="gk-desktop-table-wrap" style="overflow-x:auto;">
+                        <table class="gk-table-st">
                             <thead>
                                 <tr>
                                     <th style="width:60px;">ردیف</th>
-                                    <th>نام و مشخصات نوآموز</th>
-                                    <th class="gk-t-rc-cell-age-desktop" style="width:110px;">سن</th>
-                                    <th class="gk-t-rc-cell-phone-desktop">شماره والد</th>
+                                    <th>نام نوآموز</th>
+                                    <th style="width:110px;">سن</th>
+                                    <th>شماره والد</th>
                                     <th style="text-align:center; width:170px;">کارنامه و پرونده</th>
                                 </tr>
                             </thead>
@@ -2143,24 +2121,15 @@ class GK_Teacher_Portal {
                                 <?php else: ?>
                                     <?php foreach ($students as $idx => $st): ?>
                                         <tr class="gk-t-rc-row">
-                                            <td class="gk-t-rc-cell-num"><strong>#<?php echo $idx + 1; ?></strong></td>
-                                            <td class="gk-t-rc-cell-info">
-                                                <div style="font-size:14.5px; font-weight:900; color:#1e293b; margin-bottom:2px;">
-                                                    👶 <?php echo esc_html($st->name); ?>
-                                                </div>
-                                                <div class="gk-t-rc-mobile-meta">
-                                                    <span class="gk-t-rc-age-tag"><?php echo esc_html($st->age); ?> ساله</span>
-                                                    <span style="color:#cbd5e1;">•</span>
-                                                    <span class="gk-t-rc-phone-tag">📞 <?php echo esc_html($st->parent_phone ?: 'ثبت نشده'); ?></span>
-                                                </div>
-                                            </td>
-                                            <td class="gk-t-rc-cell-age-desktop"><?php echo esc_html($st->age); ?> ساله</td>
-                                            <td class="gk-t-rc-cell-phone-desktop">
+                                            <td><strong>#<?php echo $idx + 1; ?></strong></td>
+                                            <td><strong style="font-size:14px; color:#1e293b;">👶 <?php echo esc_html($st->name); ?></strong></td>
+                                            <td><?php echo esc_html($st->age); ?> ساله</td>
+                                            <td>
                                                 <span style="font-size:12px; font-weight:bold; color:#475569;">
                                                     📞 <?php echo esc_html($st->parent_phone ?: 'ثبت نشده'); ?>
                                                 </span>
                                             </td>
-                                            <td class="gk-t-rc-cell-btn" style="text-align:center;">
+                                            <td style="text-align:center;">
                                                 <button type="button" class="gk-btn-view-rc" onclick="gkOpenStudentReportCard(<?php echo $st->id; ?>)">
                                                     <span>📊 مشاهده کارنامه</span>
                                                 </button>
@@ -2170,6 +2139,36 @@ class GK_Teacher_Portal {
                                 <?php endif; ?>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- ۲. نسخه موبایل: کارت‌های شیک و جمع‌وجور کارنامه -->
+                    <div class="gk-rc-mobile-cards">
+                        <?php if (empty($students)): ?>
+                            <div style="text-align:center; padding:20px; color:#94a3b8; font-size:13px;">هنوز دانش‌آموزی در این کلاس ثبت نشده است.</div>
+                        <?php else: ?>
+                            <?php foreach ($students as $idx => $st): 
+                                $phone_display = !empty($st->parent_phone) ? $st->parent_phone : 'ثبت نشده';
+                            ?>
+                                <div class="gk-rc-card-item gk-searchable-rc">
+                                    <div class="gk-rc-card-info">
+                                        <div class="gk-rc-card-name">
+                                            <span class="gk-rc-card-index">#<?php echo $idx + 1; ?></span>
+                                            <strong>👶 <?php echo esc_html($st->name); ?></strong>
+                                        </div>
+                                        <div class="gk-rc-card-meta">
+                                            <span class="gk-rc-tag-age"><?php echo esc_html($st->age); ?> ساله</span>
+                                            <span class="gk-rc-meta-dot">•</span>
+                                            <span class="gk-rc-meta-phone">📞 <?php echo esc_html($phone_display); ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="gk-rc-card-action">
+                                        <button type="button" class="gk-btn-view-rc" onclick="gkOpenStudentReportCard(<?php echo $st->id; ?>)">
+                                            <span>📊 مشاهده کارنامه</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -2935,11 +2934,23 @@ class GK_Teacher_Portal {
             }, 350);
         }
 
-        // فیلتر جستجوی زنده در تب کارنامه‌ها
+        // فیلتر جستجوی زنده در تب نوآموزان و تب کارنامه‌ها
         jQuery(document).ready(function($) {
+            $('#gk-teacher-search-st').on('input', function() {
+                var val = $(this).val().trim().toLowerCase();
+                $('.gk-t-st-row, .gk-searchable-student').each(function() {
+                    var txt = $(this).text().toLowerCase();
+                    if (txt.indexOf(val) !== -1) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
             $('#gk-teacher-search-rc').on('input', function() {
                 var val = $(this).val().trim().toLowerCase();
-                $('#gk-t-reportcards-tbody tr.gk-t-rc-row').each(function() {
+                $('.gk-t-rc-row, .gk-searchable-rc').each(function() {
                     var txt = $(this).text().toLowerCase();
                     if (txt.indexOf(val) !== -1) {
                         $(this).show();
