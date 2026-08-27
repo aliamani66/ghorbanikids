@@ -79,6 +79,7 @@ class GK_School_Exams {
         }
 
         // Student resolution
+        $is_dedicated_link = !empty($_GET['st_token']);
         $st_token = sanitize_text_field($_GET['st_token'] ?? '');
         $current_student = null;
         if (!empty($st_token)) {
@@ -185,9 +186,11 @@ class GK_School_Exams {
                         </div>
                     </div>
                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <button type="button" onclick="gkChangeExamStudent();" style="background:#fff1f2; color:#b91c1c; border:1.5px solid #fecdd3; padding:7px 14px; border-radius:12px; font-weight:900; font-size:12px; cursor:pointer; font-family:inherit;">
-                            🔄 تغییر / انتخاب نوآموز دیگر
-                        </button>
+                        <?php if (!$is_dedicated_link): ?>
+                            <button type="button" onclick="gkChangeExamStudent();" style="background:#fff1f2; color:#b91c1c; border:1.5px solid #fecdd3; padding:7px 14px; border-radius:12px; font-weight:900; font-size:12px; cursor:pointer; font-family:inherit;">
+                                🔄 تغییر / انتخاب نوآموز دیگر
+                            </button>
+                        <?php endif; ?>
                         <span style="background: #16a34a; color: #ffffff; padding: 7px 16px; border-radius: 12px; font-weight: 900; font-size: 12.5px;">
                             ⭐ متصل به پنل کلاس
                         </span>
