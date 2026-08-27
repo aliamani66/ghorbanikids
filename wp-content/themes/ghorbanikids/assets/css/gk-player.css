@@ -49,6 +49,8 @@
     z-index: 30 !important;
     transition: all 0.22s ease !important;
     line-height: 1.4 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
 }
 
 .gk-btn-back {
@@ -56,6 +58,7 @@
     color: #0369a1 !important;
     border: 2px solid #bae6fd !important;
     box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08) !important;
+    white-space: nowrap !important;
 }
 
 .gk-btn-back:hover {
@@ -205,34 +208,7 @@
     border-bottom: 2px solid #f1f5f9 !important;
 }
 
-/* =========================================================
-   5. Ultra-Large Mobile & Tablet Immersive Player Mode (Rule 9)
-   ========================================================= */
-@media (max-width: 768px) {
-    .gk-game-container {
-        margin: 10px auto 40px auto !important;
-        padding: 0 8px !important;
-    }
-
-    .gk-game-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin-bottom: 16px !important;
-    flex-wrap: wrap !important;
-    gap: 12px !important;
-}
-
-.gk-game-page-title {
-    font-family: 'aviny', 'IRANSansXFaNum', cursive, sans-serif !important;
-    font-size: 2rem !important;
-    font-weight: 900 !important;
-    color: #0f172a !important;
-    margin: 0 !important;
-    line-height: 1.2 !important;
-}
-
-/* 3. Game Meta Bar Below The Game */
+/* 4. Game Meta Bar Below The Game */
 .gk-game-meta-bar {
     background: #ffffff !important;
     border: 2px solid #e2e8f0 !important;
@@ -249,36 +225,98 @@
 
 .gk-game-badges {
     display: flex !important;
-    gap: 10px !important;
     flex-wrap: wrap !important;
+    gap: 8px !important;
     align-items: center !important;
 }
 
 .gk-badge {
-    padding: 7px 16px !important;
-    border-radius: 18px !important;
-    font-size: 0.92rem !important;
+    padding: 6px 14px !important;
+    border-radius: 99px !important;
+    font-size: 0.88rem !important;
     font-weight: 800 !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
-    transition: transform 0.2s ease !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    user-select: none !important;
 }
 
 .gk-badge:hover {
     transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
+
+/* بج دسترسی رایگان / ویژه */
+.gk-badge-access,
+.gk-badge.gk-badge-free {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+    color: #166534 !important;
+    border: 1.5px solid #86efac !important;
+}
+
+.gk-badge.gk-badge-premium,
+.gk-badge.gk-badge-vip {
+    background: linear-gradient(135deg, #fef08a 0%, #fde047 100%) !important;
+    color: #854d0e !important;
+    border: 1.5px solid #facc15 !important;
+}
+
+/* بج رده سنی کودک */
+.gk-badge-age {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%) !important;
+    color: #6b21a8 !important;
+    border: 1.5px solid #d8b4fe !important;
+}
+
+/* بج موضوع و دسته‌بندی بازی */
+.gk-badge-cat {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+    color: #0369a1 !important;
+    border: 1.5px solid #7dd3fc !important;
+}
+
+/* =========================================================
+   5. Ultra-Large Mobile & Tablet Immersive Player Mode (Rule 9)
+   ========================================================= */
+@media (max-width: 768px) {
+    .gk-game-container {
+        margin: 10px auto 40px auto !important;
+        padding: 0 8px !important;
+    }
+
+    .gk-game-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 14px !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+    }
+
+    .gk-game-page-title {
+        font-size: 1.7rem !important;
+    }
 
     .gk-game-actions {
         width: 100% !important;
+        display: flex !important;
         justify-content: space-between !important;
+        align-items: center !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
     }
 
     .gk-btn {
-        flex: 1 !important;
-        padding: 10px 12px !important;
-        font-size: 0.88rem !important;
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        padding: 9px 10px !important;
+        font-size: 0.82rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        border-radius: 12px !important;
     }
 
     /* حذف محدودیت کوچک ۱۶:۹ در موبایل و اختصاص ارتفاع تمام‌صفحه ۷۴vh */
@@ -327,62 +365,4 @@
         padding: 20px 16px !important;
         border-radius: 20px !important;
     }
-}
-
-/* =========================================================
-   بج‌ها و برچسب‌های رنگی و شاداب مشخصات بازی
-   ========================================================= */
-.gk-game-badges {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    align-items: center !important;
-    margin-top: 8px !important;
-}
-
-.gk-badge {
-    padding: 6px 14px !important;
-    border-radius: 99px !important;
-    font-size: 0.88rem !important;
-    font-weight: 800 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    user-select: none !important;
-}
-
-.gk-badge:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* بج دسترسی رایگان / ویژه */
-.gk-badge-access,
-.gk-badge.gk-badge-free {
-    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
-    color: #166534 !important;
-    border: 1.5px solid #86efac !important;
-}
-
-.gk-badge.gk-badge-premium,
-.gk-badge.gk-badge-vip {
-    background: linear-gradient(135deg, #fef08a 0%, #fde047 100%) !important;
-    color: #854d0e !important;
-    border: 1.5px solid #facc15 !important;
-}
-
-/* بج رده سنی کودک */
-.gk-badge-age {
-    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%) !important;
-    color: #6b21a8 !important;
-    border: 1.5px solid #d8b4fe !important;
-}
-
-/* بج موضوع و دسته‌بندی بازی */
-.gk-badge-cat {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
-    color: #0369a1 !important;
-    border: 1.5px solid #7dd3fc !important;
 }

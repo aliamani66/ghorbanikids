@@ -73,6 +73,10 @@ class GK_Player {
                 $back_label  = '⬅️ بازی‌های درسی ' . esc_html($grade_name);
             }
 
+            if (isset($_GET['st_token']) && !empty($_GET['st_token'])) {
+                $back_url = add_query_arg('st_token', sanitize_text_field($_GET['st_token']), $back_url);
+            }
+
             $sub_status = GK_Subscriptions::user_has_active_subscription();
             $has_access = ($access_type === 'free') || ($sub_status !== false);
 
