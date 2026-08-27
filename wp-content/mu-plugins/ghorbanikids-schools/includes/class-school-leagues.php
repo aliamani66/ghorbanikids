@@ -122,6 +122,45 @@ class GK_School_Leagues {
         ob_start();
         ?>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+        window.gkAlert = function(msg, title, icon, onOk) {
+            if (typeof title === 'undefined') title = 'پیام سامانه';
+            if (typeof icon === 'undefined') icon = 'info';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title: title,
+                    html: (typeof msg === 'string') ? msg.replace(/\n/g, '<br>') : msg,
+                    icon: icon,
+                    confirmButtonText: 'متوجه شدم ✨',
+                    customClass: { popup: 'gk-swal-popup', title: 'gk-swal-title', htmlContainer: 'gk-swal-html', confirmButton: 'gk-swal-confirm' },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (typeof onOk === 'function') onOk();
+                });
+            } else {
+                window.alert(msg);
+                if (typeof onOk === 'function') onOk();
+            }
+        };
+        window.gkToast = function(msg, icon) {
+            if (typeof icon === 'undefined') icon = 'success';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: icon,
+                    title: msg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                    customClass: { popup: 'gk-swal-toast' }
+                });
+            } else {
+                window.alert(msg);
+            }
+        };
+        window.alert = function(msg) { window.gkAlert(msg); };
+        </script>
         <style>
             /* ==========================================================
                استاندارد فونت یکپارچه و لوکس مدارس قربانی کیدز (Typography Standard)
@@ -208,46 +247,6 @@ class GK_School_Leagues {
                 padding: 10px 16px !important;
                 box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
             }
-        </style>
-        <script>
-        window.gkAlert = function(msg, title, icon, onOk) {
-            if (typeof title === 'undefined') title = 'پیام سامانه';
-            if (typeof icon === 'undefined') icon = 'info';
-            if (typeof Swal !== 'undefined') {
-                return Swal.fire({
-                    title: title,
-                    html: (typeof msg === 'string') ? msg.replace(/\n/g, '<br>') : msg,
-                    icon: icon,
-                    confirmButtonText: 'متوجه شدم ✨',
-                    customClass: { popup: 'gk-swal-popup', title: 'gk-swal-title', htmlContainer: 'gk-swal-html', confirmButton: 'gk-swal-confirm' },
-                    buttonsStyling: false
-                }).then(function(result) {
-                    if (typeof onOk === 'function') onOk();
-                });
-            } else {
-                window.alert(msg);
-                if (typeof onOk === 'function') onOk();
-            }
-        };
-        window.gkToast = function(msg, icon) {
-            if (typeof icon === 'undefined') icon = 'success';
-            if (typeof Swal !== 'undefined') {
-                return Swal.fire({
-                    toast: true,
-                    position: 'top',
-                    icon: icon,
-                    title: msg,
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                    customClass: { popup: 'gk-swal-toast' }
-                });
-            } else {
-                window.alert(msg);
-            }
-        };
-        window.alert = function(msg) { window.gkAlert(msg); };
-        </script>
 
             /* تیترها با فونت شاداب آوینی */
             .gk-school-title-text,
