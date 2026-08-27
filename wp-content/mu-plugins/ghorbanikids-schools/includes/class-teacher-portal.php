@@ -912,7 +912,7 @@ class GK_Teacher_Portal {
                                                     <a href="<?php echo esc_url($test_link); ?>" target="_blank" class="gk-icon-btn gk-btn-test-link" title="ورود مستقیم به آزمون‌های <?php echo esc_attr($st->name); ?>">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                                     </a>
-                                                    <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک اختصاصی" onclick="navigator.clipboard.writeText('<?php echo esc_url($game_link); ?>'); alert('لینک اختصاصی <?php echo esc_js($st->name); ?> کپی شد!');">
+                                                    <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک آزمون‌ها و بازی‌های <?php echo esc_attr($st->name); ?>" onclick="gkCopyText('<?php echo esc_js($curr_tests_link); ?>', this);">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                                     </button>
                                                 </div>
@@ -1070,7 +1070,7 @@ class GK_Teacher_Portal {
                                                             <a href="<?php echo esc_url($child_league_link); ?>" target="_blank" class="gk-icon-btn gk-btn-play-link" title="ورود مستقیم به مسابقه به عنوان <?php echo esc_attr($r->name); ?>">
                                                                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                                             </a>
-                                                            <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک اختصاصی مسابقه برای <?php echo esc_attr($r->name); ?>" onclick="navigator.clipboard.writeText('<?php echo esc_url($child_league_link); ?>'); alert('لینک مسابقه اختصاصی برای «<?php echo esc_js($r->name); ?>» کپی شد!');">
+                                                            <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک اختصاصی مسابقه برای <?php echo esc_attr($r->name); ?>" onclick="gkCopyText('<?php echo esc_js($child_league_link); ?>', this);">
                                                                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                                             </button>
                                                         </div>
@@ -1697,50 +1697,60 @@ class GK_Teacher_Portal {
                     alert('خطای ارتباط با سرور.');
                 });
             });
-
-            // ایجاد آزمون کلاسی جدید
-            $('#gk-btn-save-new-exam').on('click', function(e) {
-                e.preventDefault();
-                var title = $('#gk-exam-title').val().trim();
-                var validity = $('#gk-exam-validity').val();
-                var selectedTests = [];
-                $('input[name="gk_exam_tests[]"]:checked').each(function() {
-                    selectedTests.push($(this).val());
-                });
-
-                if (!title) {
-                    alert('لطفاً عنوان آزمون کلاسی را وارد کنید.');
-                    return;
-                }
-                if (selectedTests.length === 0) {
-                    alert('لطفاً حداقل یک آزمون/درس را برای این امتحان انتخاب کنید.');
-                    return;
-                }
-
-                var btn = $(this).text('⏳ در حال ایجاد آزمون...').prop('disabled', true);
-
-                $.post('<?php echo $ajax_url; ?>', {
-                    action: 'gk_teacher_create_class_exam',
-                    nonce: '<?php echo $nonce; ?>',
-                    class_id: <?php echo $class->id; ?>,
-                    title: title,
-                    validity_hours: validity,
-                    test_ids: selectedTests
-                }, function(res) {
-                    btn.text('🚀 ایجاد آزمون کلاسی و دریافت لینک‌ها').prop('disabled', false);
-                    if (res.success && res.data) {
-                        $('#gk-new-exam-modal').fadeOut(200);
-                        alert('📝 آزمون کلاسی «' + res.data.title + '» ایجاد شد!\nلینک سالن آزمون: ' + res.data.exam_url);
-                        location.reload(true);
-                    } else {
-                        alert(res.data || 'خطا در ایجاد آزمون کلاسی.');
-                    }
-                }).fail(function() {
-                    btn.text('🚀 ایجاد آزمون کلاسی و دریافت لینک‌ها').prop('disabled', false);
-                    alert('خطای ارتباط با سرور.');
-                });
-            });
         });
+
+        // تابع سراسری و هوشمند کپی لینک در کلیپ‌بورد
+        function gkCopyText(text, btnEl) {
+            if (!text) return;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(function() {
+                    gkShowCopySuccess(btnEl);
+                }).catch(function() {
+                    gkFallbackCopy(text, btnEl);
+                });
+            } else {
+                gkFallbackCopy(text, btnEl);
+            }
+        }
+
+        function gkFallbackCopy(text, btnEl) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.top = '0';
+            ta.style.left = '0';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            try {
+                var successful = document.execCommand('copy');
+                if (successful) {
+                    gkShowCopySuccess(btnEl);
+                } else {
+                    prompt('لطفاً لینک را به صورت دستی کپی فرمایید:', text);
+                }
+            } catch (err) {
+                prompt('لطفاً لینک را به صورت دستی کپی فرمایید:', text);
+            }
+            document.body.removeChild(ta);
+        }
+
+        function gkShowCopySuccess(btnEl) {
+            if (btnEl) {
+                var oldHtml = btnEl.innerHTML;
+                var oldBg = btnEl.style.background;
+                btnEl.innerHTML = '✅ کپی شد!';
+                btnEl.style.background = '#10b981';
+                btnEl.style.color = '#ffffff';
+                setTimeout(function() {
+                    btnEl.innerHTML = oldHtml;
+                    btnEl.style.background = oldBg;
+                }, 2000);
+            } else {
+                alert('لینک با موفقیت کپی شد! ✅');
+            }
+        }
 
                                                 var gkActiveModalSubj = 'all';
         var gkActiveModalChap = 'all';
