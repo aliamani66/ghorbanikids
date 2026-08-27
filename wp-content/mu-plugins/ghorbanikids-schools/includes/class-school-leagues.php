@@ -343,18 +343,22 @@ class GK_School_Leagues {
             .gk-arena-play-btn {
                 background: linear-gradient(135deg, #10b981 0%, #059669 100%);
                 color: #ffffff !important;
-                font-size: 15px;
+                font-size: 13.5px;
                 font-weight: 900;
-                padding: 13px 0;
-                border-radius: 14px;
-                display: block;
+                padding: 10px 24px;
+                border-radius: 12px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
                 text-decoration: none !important;
-                margin-top: 14px;
-                box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
-                transition: transform 0.2s;
+                margin-top: 12px;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             .gk-arena-play-btn:hover {
-                transform: scale(1.03);
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
             }
         </style>
 
@@ -497,12 +501,12 @@ class GK_School_Leagues {
                             <?php echo esc_html($g->post_title); ?>
                         </h3>
                         <?php if ($is_expired): ?>
-                            <button disabled style="width:100%; background:#cbd5e1; color:#64748b; font-size:14px; font-weight:bold; padding:12px 0; border-radius:14px; border:none; margin-top:14px; cursor:not-allowed;">
-                                🔒 مسابقه به پایان رسیده است
+                            <button disabled style="background:#cbd5e1; color:#64748b; font-size:12.5px; font-weight:bold; padding:8px 18px; border-radius:12px; border:none; margin-top:12px; cursor:not-allowed;">
+                                🔒 پایان مهلت مسابقه
                             </button>
                         <?php else: ?>
                             <a href="<?php echo esc_url($play_url); ?>" class="gk-arena-play-btn">
-                                🚀 ورود و انجام بازی مسابقه
+                                🎮 شروع بازی و ثبت رکورد
                             </a>
                         <?php endif; ?>
                     </div>
