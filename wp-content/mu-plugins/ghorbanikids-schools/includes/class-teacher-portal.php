@@ -931,90 +931,87 @@ class GK_Teacher_Portal {
                     border-radius: 18px !important;
                 }
                 /* تبدیل ردیف‌های جدول نوآموزان به کارت‌های چندسطری شیک در موبایل */
-                .gk-table-st {
-                    min-width: 0 !important;
-                    width: 100% !important;
-                    border-spacing: 0 !important;
-                }
-                .gk-table-st thead {
+                /* تایل کاملاً جمع‌وجور، تک‌سطحی و شیک لیست نوآموزان در موبایل */
+                .gk-table-students-main thead {
                     display: none !important;
                 }
-                .gk-table-st, 
-                .gk-table-st tbody, 
-                .gk-t-st-row, 
-                .gk-t-st-row td {
-                    display: block !important;
-                    width: 100% !important;
-                    box-sizing: border-box !important;
+                .gk-table-students-main .gk-t-st-mobile-meta {
+                    display: flex !important;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 11.5px;
+                    color: #64748b;
+                    margin-top: 3px;
+                }
+                .gk-t-st-age-tag {
+                    background: #f1f5f9;
+                    color: #475569;
+                    padding: 1px 7px;
+                    border-radius: 6px;
+                    font-weight: 800;
+                    font-size: 11px;
+                }
+                .gk-t-st-phone-tag {
+                    color: #64748b;
+                    font-weight: 600;
+                    font-size: 11.5px;
+                }
+                .gk-t-st-cell-age-desktop,
+                .gk-t-st-cell-phone-desktop {
+                    display: none !important;
                 }
                 .gk-t-st-row {
                     background: #ffffff !important;
-                    border: 2px solid #e2e8f0 !important;
-                    border-radius: 18px !important;
-                    padding: 14px !important;
-                    margin-bottom: 14px !important;
-                    box-shadow: 0 3px 12px rgba(0,0,0,0.03) !important;
+                    border: 1.5px solid #e2e8f0 !important;
+                    border-radius: 14px !important;
+                    padding: 10px 12px !important;
+                    margin-bottom: 8px !important;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
                     position: relative !important;
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    gap: 10px !important;
+                    box-sizing: border-box !important;
+                    width: 100% !important;
                 }
                 .gk-t-st-row td {
                     background: transparent !important;
                     border: none !important;
-                    padding: 3px 0 !important;
-                    border-radius: 0 !important;
+                    padding: 0 !important;
                     text-align: right !important;
+                    display: block !important;
+                    box-sizing: border-box !important;
                 }
-                .gk-t-st-row td:nth-child(1) { /* رتبه */
-                    position: absolute;
-                    top: 14px;
-                    left: 14px;
+                .gk-t-st-cell-num {
+                    display: none !important;
+                }
+                .gk-t-st-cell-info {
+                    flex: 1 1 auto !important;
+                    min-width: 0 !important;
+                }
+                .gk-t-st-cell-actions {
+                    border-top: none !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    flex-shrink: 0 !important;
                     width: auto !important;
-                    font-size: 11.5px;
-                    color: #64748b;
-                    background: #f1f5f9;
-                    padding: 3px 8px;
-                    border-radius: 8px;
-                    font-weight: 900;
-                }
-                .gk-t-st-row td:nth-child(2) { /* نام */
-                    font-size: 15px !important;
-                    padding-left: 55px !important;
-                    margin-bottom: 4px;
-                }
-                .gk-t-st-row td:nth-child(3) { /* سن */
-                    display: inline-block !important;
-                    width: auto !important;
-                    color: #475569;
-                    font-size: 11.5px;
-                    background: #f8fafc;
-                    padding: 2px 8px;
-                    border-radius: 6px;
-                    border: 1px solid #e2e8f0;
-                    margin-left: 6px;
-                    font-weight: bold;
-                }
-                .gk-t-st-row td:nth-child(4) { /* تلفن */
-                    display: inline-block !important;
-                    width: auto !important;
-                    font-size: 12px;
-                }
-                .gk-t-st-row td:nth-child(5) { /* امتیاز کل */
-                    margin: 8px 0 !important;
-                }
-                .gk-t-st-row td:nth-child(6) { /* دکمه‌های عملیات */
-                    border-top: 1.5px dashed #e2e8f0 !important;
-                    padding-top: 12px !important;
-                    margin-top: 6px !important;
                 }
                 .gk-t-st-row .gk-action-icons-group {
                     display: flex !important;
-                    justify-content: space-between !important;
-                    width: 100% !important;
-                    gap: 8px !important;
+                    justify-content: flex-end !important;
+                    align-items: center !important;
+                    width: auto !important;
+                    gap: 6px !important;
                 }
                 .gk-t-st-row .gk-icon-btn {
-                    flex: 1 !important;
-                    height: 42px !important;
-                    border-radius: 12px !important;
+                    flex: 0 0 34px !important;
+                    width: 34px !important;
+                    height: 34px !important;
+                    border-radius: 9px !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
                 }
 
                 /* تایل کاملاً جمع‌وجور، تک‌سطحی و شیک کارنامه در موبایل */
@@ -1591,21 +1588,20 @@ class GK_Teacher_Portal {
                     </div>
 
                     <div style="overflow-x:auto;">
-                        <table class="gk-table-st">
+                        <table class="gk-table-st gk-table-students-main">
                             <thead>
                                 <tr>
-                                    <th>رتبه</th>
-                                    <th>نام نوآموز</th>
-                                    <th>سن</th>
-                                    <th>شماره همراه والد</th>
-                                    <th>مجموع امتیازات</th>
-                                    <th style="text-align:center;">دسترسی و ارسال اختصاصی</th>
+                                    <th style="width:60px;">ردیف</th>
+                                    <th>نام و مشخصات نوآموز</th>
+                                    <th class="gk-t-st-cell-age-desktop" style="width:110px;">سن</th>
+                                    <th class="gk-t-st-cell-phone-desktop">شماره همراه والد</th>
+                                    <th style="text-align:center; width:200px;">دسترسی و ارسال اختصاصی</th>
                                 </tr>
                             </thead>
                             <tbody id="gk-t-students-tbody">
                                 <?php if (empty($students)): ?>
                                     <tr>
-                                        <td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">
+                                        <td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">
                                             هنوز دانـش‌آموزی در این کلاس ثبت نشده است.
                                         </td>
                                     </tr>
@@ -1620,32 +1616,36 @@ class GK_Teacher_Portal {
                                         $phone_display = !empty($st->parent_phone) ? $st->parent_phone : 'ثبت نشده';
                                     ?>
                                         <tr class="gk-t-st-row">
-                                            <td><strong>#<?php echo $idx + 1; ?></strong></td>
-                                            <td><strong style="font-size:14px; color:#1e293b;">👶 <?php echo esc_html($st->name); ?></strong></td>
-                                            <td><?php echo esc_html($st->age); ?> ساله</td>
-                                            <td>
+                                            <td class="gk-t-st-cell-num"><strong>#<?php echo $idx + 1; ?></strong></td>
+                                            <td class="gk-t-st-cell-info">
+                                                <div style="font-size:14.5px; font-weight:900; color:#1e293b; margin-bottom:2px;">
+                                                    👶 <?php echo esc_html($st->name); ?>
+                                                </div>
+                                                <div class="gk-t-st-mobile-meta">
+                                                    <span class="gk-t-st-age-tag"><?php echo esc_html($st->age); ?> ساله</span>
+                                                    <span style="color:#cbd5e1;">•</span>
+                                                    <span class="gk-t-st-phone-tag">📞 <?php echo esc_html($phone_display); ?></span>
+                                                </div>
+                                            </td>
+                                            <td class="gk-t-st-cell-age-desktop"><?php echo esc_html($st->age); ?> ساله</td>
+                                            <td class="gk-t-st-cell-phone-desktop">
                                                 <span style="font-size:12px; font-weight:bold; color:#475569;">
                                                     📞 <?php echo esc_html($phone_display); ?>
                                                 </span>
                                             </td>
-                                            <td>
-                                                <span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:3px 8px; border-radius:8px; font-weight:900; font-size:12px;">
-                                                    🏆 <?php echo number_format($st->total_game_score); ?>
-                                                </span>
-                                            </td>
-                                            <td style="text-align:center;">
+                                            <td class="gk-t-st-cell-actions" style="text-align:center;">
                                                 <div class="gk-action-icons-group">
                                                     <a href="<?php echo esc_url($bale_url); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال لینک بازی و آزمون‌ها به بله مادر">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                                     </a>
                                                     <a href="<?php echo esc_url($game_link); ?>" target="_blank" class="gk-icon-btn gk-btn-play-link" title="ورود مستقیم به بازی‌ها به عنوان <?php echo esc_attr($st->name); ?>">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                                     </a>
                                                     <a href="<?php echo esc_url($test_link); ?>" target="_blank" class="gk-icon-btn gk-btn-test-link" title="ورود مستقیم به آزمون‌های <?php echo esc_attr($st->name); ?>">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                                     </a>
                                                     <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک آزمون‌ها و بازی‌های <?php echo esc_attr($st->name); ?>" onclick="gkCopyText('<?php echo esc_js($curr_tests_link); ?>', this);">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                                     </button>
                                                 </div>
                                             </td>
