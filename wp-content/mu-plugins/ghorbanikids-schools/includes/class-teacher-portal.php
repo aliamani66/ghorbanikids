@@ -227,6 +227,8 @@ class GK_Teacher_Portal {
                 background: #e0e7ff;
                 color: #4338ca;
             }
+            .gk-tab-lbl-short { display: none; }
+            .gk-tab-lbl-full { display: inline; }
             .gk-tab-pane {
                 display: none;
                 animation: fadeIn 0.25s ease;
@@ -758,27 +760,116 @@ class GK_Teacher_Portal {
                     justify-content: center !important;
                     padding: 11px 0 !important;
                 }
+                .gk-tab-lbl-short { display: inline !important; }
+                .gk-tab-lbl-full { display: none !important; }
                 .gk-tabs-nav-bar {
-                    overflow-x: auto !important;
+                    display: flex !important;
                     flex-wrap: nowrap !important;
-                    gap: 6px !important;
-                    padding-bottom: 6px !important;
+                    overflow-x: auto !important;
                     -webkit-overflow-scrolling: touch !important;
-                    scrollbar-width: none;
+                    scrollbar-width: none !important;
+                    gap: 6px !important;
+                    padding: 4px 2px 8px 2px !important;
+                    margin-bottom: 16px !important;
+                    border-bottom: 2px solid #e2e8f0 !important;
                 }
                 .gk-tabs-nav-bar::-webkit-scrollbar { display: none; }
                 .gk-tab-btn {
-                    flex-shrink: 0 !important;
+                    flex: 1 0 auto !important;
                     white-space: nowrap !important;
-                    padding: 8px 14px !important;
-                    font-size: 12.5px !important;
+                    padding: 10px 12px !important;
+                    font-size: 12px !important;
+                    border-radius: 12px 12px 0 0 !important;
                 }
                 .gk-card-box {
-                    padding: 16px 14px !important;
+                    padding: 16px 12px !important;
                     border-radius: 18px !important;
                 }
+                /* تبدیل ردیف‌های جدول نوآموزان به کارت‌های چندسطری شیک در موبایل */
                 .gk-table-st {
-                    min-width: 600px !important;
+                    min-width: 0 !important;
+                    width: 100% !important;
+                    border-spacing: 0 !important;
+                }
+                .gk-table-st thead {
+                    display: none !important;
+                }
+                .gk-table-st, 
+                .gk-table-st tbody, 
+                .gk-t-st-row, 
+                .gk-t-st-row td {
+                    display: block !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+                .gk-t-st-row {
+                    background: #ffffff !important;
+                    border: 2px solid #e2e8f0 !important;
+                    border-radius: 18px !important;
+                    padding: 14px !important;
+                    margin-bottom: 14px !important;
+                    box-shadow: 0 3px 12px rgba(0,0,0,0.03) !important;
+                    position: relative !important;
+                }
+                .gk-t-st-row td {
+                    background: transparent !important;
+                    border: none !important;
+                    padding: 3px 0 !important;
+                    border-radius: 0 !important;
+                    text-align: right !important;
+                }
+                .gk-t-st-row td:nth-child(1) { /* رتبه */
+                    position: absolute;
+                    top: 14px;
+                    left: 14px;
+                    width: auto !important;
+                    font-size: 11.5px;
+                    color: #64748b;
+                    background: #f1f5f9;
+                    padding: 3px 8px;
+                    border-radius: 8px;
+                    font-weight: 900;
+                }
+                .gk-t-st-row td:nth-child(2) { /* نام */
+                    font-size: 15px !important;
+                    padding-left: 55px !important;
+                    margin-bottom: 4px;
+                }
+                .gk-t-st-row td:nth-child(3) { /* سن */
+                    display: inline-block !important;
+                    width: auto !important;
+                    color: #475569;
+                    font-size: 11.5px;
+                    background: #f8fafc;
+                    padding: 2px 8px;
+                    border-radius: 6px;
+                    border: 1px solid #e2e8f0;
+                    margin-left: 6px;
+                    font-weight: bold;
+                }
+                .gk-t-st-row td:nth-child(4) { /* تلفن */
+                    display: inline-block !important;
+                    width: auto !important;
+                    font-size: 12px;
+                }
+                .gk-t-st-row td:nth-child(5) { /* امتیاز کل */
+                    margin: 8px 0 !important;
+                }
+                .gk-t-st-row td:nth-child(6) { /* دکمه‌های عملیات */
+                    border-top: 1.5px dashed #e2e8f0 !important;
+                    padding-top: 12px !important;
+                    margin-top: 6px !important;
+                }
+                .gk-t-st-row .gk-action-icons-group {
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    width: 100% !important;
+                    gap: 8px !important;
+                }
+                .gk-t-st-row .gk-icon-btn {
+                    flex: 1 !important;
+                    height: 42px !important;
+                    border-radius: 12px !important;
                 }
                 #gk-teacher-search-st {
                     width: 100% !important;
@@ -821,19 +912,19 @@ class GK_Teacher_Portal {
             <!-- ناوبری تب‌ها -->
             <div class="gk-tabs-nav-bar">
                 <button type="button" class="gk-tab-btn active" data-target="tab-students">
-                    <span>🎓 لیست نوآموزان و دسترسی‌ها</span>
+                    <span>🎓 <span class="gk-tab-lbl-full">لیست نوآموزان و دسترسی‌ها</span><span class="gk-tab-lbl-short">نوآموزان</span></span>
                     <span class="gk-tab-badge"><?php echo $total_st; ?></span>
                 </button>
                 <button type="button" class="gk-tab-btn" data-target="tab-leagues">
-                    <span>🏆 مسابقات و لیگ‌ها</span>
+                    <span>🏆 <span class="gk-tab-lbl-full">مسابقات و لیگ‌ها</span><span class="gk-tab-lbl-short">مسابقات</span></span>
                     <span class="gk-tab-badge"><?php echo $total_leagues; ?></span>
                 </button>
                 <button type="button" class="gk-tab-btn" data-target="tab-exams">
-                    <span>📝 آزمون‌ها و امتحانات کلاسی</span>
+                    <span>📝 <span class="gk-tab-lbl-full">آزمون‌ها و امتحانات کلاسی</span><span class="gk-tab-lbl-short">آزمون‌ها</span></span>
                     <span class="gk-tab-badge" id="gk-exams-count-badge"><?php echo $total_exams; ?></span>
                 </button>
                 <button type="button" class="gk-tab-btn" data-target="tab-reportcards">
-                    <span>📊 کارنامه و گزارش پیشرفت</span>
+                    <span>📊 <span class="gk-tab-lbl-full">کارنامه و گزارش پیشرفت</span><span class="gk-tab-lbl-short">کارنامه‌ها</span></span>
                     <span class="gk-tab-badge"><?php echo $total_st; ?></span>
                 </button>
             </div>
