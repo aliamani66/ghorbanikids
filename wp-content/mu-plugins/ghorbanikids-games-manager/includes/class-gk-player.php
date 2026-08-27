@@ -705,6 +705,9 @@ class GK_Player {
                     box-shadow: 0 8px 30px rgba(2, 132, 199, 0.06) !important;
                     direction: rtl !important;
                     font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                    box-sizing: border-box !important;
+                    width: 100% !important;
+                    overflow: hidden !important;
                 }
                 .gk-leaderboard-header {
                     display: flex !important;
@@ -742,26 +745,31 @@ class GK_Player {
                     font-weight: 900 !important;
                     padding: 4px 14px !important;
                     border-radius: 99px !important;
+                    white-space: nowrap !important;
                 }
                 .gk-lead-table-wrapper {
-                    overflow-x: auto !important;
+                    overflow-x: hidden !important;
                     border-radius: 16px !important;
                     border: 1.5px solid #f1f5f9 !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
                 }
                 .gk-lead-table {
                     width: 100% !important;
                     border-collapse: collapse !important;
                     font-size: 13.5px !important;
+                    table-layout: fixed !important;
                 }
                 .gk-lead-table th {
                     background: #f8fafc !important;
                     color: #475569 !important;
                     font-weight: 900 !important;
-                    padding: 12px 14px !important;
+                    padding: 12px 10px !important;
                     border-bottom: 1.5px solid #e2e8f0 !important;
+                    white-space: nowrap !important;
                 }
                 .gk-lead-table td {
-                    padding: 12px 14px !important;
+                    padding: 12px 10px !important;
                     border-bottom: 1px solid #f1f5f9 !important;
                     color: #1e293b !important;
                 }
@@ -799,26 +807,35 @@ class GK_Player {
                 .gk-lead-player-cell {
                     display: flex !important;
                     align-items: center !important;
-                    gap: 10px !important;
+                    gap: 8px !important;
+                    min-width: 0 !important;
+                    overflow: hidden !important;
                 }
                 .gk-player-avatar {
-                    font-size: 20px !important;
+                    font-size: 18px !important;
+                    flex-shrink: 0 !important;
                 }
                 .gk-player-name {
                     font-weight: 800 !important;
                     color: #0f172a !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+                    display: block !important;
                 }
                 .gk-lead-score-pill {
                     display: inline-flex !important;
                     align-items: center !important;
+                    justify-content: center !important;
                     gap: 4px !important;
                     background: #eff6ff !important;
                     color: #0284c7 !important;
                     border: 1.5px solid #bae6fd !important;
-                    padding: 4px 14px !important;
+                    padding: 4px 10px !important;
                     border-radius: 99px !important;
                     font-weight: 900 !important;
-                    font-size: 13.5px !important;
+                    font-size: 12.5px !important;
+                    white-space: nowrap !important;
                 }
                 .gk-lead-empty-box {
                     text-align: center !important;
@@ -829,6 +846,51 @@ class GK_Player {
                     background: #f8fafc !important;
                     border-radius: 18px !important;
                     border: 1.5px dashed #cbd5e1 !important;
+                }
+
+                @media (max-width: 768px) {
+                    .gk-game-leaderboard-card {
+                        padding: 16px 12px !important;
+                        border-radius: 20px !important;
+                        margin-top: 16px !important;
+                    }
+                    .gk-lead-title {
+                        font-size: 15px !important;
+                    }
+                    .gk-lead-subtitle {
+                        font-size: 11px !important;
+                    }
+                    .gk-lead-table th, 
+                    .gk-lead-table td {
+                        padding: 10px 6px !important;
+                        font-size: 12px !important;
+                    }
+                    /* در موبایل ستون زمان مخفی می‌شود تا ۳ ستون اصلی با فضای عالی و بدون لغزش نمایش داده شوند */
+                    .gk-lead-table th:nth-child(4),
+                    .gk-lead-table td:nth-child(4) {
+                        display: none !important;
+                    }
+                    .gk-lead-table th:nth-child(1),
+                    .gk-lead-table td:nth-child(1) {
+                        width: 42px !important;
+                    }
+                    .gk-lead-table th:nth-child(2),
+                    .gk-lead-table td:nth-child(2) {
+                        width: auto !important;
+                    }
+                    .gk-lead-table th:nth-child(3),
+                    .gk-lead-table td:nth-child(3) {
+                        width: 85px !important;
+                    }
+                    .gk-rank-badge {
+                        width: 26px !important;
+                        height: 26px !important;
+                        font-size: 12px !important;
+                    }
+                    .gk-lead-score-pill {
+                        padding: 3px 8px !important;
+                        font-size: 11.5px !important;
+                    }
                 }
                 </style>
             </div>
