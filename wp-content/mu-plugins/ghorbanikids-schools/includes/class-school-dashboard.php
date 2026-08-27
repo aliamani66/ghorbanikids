@@ -556,6 +556,73 @@ class GK_School_Dashboard {
                 box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
             }
 
+            /* SweetAlert2 GhorbaniKids Luxury Theme */
+            .gk-swal-popup {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', 'IRANSans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+                border-radius: 22px !important;
+                padding: 24px 20px !important;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+                direction: rtl !important;
+                text-align: right !important;
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+            }
+            .gk-swal-title {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                font-size: 17px !important;
+                font-weight: 900 !important;
+                color: #1e1b4b !important;
+                margin-bottom: 8px !important;
+                text-align: center !important;
+            }
+            .gk-swal-html {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                font-size: 13.5px !important;
+                color: #334155 !important;
+                line-height: 1.6 !important;
+                text-align: center !important;
+            }
+            .gk-swal-confirm {
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+                color: #ffffff !important;
+                font-weight: 900 !important;
+                font-size: 13px !important;
+                padding: 10px 22px !important;
+                border-radius: 12px !important;
+                border: none !important;
+                cursor: pointer !important;
+                box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
+                margin: 0 6px !important;
+                transition: transform 0.15s !important;
+            }
+            .gk-swal-confirm:hover {
+                transform: scale(1.03) !important;
+            }
+            .gk-swal-confirm.gk-swal-danger {
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+                box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3) !important;
+            }
+            .gk-swal-cancel {
+                background: #f1f5f9 !important;
+                color: #64748b !important;
+                font-weight: 800 !important;
+                font-size: 13px !important;
+                padding: 10px 18px !important;
+                border-radius: 12px !important;
+                border: 1.5px solid #cbd5e1 !important;
+                cursor: pointer !important;
+                margin: 0 6px !important;
+            }
+            .gk-swal-toast {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                border-radius: 14px !important;
+                font-size: 13px !important;
+                font-weight: 800 !important;
+                direction: rtl !important;
+                padding: 10px 16px !important;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            }
+
             /* مدال‌ها و پنجره‌های پاپ‌آپ */
             .gk-modal-backdrop {
                 position: fixed !important;
@@ -1375,13 +1442,13 @@ class GK_School_Dashboard {
                                                     <a href="<?php echo esc_url($bale_url); ?>" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال لینک اختصاصی در پیام‌رسان بله والد">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                                     </a>
-                                                    <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک اختصاصی آزمون و بازی‌ها" onclick="navigator.clipboard.writeText('<?php echo esc_url($test_link); ?>'); alert('لینک اختصاصی <?php echo esc_js($st->name); ?> کپی شد!');">
+                                                    <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک اختصاصی آزمون و بازی‌ها" onclick="gkCopyStudentLink('<?php echo esc_url($test_link); ?>', '<?php echo esc_js($st->name); ?>', this);">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                                     </button>
                                                     <button type="button" class="gk-icon-btn gk-btn-edit" title="ویرایش مشخصات نوآموز" onclick="gkOpenEditStudent(<?php echo $st->id; ?>, '<?php echo esc_js($st->name); ?>', <?php echo $st->age; ?>, <?php echo $st->class_id; ?>, '<?php echo esc_js($st->parent_phone ?: ''); ?>');">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                                     </button>
-                                                    <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف نوآموز" onclick="if(confirm('آیا از حذف نوآموز «<?php echo esc_js($st->name); ?>» اطمینان دارید؟')) gkDeleteStudent(<?php echo $st->id; ?>);">
+                                                    <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف نوآموز" onclick="gkConfirmDeleteStudent(<?php echo $st->id; ?>, '<?php echo esc_js($st->name); ?>');">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                                     </button>
                                                 </div>
@@ -1399,10 +1466,114 @@ class GK_School_Dashboard {
 
         </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-        var gkActiveFilter = 'all';
+        // موتور دیالوگ‌ها و پیام‌های شکیل و لوکس قربانی کیدز (GK Modal & Toast Engine)
+        window.gkAlert = function(msg, title, icon, onOk) {
+            if (typeof title === 'undefined') title = 'پیام سامانه';
+            if (typeof icon === 'undefined') icon = 'info';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title: title,
+                    html: (typeof msg === 'string') ? msg.replace(/\n/g, '<br>') : msg,
+                    icon: icon,
+                    confirmButtonText: 'متوجه شدم ✨',
+                    customClass: {
+                        popup: 'gk-swal-popup',
+                        title: 'gk-swal-title',
+                        htmlContainer: 'gk-swal-html',
+                        confirmButton: 'gk-swal-confirm'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (typeof onOk === 'function') onOk();
+                });
+            } else {
+                window.alert(msg);
+                if (typeof onOk === 'function') onOk();
+            }
+        };
 
-                var gkCurrentModalClassId = null;
+        window.gkToast = function(msg, icon) {
+            if (typeof icon === 'undefined') icon = 'success';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: icon,
+                    title: msg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'gk-swal-toast'
+                    }
+                });
+            } else {
+                window.alert(msg);
+            }
+        };
+
+        window.gkConfirm = function(msg, title, onConfirm, onCancel) {
+            if (typeof title === 'undefined') title = 'تأیید عملیات';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title: title,
+                    html: (typeof msg === 'string') ? msg.replace(/\n/g, '<br>') : msg,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'بله، مطمئنم ✅',
+                    cancelButtonText: 'انصراف ❌',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'gk-swal-popup',
+                        title: 'gk-swal-title',
+                        htmlContainer: 'gk-swal-html',
+                        confirmButton: 'gk-swal-confirm gk-swal-danger',
+                        cancelButton: 'gk-swal-cancel'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        if (typeof onConfirm === 'function') onConfirm();
+                    } else if (result.isDismissed) {
+                        if (typeof onCancel === 'function') onCancel();
+                    }
+                });
+            } else {
+                if (window.confirm(msg)) {
+                    if (typeof onConfirm === 'function') onConfirm();
+                } else {
+                    if (typeof onCancel === 'function') onCancel();
+                }
+            }
+        };
+
+        // بازنویسی آلرت خام مرورگر به عنوان فال‌بک ایمن
+        window.alert = function(msg) {
+            window.gkAlert(msg);
+        };
+
+        function gkCopyStudentLink(link, name, btnEl) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(link).then(function() {
+                    gkToast('لینک اختصاصی «' + name + '» کپی شد! 📋', 'success');
+                }).catch(function() {
+                    gkAlert('لطفاً لینک اختصاصی نوآموز را کپی فرمایید:<br><br><code>' + link + '</code>', 'لینک اختصاصی ' + name, 'info');
+                });
+            } else {
+                gkAlert('لطفاً لینک اختصاصی نوآموز را کپی فرمایید:<br><br><code>' + link + '</code>', 'لینک اختصاصی ' + name, 'info');
+            }
+        }
+
+        function gkConfirmDeleteStudent(id, name) {
+            gkConfirm('آیا از حذف نوآموز «' + name + '» از سامانه اطمینان دارید؟', 'حذف نوآموز', function() {
+                gkDeleteStudent(id);
+            });
+        }
+
+        var gkActiveFilter = 'all';
+        var gkCurrentModalClassId = null;
 
         function gkOpenModal(modalId) {
             var m = jQuery(modalId);
@@ -1447,10 +1618,12 @@ class GK_School_Dashboard {
             var link = card.data('invite-link') || card.data('teacher-portal') || window.location.href;
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(link).then(function() {
-                    alert('📋 لینک اختصاصی ورود به کلاس با موفقیت کپی شد:\n' + link);
+                    gkToast('لینک ورود به کلاس کپی شد! 📋', 'success');
+                }).catch(function() {
+                    gkAlert('لطفاً لینک ورود به کلاس را کپی فرمایید:<br><br><code>' + link + '</code>', 'لینک ورود به کلاس', 'info');
                 });
             } else {
-                prompt('لینک ورود به کلاس:', link);
+                gkAlert('لطفاً لینک ورود به کلاس را کپی فرمایید:<br><br><code>' + link + '</code>', 'لینک ورود به کلاس', 'info');
             }
         }
 
@@ -1469,10 +1642,10 @@ class GK_School_Dashboard {
 
         function gkTriggerDeleteFromModal() {
             if (!gkCurrentModalClassId) return;
-            if (confirm('آیا از حذف این کلاس و تمام نوآموزان آن اطمینان دارید؟')) {
+            gkConfirm('آیا از حذف این کلاس و تمام نوآموزان آن اطمینان دارید؟', 'حذف کلاس', function() {
                 gkDeleteClass(gkCurrentModalClassId);
                 gkCloseModal('#gk-class-info-modal');
-            }
+            });
         }
 
         function gkApplyLiveFilter() {
@@ -1573,7 +1746,7 @@ class GK_School_Dashboard {
                 var class_id = $('#gk-student-class').val();
                 var phone = $('#gk-student-phone').val().trim();
 
-                if (!name) { alert('لطفاً نام و نام خانوادگی کودک را وارد کنید.'); nameInput.focus(); return; }
+                if (!name) { gkAlert('لطفاً نام و نام خانوادگی کودک را وارد فرمایید.', 'نام الزامی است', 'warning'); nameInput.focus(); return; }
                 var btn = $(this).text('در حال ثبت...').prop('disabled', true);
 
                 $.post('<?php echo $ajax_url; ?>', {
@@ -1618,13 +1791,13 @@ class GK_School_Dashboard {
                                         <a href="${baleUrl}" target="_blank" class="gk-icon-btn gk-btn-bale" title="ارسال لینک اختصاصی در پیام‌رسان بله والد">
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                         </a>
-                                        <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک اختصاصی آزمون و بازی‌ها" onclick="navigator.clipboard.writeText('${testLink}'); alert('لینک اختصاصی ${d.name} کپی شد!');">
+                                        <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک اختصاصی آزمون و بازی‌ها" onclick="gkCopyStudentLink('${testLink}', '${d.name.replace(/'/g, "\\'")}', this);">
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                         </button>
                                         <button type="button" class="gk-icon-btn gk-btn-edit" title="ویرایش مشخصات نوآموز" onclick="gkOpenEditStudent(${d.id}, '${d.name.replace(/'/g, "\\'")}', ${d.age}, ${d.class_id}, '${(d.parent_phone || '').replace(/'/g, "\\'")}');">
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                         </button>
-                                        <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف نوآموز" onclick="if(confirm('آیا از حذف نوآموز «${d.name.replace(/'/g, "\\'")}» اطمینان دارید؟')) gkDeleteStudent(${d.id});">
+                                        <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف نوآموز" onclick="gkConfirmDeleteStudent(${d.id}, '${d.name.replace(/'/g, "\\'")}');">
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                         </button>
                                     </div>
@@ -1649,12 +1822,13 @@ class GK_School_Dashboard {
 
                         // اعمال فیلتر زنده فعلی
                         gkApplyLiveFilter();
+                        gkToast('نوآموز «' + d.name + '» با موفقیت افزوده شد! 👶', 'success');
                     } else {
-                        alert(res.data || 'خطا در ثبت کودک.');
+                        gkAlert(res.data || 'خطا در ثبت کودک.', 'خطا', 'error');
                     }
                 }).fail(function() {
                     btn.text('🎯 ثبت و افزودن نوآموز').prop('disabled', false);
-                    alert('خطای ارتباط با سرور.');
+                    gkAlert('خطای ارتباط با سرور.', 'خطا', 'error');
                 });
             });
 
@@ -1667,7 +1841,7 @@ class GK_School_Dashboard {
                 var classId = $('#gk-edit-st-class').val();
                 var phone = $('#gk-edit-st-phone').val().trim();
 
-                if (!name) { alert('نام نوآموز نمی‌تواند خالی باشد.'); return; }
+                if (!name) { gkAlert('نام نوآموز نمی‌تواند خالی باشد.', 'نام الزامی است', 'warning'); return; }
                 var btn = $(this).text('در حال ذخیره...').prop('disabled', true);
 
                 $.post('<?php echo $ajax_url; ?>', {
@@ -1706,13 +1880,14 @@ class GK_School_Dashboard {
                                 setTimeout(function() { row.css('background-color', '#f8fafc'); }, 1000);
                             }
                             $('#gk-visible-count').text($('.gk-student-row:visible').length);
+                            gkToast('مشخصات نوآموز «' + data.name + '» ذخیره شد! ✅', 'success');
                         }
                     } else {
-                        alert(res.data || 'خطا در ویرایش اطلاعات.');
+                        gkAlert(res.data || 'خطا در ویرایش اطلاعات.', 'خطا', 'error');
                     }
                 }).fail(function() {
                     btn.text('💾 ذخیره تغییرات').prop('disabled', false);
-                    alert('خطای ارتباط با سرور.');
+                    gkAlert('خطای ارتباط با سرور.', 'خطا', 'error');
                 });
             });
 
@@ -1725,7 +1900,7 @@ class GK_School_Dashboard {
                 var teacherPhone = $('#gk-new-teacher-phone').val().trim();
 
                 if (!name) {
-                    alert('لطفاً نام کلاس را وارد کنید.');
+                    gkAlert('لطفاً نام کلاس را وارد فرمایید.', 'نام کلاس الزامی است', 'warning');
                     inputName.focus();
                     return;
                 }
@@ -1788,12 +1963,13 @@ class GK_School_Dashboard {
 
                         // انتخاب خودکار کلاس جدید
                         gkFilterClass(d.id);
+                        gkAlert('کلاس «' + d.name + '» با موفقیت ایجاد شد! 🏫', 'کلاس جدید', 'success');
                     } else {
-                        alert(res.data || 'خطایی در ثبت کلاس رخ داد.');
+                        gkAlert(res.data || 'خطایی در ثبت کلاس رخ داد.', 'خطا', 'error');
                     }
                 }).fail(function() {
                     btn.text('🚀 ایجاد کلاس و ثبت مربی').prop('disabled', false);
-                    alert('خطای ارتباط با سرور.');
+                    gkAlert('خطای ارتباط با سرور.', 'خطا', 'error');
                 });
             });
 
@@ -1823,13 +1999,13 @@ class GK_School_Dashboard {
                         if (logoUrl) {
                             $('#gk-header-logo-container').html('<img src="' + logoUrl + '" alt="' + orgName + '" style="width:100%; height:100%; object-fit:cover;">');
                         }
-                        alert('مشخصات و برند مرکز با موفقیت ذخیره شد! ✨');
+                        gkToast('مشخصات و برند مرکز با موفقیت ذخیره شد! ✨', 'success');
                     } else {
-                        alert(res.data || 'خطایی رخ داد.');
+                        gkAlert(res.data || 'خطایی رخ داد.', 'خطا', 'error');
                     }
                 }).fail(function() {
                     btn.text('💾 ذخیره تغییرات مشخصات مرکز').prop('disabled', false);
-                    alert('خطای ارتباط با سرور.');
+                    gkAlert('خطای ارتباط با سرور.', 'خطا', 'error');
                 });
             });
         });
@@ -1848,8 +2024,9 @@ class GK_School_Dashboard {
                     jQuery('.gk-student-row[data-class-id="' + classId + '"]').fadeOut(200, function() { jQuery(this).remove(); });
                     var totalC = Math.max(0, parseInt(jQuery('#gk-stat-classes-count').text() || 0) - 1);
                     jQuery('#gk-stat-classes-count').text(totalC);
+                    gkToast('کلاس با موفقیت حذف شد. 🗑️', 'info');
                 } else {
-                    alert(res.data || 'خطا در حذف کلاس.');
+                    gkAlert(res.data || 'خطا در حذف کلاس.', 'خطا', 'error');
                 }
             });
         }
@@ -1883,8 +2060,9 @@ class GK_School_Dashboard {
                         var curFC = Math.max(0, parseInt(filterTabCount.text()) - 1);
                         filterTabCount.text(curFC);
                     }
+                    gkToast('نوآموز با موفقیت حذف شد. 🗑️', 'info');
                 } else {
-                    alert(res.data || 'خطا در حذف.');
+                    gkAlert(res.data || 'خطا در حذف.', 'خطا', 'error');
                 }
             });
         }

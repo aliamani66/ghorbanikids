@@ -123,6 +123,7 @@ class GK_School_Exams {
         ?>
         <!-- Embedded Stylesheet to ensure 100% style loading -->
         <link rel="stylesheet" href="<?php echo esc_url($css_url); ?>?ver=<?php echo $ver; ?>">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         
         <style>
             @font-face {
@@ -146,7 +147,94 @@ class GK_School_Exams {
             .gk-exam-title-font {
                 font-family: 'aviny', 'IRANSansXFaNum', Tahoma, sans-serif !important;
             }
+
+            /* SweetAlert2 GhorbaniKids Luxury Theme */
+            .gk-swal-popup {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', 'IRANSans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+                border-radius: 22px !important;
+                padding: 24px 20px !important;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+                direction: rtl !important;
+                text-align: right !important;
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+            }
+            .gk-swal-title {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                font-size: 17px !important;
+                font-weight: 900 !important;
+                color: #1e1b4b !important;
+                margin-bottom: 8px !important;
+                text-align: center !important;
+            }
+            .gk-swal-html {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                font-size: 13.5px !important;
+                color: #334155 !important;
+                line-height: 1.6 !important;
+                text-align: center !important;
+            }
+            .gk-swal-confirm {
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+                color: #ffffff !important;
+                font-weight: 900 !important;
+                font-size: 13px !important;
+                padding: 10px 22px !important;
+                border-radius: 12px !important;
+                border: none !important;
+                cursor: pointer !important;
+                box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
+                margin: 0 6px !important;
+            }
+            .gk-swal-toast {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                border-radius: 14px !important;
+                font-size: 13px !important;
+                font-weight: 800 !important;
+                direction: rtl !important;
+                padding: 10px 16px !important;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            }
         </style>
+        <script>
+        window.gkAlert = function(msg, title, icon, onOk) {
+            if (typeof title === 'undefined') title = 'پیام سامانه';
+            if (typeof icon === 'undefined') icon = 'info';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title: title,
+                    html: (typeof msg === 'string') ? msg.replace(/\n/g, '<br>') : msg,
+                    icon: icon,
+                    confirmButtonText: 'متوجه شدم ✨',
+                    customClass: { popup: 'gk-swal-popup', title: 'gk-swal-title', htmlContainer: 'gk-swal-html', confirmButton: 'gk-swal-confirm' },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (typeof onOk === 'function') onOk();
+                });
+            } else {
+                window.alert(msg);
+                if (typeof onOk === 'function') onOk();
+            }
+        };
+        window.gkToast = function(msg, icon) {
+            if (typeof icon === 'undefined') icon = 'success';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: icon,
+                    title: msg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                    customClass: { popup: 'gk-swal-toast' }
+                });
+            } else {
+                window.alert(msg);
+            }
+        };
+        window.alert = function(msg) { window.gkAlert(msg); };
+        </script>
 
         <div class="gk-tests-hub-wrapper" style="max-width:1150px; margin:20px auto 60px; direction:rtl;">
             
@@ -240,7 +328,7 @@ class GK_School_Exams {
                 function gkApplyExamStudent() {
                     var token = document.getElementById('gk-exam-select-student').value;
                     if (!token) {
-                        alert('لطفاً نام نوآموز را انتخاب فرمایید.');
+                        gkAlert('لطفاً نام نوآموز را از لیست انتخاب فرمایید.', 'انتخاب نوآموز', 'warning');
                         return;
                     }
                     document.cookie = 'gk_active_student_token=' + token + '; path=/; max-age=' + (86400 * 30);
@@ -452,7 +540,7 @@ class GK_School_Exams {
 
             nextQuestion: function() {
                 if (this.userAnswers[this.currentQIndex] === undefined) {
-                    alert('لطفاً یکی از گزینه‌ها را برای پاسخ انتخاب کنید.');
+                    gkToast('لطفاً یکی از گزینه‌ها را برای پاسخ انتخاب کنید.', 'warning');
                     return;
                 }
 

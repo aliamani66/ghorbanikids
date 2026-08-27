@@ -121,6 +121,7 @@ class GK_School_Leagues {
 
         ob_start();
         ?>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <style>
             /* ==========================================================
                استاندارد فونت یکپارچه و لوکس مدارس قربانی کیدز (Typography Standard)
@@ -159,6 +160,94 @@ class GK_School_Leagues {
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
             }
+
+            /* SweetAlert2 GhorbaniKids Luxury Theme */
+            .gk-swal-popup {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', 'IRANSans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+                border-radius: 22px !important;
+                padding: 24px 20px !important;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+                direction: rtl !important;
+                text-align: right !important;
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+            }
+            .gk-swal-title {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                font-size: 17px !important;
+                font-weight: 900 !important;
+                color: #1e1b4b !important;
+                margin-bottom: 8px !important;
+                text-align: center !important;
+            }
+            .gk-swal-html {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                font-size: 13.5px !important;
+                color: #334155 !important;
+                line-height: 1.6 !important;
+                text-align: center !important;
+            }
+            .gk-swal-confirm {
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+                color: #ffffff !important;
+                font-weight: 900 !important;
+                font-size: 13px !important;
+                padding: 10px 22px !important;
+                border-radius: 12px !important;
+                border: none !important;
+                cursor: pointer !important;
+                box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
+                margin: 0 6px !important;
+            }
+            .gk-swal-toast {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                border-radius: 14px !important;
+                font-size: 13px !important;
+                font-weight: 800 !important;
+                direction: rtl !important;
+                padding: 10px 16px !important;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            }
+        </style>
+        <script>
+        window.gkAlert = function(msg, title, icon, onOk) {
+            if (typeof title === 'undefined') title = 'پیام سامانه';
+            if (typeof icon === 'undefined') icon = 'info';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title: title,
+                    html: (typeof msg === 'string') ? msg.replace(/\n/g, '<br>') : msg,
+                    icon: icon,
+                    confirmButtonText: 'متوجه شدم ✨',
+                    customClass: { popup: 'gk-swal-popup', title: 'gk-swal-title', htmlContainer: 'gk-swal-html', confirmButton: 'gk-swal-confirm' },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (typeof onOk === 'function') onOk();
+                });
+            } else {
+                window.alert(msg);
+                if (typeof onOk === 'function') onOk();
+            }
+        };
+        window.gkToast = function(msg, icon) {
+            if (typeof icon === 'undefined') icon = 'success';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: icon,
+                    title: msg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                    customClass: { popup: 'gk-swal-toast' }
+                });
+            } else {
+                window.alert(msg);
+            }
+        };
+        window.alert = function(msg) { window.gkAlert(msg); };
+        </script>
 
             /* تیترها با فونت شاداب آوینی */
             .gk-school-title-text,
@@ -368,7 +457,10 @@ class GK_School_Leagues {
                 <script>
                 function gkApplyArenaStudent() {
                     var token = document.getElementById('gk-arena-select-student').value;
-                    if (!token) { alert('لطفاً نام نوآموز را انتخاب نمایید.'); return; }
+                    if (!token) {
+                        gkAlert('لطفاً نام نوآموز را از لیست انتخاب فرمایید.', 'انتخاب نوآموز', 'warning');
+                        return;
+                    }
                     var url = new URL(window.location.href);
                     url.searchParams.set('st_token', token);
                     window.location.href = url.toString();

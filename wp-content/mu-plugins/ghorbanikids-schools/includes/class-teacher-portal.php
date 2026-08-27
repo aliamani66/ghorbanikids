@@ -241,6 +241,73 @@ class GK_Teacher_Portal {
                 to { opacity: 1; transform: translateY(0); }
             }
 
+            /* SweetAlert2 GhorbaniKids Luxury Theme */
+            .gk-swal-popup {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', 'IRANSans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+                border-radius: 22px !important;
+                padding: 24px 20px !important;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+                direction: rtl !important;
+                text-align: right !important;
+                background: #ffffff !important;
+                border: 2px solid #e2e8f0 !important;
+            }
+            .gk-swal-title {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                font-size: 17px !important;
+                font-weight: 900 !important;
+                color: #1e1b4b !important;
+                margin-bottom: 8px !important;
+                text-align: center !important;
+            }
+            .gk-swal-html {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                font-size: 13.5px !important;
+                color: #334155 !important;
+                line-height: 1.6 !important;
+                text-align: center !important;
+            }
+            .gk-swal-confirm {
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+                color: #ffffff !important;
+                font-weight: 900 !important;
+                font-size: 13px !important;
+                padding: 10px 22px !important;
+                border-radius: 12px !important;
+                border: none !important;
+                cursor: pointer !important;
+                box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
+                margin: 0 6px !important;
+                transition: transform 0.15s !important;
+            }
+            .gk-swal-confirm:hover {
+                transform: scale(1.03) !important;
+            }
+            .gk-swal-confirm.gk-swal-danger {
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+                box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3) !important;
+            }
+            .gk-swal-cancel {
+                background: #f1f5f9 !important;
+                color: #64748b !important;
+                font-weight: 800 !important;
+                font-size: 13px !important;
+                padding: 10px 18px !important;
+                border-radius: 12px !important;
+                border: 1.5px solid #cbd5e1 !important;
+                cursor: pointer !important;
+                margin: 0 6px !important;
+            }
+            .gk-swal-toast {
+                font-family: 'IRANSansXFaNum', 'IRANSansX', sans-serif !important;
+                border-radius: 14px !important;
+                font-size: 13px !important;
+                font-weight: 800 !important;
+                direction: rtl !important;
+                padding: 10px 16px !important;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            }
+
             .gk-card-box {
                 background: #ffffff;
                 border: 2px solid #e2e8f0;
@@ -1662,7 +1729,7 @@ class GK_Teacher_Portal {
                                             <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک سالن مسابقه" onclick="gkCopyText('<?php echo esc_js($league_url); ?>', this);">
                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                             </button>
-                                            <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف مسابقه" onclick="if(confirm('آیا از حذف مسابقه «<?php echo esc_js($l->title); ?>» اطمینان دارید؟')) gkDeleteLeague(<?php echo $l->id; ?>);">
+                                            <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف مسابقه" onclick="gkDeleteLeague(<?php echo $l->id; ?>);">
                                                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                             </button>
                                         </div>
@@ -1862,7 +1929,7 @@ class GK_Teacher_Portal {
                                             <button type="button" class="gk-icon-btn gk-btn-copy" title="کپی لینک سالن آزمون" onclick="gkCopyText('<?php echo esc_js($exam_url); ?>', this);">
                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                             </button>
-                                            <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف این آزمون" onclick="if(confirm('آیا از حذف آزمون «<?php echo esc_js($ex->title); ?>» اطمینان دارید؟')) gkDeleteExam(<?php echo $ex->id; ?>);">
+                                            <button type="button" class="gk-icon-btn gk-btn-delete" title="حذف این آزمون" onclick="gkDeleteExam(<?php echo $ex->id; ?>);">
                                                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                             </button>
                                         </div>
@@ -2269,7 +2336,94 @@ class GK_Teacher_Portal {
 
         </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+        // موتور دیالوگ‌ها و پیام‌های شکیل و لوکس قربانی کیدز (GK Modal & Toast Engine)
+        window.gkAlert = function(msg, title, icon, onOk) {
+            if (typeof title === 'undefined') title = 'پیام سامانه';
+            if (typeof icon === 'undefined') icon = 'info';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title: title,
+                    html: (typeof msg === 'string') ? msg.replace(/\n/g, '<br>') : msg,
+                    icon: icon,
+                    confirmButtonText: 'متوجه شدم ✨',
+                    customClass: {
+                        popup: 'gk-swal-popup',
+                        title: 'gk-swal-title',
+                        htmlContainer: 'gk-swal-html',
+                        confirmButton: 'gk-swal-confirm'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (typeof onOk === 'function') onOk();
+                });
+            } else {
+                window.alert(msg);
+                if (typeof onOk === 'function') onOk();
+            }
+        };
+
+        window.gkToast = function(msg, icon) {
+            if (typeof icon === 'undefined') icon = 'success';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: icon,
+                    title: msg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'gk-swal-toast'
+                    }
+                });
+            } else {
+                window.alert(msg);
+            }
+        };
+
+        window.gkConfirm = function(msg, title, onConfirm, onCancel) {
+            if (typeof title === 'undefined') title = 'تأیید عملیات';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title: title,
+                    html: (typeof msg === 'string') ? msg.replace(/\n/g, '<br>') : msg,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'بله، مطمئنم ✅',
+                    cancelButtonText: 'انصراف ❌',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'gk-swal-popup',
+                        title: 'gk-swal-title',
+                        htmlContainer: 'gk-swal-html',
+                        confirmButton: 'gk-swal-confirm gk-swal-danger',
+                        cancelButton: 'gk-swal-cancel'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        if (typeof onConfirm === 'function') onConfirm();
+                    } else if (result.isDismissed) {
+                        if (typeof onCancel === 'function') onCancel();
+                    }
+                });
+            } else {
+                if (window.confirm(msg)) {
+                    if (typeof onConfirm === 'function') onConfirm();
+                } else {
+                    if (typeof onCancel === 'function') onCancel();
+                }
+            }
+        };
+
+        // بازنویسی آلرت خام مرورگر به عنوان فال‌بک ایمن
+        window.alert = function(msg) {
+            window.gkAlert(msg);
+        };
+
         function gkSwitchTeacherTab(targetTab) {
             if (!targetTab) return;
             var $btn = jQuery('.gk-tab-btn[data-target="' + targetTab + '"]');
@@ -2331,8 +2485,8 @@ class GK_Teacher_Portal {
                     selectedGames.push($(this).val());
                 });
 
-                if (!title) { alert('لطفاً عنوان مسابقه را وارد کنید.'); return; }
-                if (selectedGames.length === 0) { alert('لطفاً حداقل یک بازی را برای این مسابقه انتخاب نمایید.'); return; }
+                if (!title) { gkAlert('لطفاً عنوان مسابقه را وارد فرمایید.', 'عنوان الزامی است', 'warning'); return; }
+                if (selectedGames.length === 0) { gkAlert('لطفاً حداقل یک بازی را برای این مسابقه انتخاب نمایید.', 'انتخاب بازی', 'warning'); return; }
 
                 var btn = $(this).text('در حال ساخت مسابقه...').prop('disabled', true);
 
@@ -2351,14 +2505,23 @@ class GK_Teacher_Portal {
                             localStorage.setItem('gk_teacher_active_tab_<?php echo $class->id; ?>', 'tab-leagues');
                             window.location.hash = 'tab-leagues';
                         } catch(e) {}
-                        alert('🏆 مسابقه «' + res.data.title + '» ایجاد شد!\nلینک مسابقه: ' + res.data.league_url);
-                        window.location.reload(true);
+                        
+                        var modalHtml = '<div style="text-align:center; padding:10px 0;">' +
+                            '<p style="font-size:14.5px; font-weight:bold; color:#1e1b4b; margin-bottom:12px;">مسابقه «' + res.data.title + '» با موفقیت ساخته شد! 🏆</p>' +
+                            '<div style="background:#f1f5f9; border:1px solid #cbd5e1; padding:10px 12px; border-radius:12px; font-size:12px; word-break:break-all; color:#334155; margin-bottom:10px;">' +
+                                '🔗 لینک مسابقه:<br><strong>' + res.data.league_url + '</strong>' +
+                            '</div>' +
+                        '</div>';
+
+                        gkAlert(modalHtml, 'مسابقه فعال شد', 'success', function() {
+                            window.location.reload(true);
+                        });
                     } else {
-                        alert(res.data || 'خطا در ایجاد لیگ.');
+                        gkAlert(res.data || 'خطا در ایجاد لیگ.', 'خطا', 'error');
                     }
                 }).fail(function() {
                     btn.text('🚀 ایجاد مسابقه و دریافت لینک').prop('disabled', false);
-                    alert('خطای ارتباط با سرور.');
+                    gkAlert('خطای ارتباط با سرور.', 'خطا', 'error');
                 });
             });
         });
@@ -2392,15 +2555,16 @@ class GK_Teacher_Portal {
                 if (successful) {
                     gkShowCopySuccess(btnEl);
                 } else {
-                    prompt('لطفاً لینک را به صورت دستی کپی فرمایید:', text);
+                    gkAlert('لطفاً لینک را به صورت دستی کپی فرمایید:<br><br><code>' + text + '</code>', 'کپی دستی لینک', 'info');
                 }
             } catch (err) {
-                prompt('لطفاً لینک را به صورت دستی کپی فرمایید:', text);
+                gkAlert('لطفاً لینک را به صورت دستی کپی فرمایید:<br><br><code>' + text + '</code>', 'کپی دستی لینک', 'info');
             }
             document.body.removeChild(ta);
         }
 
         function gkShowCopySuccess(btnEl) {
+            gkToast('لینک با موفقیت کپی شد! 📋', 'success');
             if (btnEl) {
                 var oldHtml = btnEl.innerHTML;
                 var oldBg = btnEl.style.background;
@@ -2411,8 +2575,6 @@ class GK_Teacher_Portal {
                     btnEl.innerHTML = oldHtml;
                     btnEl.style.background = oldBg;
                 }, 2000);
-            } else {
-                alert('لینک با موفقیت کپی شد! ✅');
             }
         }
 
@@ -2520,12 +2682,12 @@ class GK_Teacher_Portal {
             }
 
             if (!title) {
-                alert('لطفاً عنوان آزمون کلاسی را وارد کنید.');
+                gkAlert('لطفاً عنوان آزمون کلاسی را وارد فرمایید.', 'عنوان الزامی است', 'warning');
                 if (titleEl) titleEl.focus();
                 return;
             }
             if (selectedTests.length === 0) {
-                alert('لطفاً حداقل یک آزمون/درس را برای این امتحان انتخاب کنید.');
+                gkAlert('لطفاً حداقل یک آزمون/درس را برای این امتحان انتخاب نمایید.', 'انتخاب آزمون', 'warning');
                 return;
             }
 
@@ -2554,18 +2716,27 @@ class GK_Teacher_Portal {
                             localStorage.setItem('gk_teacher_active_tab_<?php echo $class->id; ?>', 'tab-exams');
                             window.location.hash = 'tab-exams';
                         } catch(e) {}
-                        alert('📝 آزمون کلاسی «' + res.data.title + '» با موفقیت ساخته شد!\nلینک سالن آزمون:\n' + res.data.exam_url);
-                        window.location.reload(true);
+
+                        var modalHtml = '<div style="text-align:center; padding:10px 0;">' +
+                            '<p style="font-size:14.5px; font-weight:bold; color:#1e1b4b; margin-bottom:12px;">آزمون کلاسی «' + res.data.title + '» با موفقیت ساخته شد! 📝</p>' +
+                            '<div style="background:#f1f5f9; border:1px solid #cbd5e1; padding:10px 12px; border-radius:12px; font-size:12px; word-break:break-all; color:#334155; margin-bottom:10px;">' +
+                                '🔗 لینک سالن آزمون:<br><strong>' + res.data.exam_url + '</strong>' +
+                            '</div>' +
+                        '</div>';
+
+                        gkAlert(modalHtml, 'آزمون فعال شد', 'success', function() {
+                            window.location.reload(true);
+                        });
                     } else {
                         var err = (res.data && res.data.message) ? res.data.message : (res.data || 'خطا در ایجاد آزمون کلاسی.');
-                        alert(err);
+                        gkAlert(err, 'خطا در ایجاد آزمون', 'error');
                     }
                 },
                 error: function(xhr, status, error) {
                     $btn.text('🚀 ایجاد آزمون کلاسی و دریافت لینک‌ها').prop('disabled', false);
                     gkExamSubmitting = false;
                     console.error('Create exam error:', xhr.responseText);
-                    alert('خطای ارتباط با سرور.');
+                    gkAlert('خطای ارتباط با سرور.', 'خطا', 'error');
                 }
             });
         }
@@ -2582,32 +2753,37 @@ class GK_Teacher_Portal {
             }
         }
         function gkDeleteExam(examId) {
-            if (!confirm('آیا از حذف این آزمون کلاسی اطمینان دارید؟')) return;
-            jQuery.post('<?php echo $ajax_url; ?>', {
-                action: 'gk_teacher_delete_class_exam',
-                nonce: '<?php echo $nonce; ?>',
-                exam_id: examId
-            }, function(res) {
-                if (res.success) {
-                    jQuery('#gk-exam-card-' + examId).fadeOut(300, function() {
-                        jQuery(this).remove();
-                    });
-                } else {
-                    alert(res.data || 'خطا در حذف آزمون.');
-                }
+            gkConfirm('آیا از حذف این آزمون کلاسی اطمینان دارید؟', 'حذف آزمون کلاسی', function() {
+                jQuery.post('<?php echo $ajax_url; ?>', {
+                    action: 'gk_teacher_delete_class_exam',
+                    nonce: '<?php echo $nonce; ?>',
+                    exam_id: examId
+                }, function(res) {
+                    if (res.success) {
+                        jQuery('#gk-exam-card-' + examId).fadeOut(300, function() {
+                            jQuery(this).remove();
+                        });
+                        gkToast('آزمون کلاسی با موفقیت حذف شد. 🗑️', 'info');
+                    } else {
+                        gkAlert(res.data || 'خطا در حذف آزمون.', 'خطا', 'error');
+                    }
+                });
             });
         }
         function gkDeleteLeague(leagueId) {
-            jQuery.post('<?php echo $ajax_url; ?>', {
-                action: 'gk_teacher_delete_league',
-                nonce: '<?php echo $nonce; ?>',
-                league_id: leagueId
-            }, function(res) {
-                if (res.success) {
-                    jQuery('#gk-league-card-' + leagueId).fadeOut(200, function() { jQuery(this).remove(); });
-                } else {
-                    alert(res.data || 'خطا در حذف مسابقه.');
-                }
+            gkConfirm('آیا از حذف این مسابقه و لیگ کلاسی اطمینان دارید؟', 'حذف مسابقه', function() {
+                jQuery.post('<?php echo $ajax_url; ?>', {
+                    action: 'gk_teacher_delete_league',
+                    nonce: '<?php echo $nonce; ?>',
+                    league_id: leagueId
+                }, function(res) {
+                    if (res.success) {
+                        jQuery('#gk-league-card-' + leagueId).fadeOut(200, function() { jQuery(this).remove(); });
+                        gkToast('مسابقه با موفقیت حذف شد. 🗑️', 'info');
+                    } else {
+                        gkAlert(res.data || 'خطا در حذف مسابقه.', 'خطا', 'error');
+                    }
+                });
             });
         }
 
