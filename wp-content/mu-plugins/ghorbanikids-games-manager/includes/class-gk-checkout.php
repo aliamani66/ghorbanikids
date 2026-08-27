@@ -13,7 +13,9 @@ class GK_Checkout {
         $instance = new self();
 
         add_action('wp_enqueue_scripts', [$instance, 'enqueue_assets'], 20);
-        add_action('wp_head', function() { echo '<style id=\"gk-stepper-inline-fix\">.gk-text-mobile{display:none!important}@media(max-width:768px){.gk-text-desktop{display:none!important}.gk-text-mobile{display:block!important;font-size:0.76rem!important;font-weight:900!important;line-height:1.2!important;color:inherit!important}}</style>'; }, 1);
+        add_action('wp_head', function() { 
+            echo '<style id="gk-stepper-inline-fix">.gk-text-mobile{display:none!important}@media(max-width:768px){.gk-text-desktop{display:none!important}.gk-text-mobile{display:block!important;font-size:0.76rem!important;font-weight:900!important;line-height:1.2!important;color:inherit!important}}</style>'; 
+        }, 1);
 
         // نوار مراحل خرید و هدر تمیز ثبت سفارش
         add_action('woocommerce_before_checkout_form', [$instance, 'render_checkout_stepper'], 5);

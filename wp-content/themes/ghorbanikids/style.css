@@ -195,3 +195,25 @@ img {
     box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35) !important;
     background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
 }
+
+/* ==========================================================
+   قانون قطعی مخفی‌سازی سایدبار دسکتاپ در تمام صفحات موبایل (Rule 9)
+   ========================================================== */
+@media (max-width: 1023px) {
+    aside.gk-desktop-sidebar,
+    .gk-desktop-sidebar,
+    #gkDesktopSidebar,
+    #gkSidebarOverlay,
+    #gkFloatingOpenBtn,
+    .gk-floating-open-sidebar-btn {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+    }
+}
