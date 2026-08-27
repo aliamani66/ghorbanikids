@@ -899,6 +899,209 @@ class GK_Teacher_Portal {
                     height: 42px !important;
                     border-radius: 12px !important;
                 }
+
+                /* تبدیل جدول‌های آزمون‌ها و لیگ‌ها به کارت‌های چندسطری شیک در موبایل */
+                .gk-table-exam-scores, 
+                .gk-table-exam-links, 
+                .gk-table-league-rankings {
+                    min-width: 0 !important;
+                    width: 100% !important;
+                    border-spacing: 0 !important;
+                }
+                .gk-table-exam-scores thead,
+                .gk-table-exam-links thead,
+                .gk-table-league-rankings thead {
+                    display: none !important;
+                }
+                .gk-table-exam-scores, 
+                .gk-table-exam-scores tbody, 
+                .gk-table-exam-scores tr, 
+                .gk-table-exam-scores td,
+                .gk-table-exam-links, 
+                .gk-table-exam-links tbody, 
+                .gk-table-exam-links tr, 
+                .gk-table-exam-links td,
+                .gk-table-league-rankings, 
+                .gk-table-league-rankings tbody, 
+                .gk-table-league-rankings tr, 
+                .gk-table-league-rankings td {
+                    display: block !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+                
+                /* کارت‌های تابلوی نمرات آزمون در موبایل */
+                .gk-table-exam-scores tbody tr {
+                    background: #ffffff !important;
+                    border: 1.5px solid #d8b4fe !important;
+                    border-radius: 16px !important;
+                    padding: 12px 14px !important;
+                    margin-bottom: 12px !important;
+                    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.05) !important;
+                    position: relative !important;
+                }
+                .gk-table-exam-scores td {
+                    border: none !important;
+                    background: transparent !important;
+                    padding: 3px 0 !important;
+                    text-align: right !important;
+                }
+                .gk-table-exam-scores td:nth-child(1) { /* رتبه */
+                    position: absolute;
+                    top: 12px;
+                    left: 12px;
+                    width: auto !important;
+                    font-size: 13px;
+                    background: #f3e8ff;
+                    padding: 2px 8px;
+                    border-radius: 8px;
+                }
+                .gk-table-exam-scores td:nth-child(2) { /* نام */
+                    font-size: 15px !important;
+                    padding-left: 50px !important;
+                    margin-bottom: 4px;
+                }
+                .gk-table-exam-scores td:nth-child(3) { /* تعداد دروس */
+                    display: inline-block !important;
+                    width: auto !important;
+                    font-size: 11.5px;
+                    color: #64748b;
+                    background: #f8fafc;
+                    padding: 2px 8px;
+                    border-radius: 6px;
+                    border: 1px solid #e2e8f0;
+                    margin-left: 6px;
+                }
+                .gk-table-exam-scores td:nth-child(4) { /* میانگین درصد */
+                    display: inline-block !important;
+                    width: auto !important;
+                    margin-left: 6px;
+                }
+                .gk-table-exam-scores td:nth-child(5) { /* سطح توصیفی */
+                    display: inline-block !important;
+                    width: auto !important;
+                    font-size: 12px;
+                }
+                .gk-table-exam-scores td:nth-child(6) { /* تاریخ */
+                    font-size: 11px !important;
+                    color: #94a3b8 !important;
+                    margin-top: 6px !important;
+                    border-top: 1px dashed #f3e8ff !important;
+                    padding-top: 6px !important;
+                }
+
+                /* کارت‌های لینک‌های اختصاصی آزمون نوآموزان در موبایل */
+                .gk-table-exam-links tbody tr {
+                    background: #ffffff !important;
+                    border: 1.5px solid #e2e8f0 !important;
+                    border-radius: 16px !important;
+                    padding: 12px 14px !important;
+                    margin-bottom: 12px !important;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+                    position: relative !important;
+                }
+                .gk-table-exam-links td {
+                    border: none !important;
+                    background: transparent !important;
+                    padding: 3px 0 !important;
+                    text-align: right !important;
+                }
+                .gk-table-exam-links td:nth-child(1) { /* ردیف */
+                    position: absolute;
+                    top: 12px;
+                    left: 12px;
+                    width: auto !important;
+                    font-size: 11.5px;
+                    color: #64748b;
+                    background: #f1f5f9;
+                    padding: 2px 7px;
+                    border-radius: 6px;
+                }
+                .gk-table-exam-links td:nth-child(2) { /* نام نوآموز */
+                    font-size: 14.5px !important;
+                    padding-left: 45px !important;
+                    margin-bottom: 6px;
+                }
+                .gk-table-exam-links td:nth-child(3) { /* اینپوت لینک مستقیم در موبایل مخفی تا دکمه‌ها جا شوند */
+                    display: none !important;
+                }
+                .gk-table-exam-links td:nth-child(4) { /* اکشن بار */
+                    border-top: 1px dashed #e2e8f0 !important;
+                    padding-top: 10px !important;
+                    margin-top: 6px !important;
+                }
+                .gk-table-exam-links .gk-action-icons-group {
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    width: 100% !important;
+                    gap: 8px !important;
+                }
+                .gk-table-exam-links .gk-icon-btn {
+                    flex: 1 !important;
+                    height: 40px !important;
+                    border-radius: 10px !important;
+                }
+
+                /* کارت‌های رتبه‌بندی مسابقات کلاسی در موبایل */
+                .gk-table-league-rankings tbody tr {
+                    background: #ffffff !important;
+                    border: 1.5px solid #e2e8f0 !important;
+                    border-radius: 16px !important;
+                    padding: 12px 14px !important;
+                    margin-bottom: 12px !important;
+                    position: relative !important;
+                }
+                .gk-table-league-rankings td {
+                    border: none !important;
+                    background: transparent !important;
+                    padding: 3px 0 !important;
+                    text-align: right !important;
+                }
+                .gk-table-league-rankings td:nth-child(1) { /* مدال/رتبه */
+                    position: absolute;
+                    top: 12px;
+                    left: 12px;
+                    width: auto !important;
+                    font-size: 13px;
+                }
+                .gk-table-league-rankings td:nth-child(2) { /* نام */
+                    font-size: 15px !important;
+                    padding-left: 45px !important;
+                    margin-bottom: 4px;
+                }
+                .gk-table-league-rankings td:nth-child(3) { /* رکورد */
+                    display: inline-block !important;
+                    width: auto !important;
+                    margin-left: 6px;
+                }
+                .gk-table-league-rankings td:nth-child(4) { /* تعداد شرکت */
+                    display: inline-block !important;
+                    width: auto !important;
+                    font-size: 11.5px;
+                    color: #64748b;
+                }
+                .gk-table-league-rankings td:nth-child(5) { /* وضعیت */
+                    display: inline-block !important;
+                    width: auto !important;
+                    font-size: 11.5px;
+                    margin-right: 6px;
+                }
+                .gk-table-league-rankings td:nth-child(6) { /* اکشن‌ها */
+                    border-top: 1px dashed #e2e8f0 !important;
+                    padding-top: 10px !important;
+                    margin-top: 6px !important;
+                }
+                .gk-table-league-rankings .gk-action-icons-group {
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    width: 100% !important;
+                    gap: 8px !important;
+                }
+                .gk-table-league-rankings .gk-icon-btn {
+                    flex: 1 !important;
+                    height: 40px !important;
+                    border-radius: 10px !important;
+                }
                 #gk-teacher-search-st {
                     width: 100% !important;
                     box-sizing: border-box !important;
@@ -1172,7 +1375,7 @@ class GK_Teacher_Portal {
                                     📊 رتبه‌بندی زنده و ارسال اختصاصی لینک مسابقه برای هر نوآموز:
                                 </h4>
                                 <div style="overflow-x:auto;">
-                                    <table style="width:100%; border-collapse:separate; border-spacing:0 6px;">
+                                    <table class="gk-table-st gk-table-league-rankings" style="width:100%; border-collapse:separate; border-spacing:0 6px;">
                                         <thead>
                                             <tr style="color:#64748b; font-size:12px;">
                                                 <th style="padding:6px 10px;">رتبه</th>
@@ -1380,7 +1583,7 @@ class GK_Teacher_Portal {
                                     </div>
 
                                     <div style="overflow-x:auto;">
-                                        <table class="gk-table-st" style="font-size:12.5px; background:#fff; border-radius:12px;">
+                                        <table class="gk-table-st gk-table-exam-scores" style="font-size:12.5px; background:#fff; border-radius:12px;">
                                             <thead>
                                                 <tr style="background:#f3e8ff; color:#581c87;">
                                                     <th>رتبه</th>
@@ -1435,7 +1638,7 @@ class GK_Teacher_Portal {
                                         👶 لینک اختصاصی ورود هر نوآموز به این آزمون (با ثبت خودکار نمره در کارنامه):
                                     </div>
                                     <div style="overflow-x:auto;">
-                                        <table class="gk-table-st" style="font-size:12.5px;">
+                                        <table class="gk-table-st gk-table-exam-links" style="font-size:12.5px;">
                                             <thead>
                                                 <tr>
                                                     <th style="width:50px;">ردیف</th>
