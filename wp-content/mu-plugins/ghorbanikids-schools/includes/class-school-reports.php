@@ -667,7 +667,7 @@ class GK_School_Reports {
                 </div>
 
                 <div class="gk-rc-actions-box">
-                    <button type="button" class="gk-rc-btn-print" onclick="window.print();">
+                    <button type="button" class="gk-rc-btn-print" onclick="if(typeof gkPrintReportCard === 'function'){ gkPrintReportCard(); } else { window.print(); }">
                         🖨️ چاپ کارنامه رسمی
                     </button>
                     <div class="gk-rc-date-badge">

@@ -811,24 +811,54 @@ class GK_Teacher_Portal {
             }
 
             @media print {
-                body * {
-                    visibility: hidden !important;
-                }
-                #gkReportCardPrintArea,
-                #gkReportCardPrintArea * {
-                    visibility: visible !important;
-                }
-                #gkReportCardPrintArea {
-                    position: absolute !important;
-                    left: 0 !important;
-                    top: 0 !important;
-                    width: 100% !important;
+                body {
+                    background: #ffffff !important;
                     margin: 0 !important;
-                    padding: 20px !important;
-                    background: #fff !important;
+                    padding: 0 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
                 }
+                .gk-teacher-wrap,
+                header, footer, nav, .admin-bar, #wpadminbar {
+                    display: none !important;
+                }
+                #gk-student-reportcard-modal {
+                    position: static !important;
+                    display: block !important;
+                    width: 100% !important;
+                    height: auto !important;
+                    background: transparent !important;
+                    backdrop-filter: none !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                #gk-student-reportcard-modal > div {
+                    position: static !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    height: auto !important;
+                    max-height: none !important;
+                    overflow: visible !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    background: #ffffff !important;
+                }
+                #gk-reportcard-modal-title,
+                #gk-student-reportcard-modal button,
                 .gk-rc-btn-print {
                     display: none !important;
+                }
+                .gk-reportcard-view {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                .gk-rc-section, .gk-rc-letterhead, .gk-rc-student-card, .gk-rc-kpi-item {
+                    break-inside: avoid !important;
+                    page-break-inside: avoid !important;
                 }
             }
                     /* استایل‌های واکنش‌گرا موبایل پنل معلم */
@@ -2831,6 +2861,57 @@ class GK_Teacher_Portal {
             if (modal) {
                 modal.style.display = 'none';
             }
+        }
+
+        // تابع پرینت ایزوله و کامل کارنامه رسمی نوآموز
+        function gkPrintReportCard() {
+            var printContent = document.getElementById('gkReportCardPrintArea');
+            if (!printContent) {
+                window.print();
+                return;
+            }
+            
+            var iframe = document.createElement('iframe');
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+            document.body.appendChild(iframe);
+            
+            var doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write('<!DOCTYPE html><html dir="rtl" lang="fa"><head><meta charset="UTF-8"><title>کارنامه رسمی نوآموز</title>');
+            
+            var styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+            styles.forEach(function(s) {
+                doc.write(s.outerHTML);
+            });
+            
+            doc.write('<style>');
+            doc.write('@page { size: A4 portrait; margin: 8mm 10mm; }');
+            doc.write('body { font-family: "IRANSansXFaNum", Tahoma, sans-serif !important; background: #ffffff !important; margin: 0; padding: 10px; direction: rtl; text-align: right; color: #1e293b; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }');
+            doc.write('.gk-rc-btn-print { display: none !important; }');
+            doc.write('.gk-reportcard-view { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }');
+            doc.write('.gk-rc-section, .gk-rc-letterhead, .gk-rc-student-card, .gk-rc-kpi-item { break-inside: avoid !important; page-break-inside: avoid !important; }');
+            doc.write('</style>');
+            doc.write('</head><body>');
+            doc.write('<div class="gk-reportcard-view">');
+            doc.write(printContent.innerHTML);
+            doc.write('</div>');
+            doc.write('</body></html>');
+            doc.close();
+            
+            iframe.contentWindow.focus();
+            setTimeout(function() {
+                iframe.contentWindow.print();
+                setTimeout(function() {
+                    if (iframe.parentNode) {
+                        iframe.parentNode.removeChild(iframe);
+                    }
+                }, 2000);
+            }, 350);
         }
 
         // فیلتر جستجوی زنده در تب کارنامه‌ها
